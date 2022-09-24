@@ -6,6 +6,8 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Assassin : Character
     {
+        public Assassin() : base() { }
+
         public Assassin(int order) : base(order)
         {
         }
@@ -30,6 +32,6 @@ namespace CitadellesDotIO.Model.Characters
                 throw e;
             }
         }
-            
+
     }
 }

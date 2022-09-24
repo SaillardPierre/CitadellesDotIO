@@ -10,18 +10,14 @@ namespace CitadellesDotIO.Tests
     public class CharactersTests
     {
         [TestMethod]
-        public void Character_Cant_Play_After_Being_Killed_By_Assassin()
+        public void Character_IsDead_After_Being_Killed_By_Assassin()
         {
             Mock<Assassin> assassin = new Mock<Assassin>();
             Mock<Character> target = new Mock<Character>();
-            Console.WriteLine("Instantiated assassin and target");
-
 
             assassin.Object.KillCharacter(target.Object);
-            Console.WriteLine("Assassin killed target");
 
-            Assert.IsFalse(target.Object.CanPlay);
-            Console.WriteLine("Target cant play : CanPlay = "+ target.Object.CanPlay.ToString());
+            Assert.IsFalse(target.Object.IsAlive);
         }
 
         public void Character_Gold_Is0_After_Being_Stolen_By_Thief()

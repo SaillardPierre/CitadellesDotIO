@@ -7,7 +7,7 @@ namespace CitadellesDotIO.Config
 {
     public static class CharactersLists
     {
-        public static List<Character> VanillaCharactersList => new List<Character>()
+        public static List<Character> VanillaCharactersList => new List<Character>
         {
             new Assassin(0),
             new Thief(1),
