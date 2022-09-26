@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CitadellesDotIO.Exceptions;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -27,7 +25,7 @@ namespace CitadellesDotIO.Model.Characters
             {
                 target.IsAlive = false;
             }
-            catch (Exception e)
+            catch (CharacterBehaviourException e)
             {
                 throw e;
             }
