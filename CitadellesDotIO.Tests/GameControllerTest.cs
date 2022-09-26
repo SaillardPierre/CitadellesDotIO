@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
 using CitadellesDotIO.Model;
+using Moq;
+using CitadellesDotIO.View;
 
 namespace CitadellesDotIO.Tests
 {
@@ -12,6 +14,15 @@ namespace CitadellesDotIO.Tests
         GameController gameControllerUnderTest;
 
         [TestMethod]
+        public void ConsoleViewTest()
+        {
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4);
+            this.gameControllerUnderTest.View = new View.ConsoleView();
+            this.gameControllerUnderTest.Run();
+        }
+
+
+        [TestMethod]
         [DataRow(2,1,4)]
         [DataRow(1,1,5)]
         [DataRow(0,1,6)]
@@ -19,10 +30,10 @@ namespace CitadellesDotIO.Tests
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
             this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers);
-            this.gameControllerUnderTest.DistributeCharacters();
+            this.gameControllerUnderTest.PrepareCharactersDistribution();
             Assert.AreEqual(true,
-                this.gameControllerUnderTest.Game.CharactersBin.Where(c => c.IsVisible).Count() == xVisible &&
-                this.gameControllerUnderTest.Game.CharactersBin.Where(c => !c.IsVisible).Count() == yHidden);
+                this.gameControllerUnderTest.CharactersBin.Where(c => c.IsVisible).Count() == xVisible &&
+                this.gameControllerUnderTest.CharactersBin.Where(c => !c.IsVisible).Count() == yHidden);
         }
 
         public GameController GetGameControllerForPlayerNumber(int number)
@@ -34,7 +45,7 @@ namespace CitadellesDotIO.Tests
             {
                 players.Add(new Player() { Name = playerNames[i] });
             }            
-            gc.StartNewVanillaGame(players);
+            gc.StartNewVanillaGame(players, new Mock<IView>().Object);
             return gc;
         }
     }

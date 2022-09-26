@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.Controllers
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Config", "..\CitadellesDotIO\CitadellesDotIO.Config\CitadellesDotIO.Config.csproj", "{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.ConsoleView", "..\CitadellesDotIO\CitadellesDotIO.ConsoleView\CitadellesDotIO.ConsoleView.csproj", "{1C43A6D6-5482-4F7F-A4A0-414634226EFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.View", "..\CitadellesDotIO\CitadellesDotIO.View\CitadellesDotIO.View.csproj", "{1C43A6D6-5482-4F7F-A4A0-414634226EFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

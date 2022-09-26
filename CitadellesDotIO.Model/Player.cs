@@ -10,7 +10,9 @@ namespace CitadellesDotIO.Model
     {
         public string Name { get; set; }
         public int Gold { get; set; }
+        public bool IsCurrentKing { get; set; }
         public Character Character { get; set; }
-        public List<District> Districts { get; set; }        
+        public bool HasPickedCharacter => this.Character != null;
+        public List<District> Districts { get; set; }
     }
 }

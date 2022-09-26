@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Model\CitadellesDotIO.Model.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.Controllers\CitadellesDotIO.Controllers.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.View\CitadellesDotIO.View.csproj" />
   </ItemGroup>
 
 </Project>
