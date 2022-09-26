@@ -6,5 +6,6 @@
 
  <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Exceptions\CitadellesDotIO.Exceptions.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.Enums\CitadellesDotIO.Enums.csproj" />
   </ItemGroup>
 </Project>
