@@ -17,7 +17,7 @@ namespace CitadellesDotIO.Model.Characters
             get { return true; }
             set
             {
-                throw new Exception("L'assassin ne peut être assassiné");
+                throw new CharacterBehaviourException("L'assassin ne peut être assassiné");
             }
         }
 

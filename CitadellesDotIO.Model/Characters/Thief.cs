@@ -13,7 +13,7 @@ namespace CitadellesDotIO.Model.Characters
         public new bool IsStolen
         {
             get { return false; }
-            set { throw new Exception("Le voleur ne peut être volé"); }
+            set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }
         }
     }
 }
