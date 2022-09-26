@@ -22,14 +22,25 @@ namespace CitadellesDotIO.Controllers
 
 
         public void Run(){
-            switch(this.GameState){
-                case GameState.CharacterPickPhase:
-                    this.PickCharacters();
-                    break;
-                case GameState.TableRoundPhase:
-                    Console.WriteLine("Should start table round phase");
-                    break;               
-            }
+            while (this.GameState != GameState.Finished)
+            {
+                switch (this.GameState)
+                {
+                    case GameState.CharacterPickPhase:
+                        this.PickCharacters();
+                        break;
+                    case GameState.TableRoundPhase:
+                        Console.WriteLine("Should start table round phase");
+                        this.SimulateTableRound();
+                        break;
+                }
+            }            
+        }
+
+        // Méthode temporaire permettant de mettre fin à la partie pour les test unitaires
+        public void SimulateTableRound()
+        {
+            this.GameState = GameState.Finished;
         }
 
         public void PickCharacters(){            
@@ -67,7 +78,13 @@ namespace CitadellesDotIO.Controllers
         private void ShuffleCharacters()
         {
             // Récupération de la défausse des personnages
-            this.CharactersDeck.AddRange(this.CharactersBin);
+            if(this.CharactersBin != null) { 
+                this.CharactersDeck.AddRange(this.CharactersBin);
+            }
+            else
+            {
+                this.CharactersBin = new List<Character>();
+            }
             // Vidage de la défausse
             this.CharactersBin.Clear();
             // Mélange aléatoire

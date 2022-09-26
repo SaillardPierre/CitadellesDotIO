@@ -14,11 +14,18 @@ namespace CitadellesDotIO.Tests
         GameController gameControllerUnderTest;
 
         [TestMethod]
-        public void ConsoleViewTest()
+        [DataRow(4)]
+        [DataRow(5)]
+        [DataRow(6)]
+        [DataRow(7)]
+        public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4);
-            this.gameControllerUnderTest.View = new View.ConsoleView();
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers);
+            this.gameControllerUnderTest.View = new RandomActionView();
             this.gameControllerUnderTest.Run();
+
+            Assert.AreEqual(true,
+                this.gameControllerUnderTest.Players.Where(p => p.HasPickedCharacter).Count() == this.gameControllerUnderTest.Players.Count());
         }
 
 
