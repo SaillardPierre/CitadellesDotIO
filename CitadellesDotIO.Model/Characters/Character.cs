@@ -1,4 +1,6 @@
-﻿namespace CitadellesDotIO.Model.Characters
+﻿using CitadellesDotIO.Enums;
+
+namespace CitadellesDotIO.Model.Characters
 {
     public abstract class Character
     {        
@@ -10,6 +12,8 @@
         public string Name => this.GetType().Name;
         public int? PlayerId { get; set; }
         public int Order { get; set; }
+        public DistrictType? AssociatedDistrictType { get;}
+        public bool HasAssociatedDistrictType => this.AssociatedDistrictType.HasValue;
         public bool IsPicked => this.PlayerId.HasValue;
         public bool IsAlive { get; set; }
         public bool IsStolen { get; set; }
