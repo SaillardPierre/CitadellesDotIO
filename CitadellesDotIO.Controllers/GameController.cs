@@ -72,7 +72,7 @@ namespace CitadellesDotIO.Controllers
 
         private void ShufflePlayers()
         {
-            this.Players.OrderBy(_ => new Random().Next()).ToList();
+            this.Players = this.Players.OrderBy(_ => new Random().Next()).ToList();
         }
 
         private void ShuffleCharacters()
@@ -88,7 +88,7 @@ namespace CitadellesDotIO.Controllers
             // Vidage de la défausse
             this.CharactersBin.Clear();
             // Mélange aléatoire
-            this.CharactersDeck.OrderBy(_ => new Random().Next()).ToList();
+            this.CharactersDeck = this.CharactersDeck.OrderBy(_ => new Random().Next()).ToList();
         }
 
         public void PrepareCharactersDistribution()
