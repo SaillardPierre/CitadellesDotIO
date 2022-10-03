@@ -96,7 +96,7 @@ namespace CitadellesDotIO.Controllers
             this.ShuffleCharacters();
             int visibleCharactersCount = 0;
             int hiddenCharactersCount = 0;
-            switch (this.Players.Count())
+            switch (this.Players.Count)
             {
                 case 4:
                     visibleCharactersCount = 2;
@@ -115,7 +115,7 @@ namespace CitadellesDotIO.Controllers
             // Ajout des cartes faces visibles à la défausse
             this.CharactersBin.AddRange(this.CharactersDeck.GetRange(0, visibleCharactersCount));
             this.CharactersBin.ForEach(c => c.Flip());
-            // Si le roi est parmis les cartes visibles, on reméllange
+            // Si le roi est parmis les cartes visibles, on remélange
             // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface
             if (this.ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King))){
                 this.PrepareCharactersDistribution();
