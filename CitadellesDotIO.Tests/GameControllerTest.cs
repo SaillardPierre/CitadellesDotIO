@@ -43,6 +43,13 @@ namespace CitadellesDotIO.Tests
                 this.gameControllerUnderTest.CharactersBin.Where(c => !c.IsVisible).Count() == yHidden);
         }
 
+        [TestMethod]
+        public void DistrictList_ShouldHave50TestDistrict_AfterStartingNewVanillaGame()
+        {
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4);
+            Assert.IsTrue(gameControllerUnderTest.DistrictsDeck.Count == 50);
+        }
+
         public GameController GetGameControllerForPlayerNumber(int number)
         {
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };

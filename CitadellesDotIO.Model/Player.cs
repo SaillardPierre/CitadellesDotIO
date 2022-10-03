@@ -1,7 +1,9 @@
-﻿using CitadellesDotIO.Model.Characters;
+﻿using CitadellesDotIO.Enums.TurnChoices;
+using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CitadellesDotIO.Model
@@ -13,6 +15,17 @@ namespace CitadellesDotIO.Model
         public bool IsCurrentKing { get; set; }
         public Character Character { get; set; }
         public bool HasPickedCharacter => this.Character != null;
-        public List<District> Districts { get; set; }
+        public bool HasPlayed { get; set; }
+        public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
+        public List<District> BuiltDistricts { get; set; }
+        public List<District> DistrictsDeck { get; set; }
+        public void PickCharacter(Character character)
+        {
+            this.Character = character;
+            character.Player = this;
+        }
+
+        public List<UnorderedTurnChoice> TakenChoices { get; set; }
+        public List<UnorderedTurnChoice> AvailableChoices => Consts.UnorderedTurnChoices.Except(this.TakenChoices).ToList();
     }
 }

@@ -1,30 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using CitadellesDotIO.Enums;
+using CitadellesDotIO.Enums.TurnChoices;
+using CitadellesDotIO.Model;
 using CitadellesDotIO.Model.Characters;
+using CitadellesDotIO.Model.Districts;
 
 namespace CitadellesDotIO.View
 {
     public class RandomActionView : IView
     {
         public Character PickCharacter(List<Character> characters)
+            => characters[RandomNumberGenerator.GetInt32(0, characters.Count)];
+
+        public MandatoryTurnChoice PickMandatoryTurnChoice()
+            => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
+
+        public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
+            => (UnorderedTurnChoice)RandomNumberGenerator.GetInt32(0, availableChoices.Count);
+
+        public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
         {
-            Random rIndex = new Random();
-            return characters[rIndex.Next(0, characters.Count)]; 
-
-            //Console.WriteLine("Characters available in deck :");
-            //int index = 0;
-            //characters.ForEach(c=>{
-            //    Console.WriteLine(c.Name + " "+index);
-            //});
-
-            //Console.WriteLine("Select by index");
-            //if(int.TryParse(Console.ReadLine(), out int selectedIndex) && selectedIndex <= characters.Count){
-            //    return characters[selectedIndex];
-            //}
-            //else {
-            //    Console.WriteLine("Please select a valid index");
-            //    return this.PickCharacter(characters);
-            //}
+            return pool.OrderBy(d => RandomNumberGenerator.GetInt32(0, pool.Count)).Take(pickCount).ToList();
         }
     }
 }

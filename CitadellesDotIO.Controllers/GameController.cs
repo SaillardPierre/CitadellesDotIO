@@ -1,11 +1,14 @@
 ﻿using CitadellesDotIO.Config;
 using CitadellesDotIO.Enums;
+using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Model;
 using CitadellesDotIO.Model.Characters;
+using CitadellesDotIO.Model.Districts;
 using CitadellesDotIO.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -17,8 +20,8 @@ namespace CitadellesDotIO.Controllers
         public List<Player> Players { get; set; }
         public List<Character> CharactersDeck { get; set; }
         public List<Character> CharactersBin { get; set; }
-        public Queue<Object> DistrictsList { get; set; }
-        public List<Object> DistricstBin { get; set; }
+        public Queue<District> DistrictsDeck { get; set; }
+        public List<District> DistricstBin { get; set; }
 
 
         public void Run(){
@@ -46,6 +49,7 @@ namespace CitadellesDotIO.Controllers
         public void PickCharacters(){            
             this.PrepareCharactersDistribution();
             // Tant que tous les joueurs n'ont pas de personnages
+            // TODO Gérer le roi et l'ordre de pick
             while (this.Players.Any(p=>!p.HasPickedCharacter))
             {
                 Player currentPicker = this.Players.FirstOrDefault(p=>!p.HasPickedCharacter);
@@ -59,11 +63,116 @@ namespace CitadellesDotIO.Controllers
             this.Run();
         }
 
+        public void PlayTableRound()
+        {
+            this.SortPlayersByOrder();
+            while(this.Players.Any(p=>p.CanPlay))
+            {
+                Player currentPlayer = this.Players.FirstOrDefault(p => p.CanPlay);
+                if(currentPlayer != null)
+                {
+                    this.PlayCharacterRound(currentPlayer.Character);
+                }
+            }
+        }
+
+        public void PlayCharacterRound(Character character)
+        {
+            // On montre la carte du personnage courant s'il n'est pas assassiné
+            if (character.IsAlive)
+            {
+                character.Flip();
+                this.SetNewKing(character);
+
+                // Le personnage détroussé l'est au début de son tour
+                if (character.IsStolen)
+                {
+                    // Récupération du butin
+                    int stolenGold = character.Player.Gold;
+                    // Mise à 0 du trésor de la victime
+                    character.Player.Gold = 0;
+                    // Ajout du butin au trésor du voleur
+                    this.Players.SingleOrDefault(p => p.Character is Thief).Gold += stolenGold;
+                }
+
+                // Le marchand prend une pièce bonus quoi qu'il arrive
+                if (character is Merchant)
+                {
+                    character.Player.Gold += 1;
+                }
+
+                MandatoryTurnChoice turnChoice = this.View.PickMandatoryTurnChoice();
+                if(turnChoice == MandatoryTurnChoice.BaseIncome)
+                {
+                    character.Player.Gold += 2;                    
+                }
+                else
+                {
+                    List<District> pickedDistrics = this.View.PickDistrictsFromPool(1, GenerateDistrictPool(2));
+                    // TODO : gérer les cartes manipulées, ajouter a la main du joueur
+                    // La dequeue à déja viré les cartes du deck.
+                }
+
+                while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn)){
+
+                    UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
+                    // Ajout du choix courant à la liste des choix pris
+                    character.Player.TakenChoices.Add(currentChoice);
+
+                    switch(currentChoice)
+                    {
+                        case UnorderedTurnChoice.BonusIncome:
+                            if (character.HasAssociatedDistrictType)
+                            {
+                                int bonusIncome = character.Player.BuiltDistricts.Where(d => d.DistrictType == character.AssociatedDistrictType).Count();
+                                character.Player.Gold += bonusIncome;
+                            }
+                            break;
+                        case UnorderedTurnChoice.BuildDistrict:
+                            // TODO : Gérer la construction du district
+                            break;
+                        case UnorderedTurnChoice.UseCharacterSpell:
+                            // TODO : Gérer le spell du perso
+                            break;
+                        case UnorderedTurnChoice.EndTurn:
+                            break;
+                    }                    
+                }                
+            }
+        }
+
+        public List<District> GenerateDistrictPool(int poolSize)
+        {
+            List<District> pool = new List<District>();
+            for (int i=0; i<poolSize; i++)
+            {
+                pool.Add(this.DistrictsDeck.Dequeue());
+            }
+            return pool;
+        }
+
+        public void SetNewKing(Character character)
+        {
+            if (character is King)
+            {
+                // Destitution de l'ancien Roi s'il existe
+                Player oldKing = this.Players.SingleOrDefault(p => p.IsCurrentKing);
+                if(oldKing != null)
+                {
+                    oldKing.IsCurrentKing = false;
+                }
+
+                // Investiture du nouveau Roi
+                character.Player.IsCurrentKing = true;
+            }
+        }
+
         public void StartNewVanillaGame(List<Player> players, IView view)
         {
             // Ajout et mélange des joueurs à la partie
             this.Players = players;
             this.CharactersDeck = CharactersLists.VanillaCharactersList;
+            this.DistrictsDeck = DistrictLists.TestDistrictList();
             this.ApplyKingShuffleRule = true;
             this.ShufflePlayers();
             // Ajout de la vue
@@ -72,7 +181,12 @@ namespace CitadellesDotIO.Controllers
 
         private void ShufflePlayers()
         {
-            this.Players = this.Players.OrderBy(_ => new Random().Next()).ToList();
+            this.Players = this.Players.OrderBy(_ => RandomNumberGenerator.GetInt32(0,100)).ToList();
+        }
+
+        private void SortPlayersByOrder()
+        {
+            this.Players.Sort((xP, yP) => xP.Character.Order.CompareTo(yP.Character.Order));
         }
 
         private void ShuffleCharacters()
@@ -88,7 +202,7 @@ namespace CitadellesDotIO.Controllers
             // Vidage de la défausse
             this.CharactersBin.Clear();
             // Mélange aléatoire
-            this.CharactersDeck = this.CharactersDeck.OrderBy(_ => new Random().Next()).ToList();
+            this.CharactersDeck = this.CharactersDeck.OrderBy(_ => RandomNumberGenerator.GetInt32(0, 100)).ToList();
         }
 
         public void PrepareCharactersDistribution()
