@@ -5,6 +5,7 @@ using System.Linq;
 using CitadellesDotIO.Model;
 using Moq;
 using CitadellesDotIO.View;
+using System;
 
 namespace CitadellesDotIO.Tests
 {
@@ -14,15 +15,23 @@ namespace CitadellesDotIO.Tests
         GameController gameControllerUnderTest;
 
         [TestMethod]
+        public void GeneralTest()
+        {
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5, typeof(RandomActionView));
+            this.gameControllerUnderTest.Run();
+        }
+
+
+
+        [TestMethod]
         [DataRow(4)]
         [DataRow(5)]
         [DataRow(6)]
         [DataRow(7)]
         public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers);
-            this.gameControllerUnderTest.View = new RandomActionView();
-            this.gameControllerUnderTest.Run();
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers, typeof(RandomActionView));
+            this.gameControllerUnderTest.PickCharacters();
 
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.Players.Where(p => p.HasPickedCharacter).Count() == this.gameControllerUnderTest.Players.Count());
@@ -36,7 +45,7 @@ namespace CitadellesDotIO.Tests
         [DataRow(0,1,7)]
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers);
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers, new Mock<IView>().Object.GetType());
             this.gameControllerUnderTest.PrepareCharactersDistribution();
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.CharactersBin.Where(c => c.IsVisible).Count() == xVisible &&
@@ -46,11 +55,11 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void DistrictList_ShouldHave50TestDistrict_AfterStartingNewVanillaGame()
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4);
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4, new Mock<IView>().Object.GetType());
             Assert.IsTrue(gameControllerUnderTest.DistrictsDeck.Count == 50);
         }
 
-        public GameController GetGameControllerForPlayerNumber(int number)
+        public GameController GetGameControllerForPlayerNumber(int number, Type viewType)
         {
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
             GameController gc = new GameController();
@@ -59,7 +68,7 @@ namespace CitadellesDotIO.Tests
             {
                 players.Add(new Player() { Name = playerNames[i] });
             }            
-            gc.StartNewVanillaGame(players, new Mock<IView>().Object);
+            gc.StartNewVanillaGame(players, Activator.CreateInstance(viewType) as IView);
             return gc;
         }
     }

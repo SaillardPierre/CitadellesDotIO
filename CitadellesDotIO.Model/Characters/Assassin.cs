@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Exceptions;
+﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Exceptions;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -10,7 +11,7 @@ namespace CitadellesDotIO.Model.Characters
         {
         }
 
-        public new bool IsAlive
+        public new bool IsMurdered
         {
             get { return true; }
             set
@@ -19,11 +20,15 @@ namespace CitadellesDotIO.Model.Characters
             }
         }
 
+        public override DistrictType? AssociatedDistrictType => null;
+
+        public override Spell Spell => new Spell();
+
         public void KillCharacter(Character target)
         {
             try
             {
-                target.IsAlive = false;
+                target.IsMurdered = true;
             }
             catch (CharacterBehaviourException e)
             {

@@ -23,9 +23,40 @@ namespace CitadellesDotIO.Model
         {
             this.Character = character;
             character.Player = this;
+            this.TakenChoices = new List<UnorderedTurnChoice>();
         }
 
         public List<UnorderedTurnChoice> TakenChoices { get; set; }
-        public List<UnorderedTurnChoice> AvailableChoices => Consts.UnorderedTurnChoices.Except(this.TakenChoices).ToList();
+        public List<UnorderedTurnChoice> AvailableChoices
+        {
+            get
+            {
+                // Le joueur peut toujours choisir de terminer son tour
+                List<UnorderedTurnChoice> choices = new List<UnorderedTurnChoice>() {
+                    UnorderedTurnChoice.EndTurn 
+                };
+
+                // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
+                if (this.Character.HasAssociatedDistrictType &&
+                    BuiltDistricts.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
+                {
+                    choices.Add(UnorderedTurnChoice.BonusIncome);
+                }
+
+                // Le personnage dispose d'un pouvoir à utiliser
+                if (this.Character.HasSpell)
+                {
+                    choices.Add(UnorderedTurnChoice.UseCharacterSpell);
+                }
+
+                // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
+                if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name)))
+                {
+                    choices.Add(UnorderedTurnChoice.BuildDistrict);
+                } 
+
+                return choices.Except(TakenChoices).ToList();
+            }
+        }
     }
 }

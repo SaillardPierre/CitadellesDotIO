@@ -19,11 +19,24 @@ namespace CitadellesDotIO.View
             => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
 
         public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
-            => (UnorderedTurnChoice)RandomNumberGenerator.GetInt32(0, availableChoices.Count);
+            => (UnorderedTurnChoice)(availableChoices.Count != 1 ? availableChoices[RandomNumberGenerator.GetInt32(0, availableChoices.Count - 1)] : availableChoices.Single());
 
         public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
         {
             return pool.OrderBy(d => RandomNumberGenerator.GetInt32(0, pool.Count)).Take(pickCount).ToList();
+        }
+
+        public District PickDistrictToBuild(List<District> buildables)
+        {
+            if (buildables.Count == 0)
+            {
+                return null;
+            }
+            else if (buildables.Count == 1)
+            {
+                return buildables.Single();
+            }
+            return buildables[RandomNumberGenerator.GetInt32(0, buildables.Count)]; 
         }
     }
 }

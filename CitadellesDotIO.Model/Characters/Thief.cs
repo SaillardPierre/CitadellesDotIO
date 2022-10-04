@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Exceptions;
+﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Exceptions;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -13,5 +14,9 @@ namespace CitadellesDotIO.Model.Characters
             get { return false; }
             set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }
         }
+
+        public override DistrictType? AssociatedDistrictType => null;
+
+        public override Spell Spell => new Spell();
     }
 }

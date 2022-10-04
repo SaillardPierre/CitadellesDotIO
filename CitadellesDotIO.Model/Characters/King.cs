@@ -11,6 +11,7 @@ namespace CitadellesDotIO.Model.Characters
         {
         }
 
-        public new DistrictType? AssociatedDistrictType => DistrictType.Noble;
+        public override DistrictType? AssociatedDistrictType => DistrictType.Noble;
+        public override Spell Spell => null;
     }
 }
