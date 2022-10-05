@@ -2,7 +2,7 @@ using CitadellesDotIO.Enums;
 
 namespace CitadellesDotIO.Model.Districts
 {
-    public abstract class District
+    public abstract class District : ITarget
     {
         public string Name { get; set; }
         public int BuildingCost { get; set; }

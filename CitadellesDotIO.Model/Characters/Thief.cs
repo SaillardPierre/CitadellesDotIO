@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Exceptions;
+using CitadellesDotIO.Model.Spells;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -17,6 +18,6 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
 
-        public override Spell Spell => new Spell();
+        public override ISpell<ITarget> Spell => new Steal<Character>() as ISpell<ITarget>;
     }
 }

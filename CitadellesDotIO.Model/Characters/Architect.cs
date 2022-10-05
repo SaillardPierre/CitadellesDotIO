@@ -1,4 +1,5 @@
 ﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Model.Spells;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -7,9 +8,7 @@ namespace CitadellesDotIO.Model.Characters
         public Architect(int order) : base(order)
         {
         }
-
         public override DistrictType? AssociatedDistrictType => null;
-
-        public override Spell Spell => new Spell();
+        public override ISpell<ITarget> Spell => null;
     }
 }

@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Model.Characters;
+﻿using CitadellesDotIO.Model;
+using CitadellesDotIO.Model.Characters;
 using System;
 using System.Collections.Generic;
 using System.Text;

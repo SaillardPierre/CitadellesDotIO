@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CitadellesDotIO.Enums;
+﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Model.Districts;
+using CitadellesDotIO.Model.Spells;
+using System;
 
 namespace CitadellesDotIO.Model.Characters
 {
@@ -10,9 +10,7 @@ namespace CitadellesDotIO.Model.Characters
         public Condottiere(int order) : base(order)
         {
         }
-
         public override DistrictType? AssociatedDistrictType => DistrictType.Warfare;
-
-        public override Spell Spell => new Spell();
+        public override ISpell<ITarget> Spell => new Demolish<District>() as ISpell<ITarget>;
     }
 }

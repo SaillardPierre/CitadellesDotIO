@@ -1,19 +1,18 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Exceptions;
+using CitadellesDotIO.Model.Spells;
 
 namespace CitadellesDotIO.Model.Characters
 {
     public class Assassin : Character
-    {
-        public Assassin() : base() { }
-
+    {       
         public Assassin(int order) : base(order)
         {
         }
 
         public new bool IsMurdered
         {
-            get { return true; }
+            get { return false; }
             set
             {
                 throw new CharacterBehaviourException("L'assassin ne peut être assassiné");
@@ -22,19 +21,7 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
 
-        public override Spell Spell => new Spell();
-
-        public void KillCharacter(Character target)
-        {
-            try
-            {
-                target.IsMurdered = true;
-            }
-            catch (CharacterBehaviourException e)
-            {
-                throw e;
-            }
-        }
+        public override ISpell<ITarget> Spell => new Murder<Character>() as ISpell<ITarget>;        
 
     }
 }

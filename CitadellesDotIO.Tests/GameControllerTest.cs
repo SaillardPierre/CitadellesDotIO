@@ -20,6 +20,7 @@ namespace CitadellesDotIO.Tests
         {
             this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5, typeof(RandomActionView));
             this.gameControllerUnderTest.Run();
+            Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.BuiltDistricts.Count == 8));
         }
 
 
@@ -35,7 +36,7 @@ namespace CitadellesDotIO.Tests
             this.gameControllerUnderTest.Run();
 
             Assert.AreEqual(true,
-                this.gameControllerUnderTest.Players.Where(p => p.HasPickedCharacter).Count() == this.gameControllerUnderTest.Players.Count());
+                this.gameControllerUnderTest.Players.Count(p => p.HasPickedCharacter) == this.gameControllerUnderTest.Players.Count);
         }
 
 
@@ -48,8 +49,8 @@ namespace CitadellesDotIO.Tests
         {
             this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers, new Mock<IView>().Object.GetType());
             Assert.AreEqual(true,
-                this.gameControllerUnderTest.CharactersBin.Where(c => c.IsVisible).Count() == xVisible &&
-                this.gameControllerUnderTest.CharactersBin.Where(c => !c.IsVisible).Count() == yHidden);
+                this.gameControllerUnderTest.CharactersBin.Count(c => c.IsVisible) == xVisible &&
+                this.gameControllerUnderTest.CharactersBin.Count(c => !c.IsVisible) == yHidden);
         }
 
         [TestMethod]
@@ -70,7 +71,7 @@ namespace CitadellesDotIO.Tests
             return new GameController(
                 players,
                 CharactersLists.VanillaCharactersList,
-                DistrictLists.VanillaDistrictList,
+                DistrictLists.TestDistrictList(),
                 Activator.CreateInstance(viewType) as IView);                       
         }
     }

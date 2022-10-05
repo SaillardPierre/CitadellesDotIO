@@ -20,7 +20,7 @@ namespace CitadellesDotIO.Enums.TurnChoices
     }
 
     public static class Consts {
-        public static List<UnorderedTurnChoice> UnorderedTurnChoices = Enum.GetValues(typeof(UnorderedTurnChoice)).OfType<UnorderedTurnChoice>().ToList();
+        public static readonly List<UnorderedTurnChoice> UnorderedTurnChoices = Enum.GetValues(typeof(UnorderedTurnChoice)).OfType<UnorderedTurnChoice>().ToList();
     }
 
 }

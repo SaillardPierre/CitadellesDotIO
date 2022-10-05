@@ -1,4 +1,5 @@
 using CitadellesDotIO.Controllers;
+using CitadellesDotIO.Model;
 using CitadellesDotIO.Model.Characters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -12,10 +13,12 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void Character_IsMurdered_After_Being_Killed_By_Assassin()
         {
-            Mock<Assassin> assassin = new Mock<Assassin>();
+            Mock<Assassin> assassin = new Mock<Assassin>(1);
             Mock<Character> target = new Mock<Character>();
 
-            assassin.Object.KillCharacter(target.Object);
+            ITarget targetObject = target.Object;
+
+            assassin.Object.Spell.Cast(ref targetObject);
 
             Assert.IsTrue(target.Object.IsMurdered);
         }

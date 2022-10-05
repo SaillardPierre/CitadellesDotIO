@@ -10,12 +10,12 @@ namespace CitadellesDotIO.Config
         // A peupler avec les district de la boite
         public static List<District> VanillaDistrictList => new List<District>();
 
-        public static Queue<District> TestDistrictList()
+        public static List<District> TestDistrictList()
         {
-            Queue<District> districts = new Queue<District>();
+            List<District> districts = new List<District>();
             for(int i=0; i < 50; i++)
             {
-                districts.Enqueue(new TestDistrict());
+                districts.Add(new TestDistrict());
             }
             return districts;
         }

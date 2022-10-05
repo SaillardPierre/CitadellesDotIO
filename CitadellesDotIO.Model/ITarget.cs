@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Model
 {
-    public class Spell
+    public interface ITarget
     {
     }
 }

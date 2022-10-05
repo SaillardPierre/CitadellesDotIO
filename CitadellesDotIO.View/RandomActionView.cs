@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using CitadellesDotIO.Enums;
 using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Model;
-using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
 
 namespace CitadellesDotIO.View
