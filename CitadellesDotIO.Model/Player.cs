@@ -26,6 +26,15 @@ namespace CitadellesDotIO.Model
             this.TakenChoices = new List<UnorderedTurnChoice>();
         }
 
+        public Player(string name)
+        {
+            Name = name;
+            IsCurrentKing = false;
+            BuiltDistricts = new List<District>();
+            DistrictsDeck = new List<District>();
+            this.TakenChoices = new List<UnorderedTurnChoice>();
+        }
+
         public List<UnorderedTurnChoice> TakenChoices { get; set; }
         public List<UnorderedTurnChoice> AvailableChoices
         {

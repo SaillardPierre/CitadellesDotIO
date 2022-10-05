@@ -15,56 +15,141 @@ namespace CitadellesDotIO.Controllers
 {
     public class GameController
     {
-        private bool ApplyKingShuffleRule;
+        private const bool ApplyKingShuffleRule = true;
+        private const int InitialGold = 2;
+        private const int InitialDeck = 4;
         public IView View {get;set;} 
         public GameState GameState { get; set; }
-        public List<Player> Players { get; set; }
         public List<Character> CharactersDeck { get; set; }
         public List<Character> CharactersBin { get; set; }
         public Queue<District> DistrictsDeck { get; set; }
         public List<District> DistrictsBin { get; set; }
+        public List<Player> Players { get; set; }
 
+        private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);        
+
+        public GameController(IEnumerable<Player> players, IEnumerable<Character> characters, IEnumerable<District> districts, IView view)
+        {
+            this.GameState = GameState.Starting;
+            this.View = view;
+
+            // Gestion des joueurs
+            this.Players = players.ToList();
+            this.ShufflePlayers();
+            this.PickInitialHandAndGold();
+            // Gestion de la pioche et de la défausse des personnages
+            this.CharactersDeck = characters.ToList();
+            this.CharactersBin = new List<Character>();
+            // Gestion de la pioche et de la défausse des districts
+            this.DistrictsDeck = new Queue<District>(districts.OrderBy(_=>Dice.Roll(100)));
+            this.DistrictsBin = new List<District>();            
+        }
+        private void SetNewKing(Player newKing)
+        {
+            // Destitution de l'ancien Roi s'il existe
+            if (this.CurrentKing != null)
+            {
+                this.CurrentKing.IsCurrentKing = false;
+            }
+
+            // Investiture du nouveau Roi
+            newKing.IsCurrentKing = true;
+        }        
+        private void PickInitialHandAndGold() => this.Players.ForEach(p =>
+        {
+            // Pour l'instant 4 cartes, voir pour paramétrer
+            // Les index commencent à 0 mais les humains distribuent la première carte en disant 1
+            for (int i = 1; i < InitialDeck; i++)
+            {
+                p.DistrictsDeck.Add(this.DistrictsDeck.Dequeue());
+            }
+            p.Gold = InitialGold;
+        });
+        private void OrderPlayers()
+        {
+            if (this.CurrentKing == null)
+            {
+                this.Players.First().IsCurrentKing = true;
+            }
+            else
+            {
+                this.Players.SetFirstElement(this.CurrentKing);
+            }
+        }
+        private void ShuffleCharacters()
+        {
+            // Vidage de la défausse
+            this.CharactersDeck.AddRange(this.CharactersBin);
+            this.CharactersBin.Clear();
+            // Mélange aléatoire
+            this.CharactersDeck = this.CharactersDeck.OrderBy(_ => Dice.Roll(100)).ToList();
+        }
+        private void PrepareCharactersDistribution()
+        {
+            int visibleCharactersCount = 0;
+            int hiddenCharactersCount = 0;
+            switch (this.Players.Count)
+            {
+                case 4:
+                    visibleCharactersCount = 2;
+                    hiddenCharactersCount = 1;
+                    break;
+                case 5:
+                    visibleCharactersCount = 1;
+                    hiddenCharactersCount = 1;
+                    break;
+                case 6:
+                case 7:
+                    hiddenCharactersCount++;
+                    break;
+                default: throw new NotImplementedException("4 à 7 joueurs pour l'instant svp");
+            }
+            // Ajout des cartes faces visibles à la défausse
+            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(0, visibleCharactersCount));
+            this.CharactersBin.ForEach(c => c.Flip());
+            // Si le roi est parmis les cartes visibles, on remélange
+            // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface
+            if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King)))
+            {
+                this.PrepareCharactersDistribution();
+            }
+
+            // Ajout des cartes cachées à la défausse
+            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(visibleCharactersCount, hiddenCharactersCount));
+            // Suppression des cartes écartées du deck
+            this.CharactersDeck.RemoveRange(0, visibleCharactersCount + hiddenCharactersCount);
+        }
+        private void PickCharacters()
+        {
+            Players.ForEach(p =>
+            {
+                Character pickedCharacter = this.View.PickCharacter(this.CharactersDeck);
+                p.PickCharacter(CharactersDeck.DrawElement(pickedCharacter));
+            });
+            this.GameState = GameState.TableRoundPhase;
+        }
 
         public void Run(){
+            this.GameState = GameState.CharacterPickPhase;
             while (this.GameState != GameState.Finished)
             {
                 switch (this.GameState)
-                {
+                {                    
                     case GameState.CharacterPickPhase:
+                        this.OrderPlayers();
+                        this.ShuffleCharacters();
+                        this.PrepareCharactersDistribution();
                         this.PickCharacters();
                         break;
                     case GameState.TableRoundPhase:
-                        Console.WriteLine("Should start table round phase");
                         this.PlayTableRound();
-                        //this.SimulateTableRound();
                         break;
                 }
             }            
         }
 
-        // Méthode temporaire permettant de mettre fin à la partie pour les test unitaires
-        public void SimulateTableRound()
-        {
-            this.GameState = GameState.Finished;
-        }
 
-        public void PickCharacters(){            
-            this.PrepareCharactersDistribution();
-            // Tant que tous les joueurs n'ont pas de personnages
-            while (this.Players.Any(p=>!p.HasPickedCharacter))
-            {
-                Player currentPicker = this.Players.FirstOrDefault(p=>!p.HasPickedCharacter);
-                if (currentPicker != null)
-                {
-                    Character pickedCharacter = this.View.PickCharacter(this.CharactersDeck);
-                    // Liaison symétrique entre joueur et personnage
-                    currentPicker.PickCharacter(pickedCharacter);                    
-                    this.CharactersDeck.Remove(currentPicker.Character);
-                }
-            }
-            this.GameState = GameState.TableRoundPhase;
-            this.Run();
-        }
+        
 
         public void PlayTableRound()
         {
@@ -82,7 +167,7 @@ namespace CitadellesDotIO.Controllers
             if (!character.IsMurdered)
             {
                 character.Flip();
-                this.SetNewKing(character);
+                this.SetNewKing(character.Player);
 
                 // Le personnage détroussé l'est au début de son tour
                 if (character.IsStolen)
@@ -185,103 +270,16 @@ namespace CitadellesDotIO.Controllers
             return pool;
         }
 
-        public void SetNewKing(Character character)
-        {
-            if (character is King)
-            {
-                // Destitution de l'ancien Roi s'il existe
-                Player oldKing = this.Players.SingleOrDefault(p => p.IsCurrentKing);
-                if(oldKing != null)
-                {
-                    oldKing.IsCurrentKing = false;
-                }
+         
 
-                // Investiture du nouveau Roi
-                character.Player.IsCurrentKing = true;
-                this.Players.SetFirstElement(character.Player);
-            }
-        }
-
-        public void StartNewVanillaGame(List<Player> players, IView view)
-        {
-            // Ajout et mélange des joueurs à la partie
-            this.Players = players;
-            this.CharactersDeck = CharactersLists.VanillaCharactersList;
-            this.CharactersBin = new List<Character>();
-            this.DistrictsDeck = DistrictLists.TestDistrictList();
-            foreach (Player player in players)
-            {
-                player.Gold = 2;
-                player.DistrictsDeck = new List<District>();
-                for (int i=0;i<3;i++)
-                {
-                    player.DistrictsDeck.Add(this.DistrictsDeck.Dequeue());
-                }
-                player.BuiltDistricts = new List<District>();
-            }
-            this.DistrictsBin = new List<District>();
-            this.ApplyKingShuffleRule = true;
-            this.ShufflePlayers();
-            // Ajout de la vue
-            this.View = view;
-        }
 
         private void ShufflePlayers()
         {
-            this.Players = this.Players.OrderBy(_ => RandomNumberGenerator.GetInt32(0,100)).ToList();
-        }     
-
-        private void ShuffleCharacters()
-        {
-            // Récupération de la défausse des personnages
-            if(this.CharactersBin != null) { 
-                this.CharactersDeck.AddRange(this.CharactersBin);
-            }
-            else
-            {
-                this.CharactersBin = new List<Character>();
-            }
-            // Vidage de la défausse
-            this.CharactersBin.Clear();
-            // Mélange aléatoire
-            this.CharactersDeck = this.CharactersDeck.OrderBy(_ => RandomNumberGenerator.GetInt32(0, 100)).ToList();
+            this.Players = this.Players.OrderBy(_ => Dice.Roll(100)).ToList();
         }
+       
+        
 
-        public void PrepareCharactersDistribution()
-        {
-            this.ShuffleCharacters();
-            int visibleCharactersCount = 0;
-            int hiddenCharactersCount = 0;
-            switch (this.Players.Count)
-            {
-                case 4:
-                    visibleCharactersCount = 2;
-                    hiddenCharactersCount = 1;
-                    break;
-                case 5:
-                    visibleCharactersCount = 1;
-                    hiddenCharactersCount = 1;
-                    break;
-                case 6:
-                case 7:
-                    hiddenCharactersCount++;
-                    break;
-                default: throw new NotImplementedException("4 à 7 joueurs pour l'instant svp");
-            }
-            // Ajout des cartes faces visibles à la défausse
-            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(0, visibleCharactersCount));
-            this.CharactersBin.ForEach(c => c.Flip());
-            // Si le roi est parmis les cartes visibles, on remélange
-            // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface
-            if (this.ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King))){
-                this.PrepareCharactersDistribution();
-            }
-    
-            // Ajout des cartes cachées à la défausse
-            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(visibleCharactersCount, hiddenCharactersCount));
-
-            // Suppression des cartes écartées du deck
-            this.CharactersDeck.RemoveRange(0, visibleCharactersCount + hiddenCharactersCount);            
-        }
+       
     }
 }

@@ -6,6 +6,7 @@ using CitadellesDotIO.Model;
 using Moq;
 using CitadellesDotIO.View;
 using System;
+using CitadellesDotIO.Config;
 
 namespace CitadellesDotIO.Tests
 {
@@ -31,7 +32,7 @@ namespace CitadellesDotIO.Tests
         public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
             this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers, typeof(RandomActionView));
-            this.gameControllerUnderTest.PickCharacters();
+            this.gameControllerUnderTest.Run();
 
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.Players.Where(p => p.HasPickedCharacter).Count() == this.gameControllerUnderTest.Players.Count());
@@ -46,7 +47,6 @@ namespace CitadellesDotIO.Tests
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
             this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers, new Mock<IView>().Object.GetType());
-            this.gameControllerUnderTest.PrepareCharactersDistribution();
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.CharactersBin.Where(c => c.IsVisible).Count() == xVisible &&
                 this.gameControllerUnderTest.CharactersBin.Where(c => !c.IsVisible).Count() == yHidden);
@@ -62,14 +62,16 @@ namespace CitadellesDotIO.Tests
         public GameController GetGameControllerForPlayerNumber(int number, Type viewType)
         {
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
-            GameController gc = new GameController();
             List<Player> players = new List<Player>();
-            for (int i=0; i<number; i++)
+            for (int i = 0; i < number; i++)
             {
-                players.Add(new Player() { Name = playerNames[i] });
-            }            
-            gc.StartNewVanillaGame(players, Activator.CreateInstance(viewType) as IView);
-            return gc;
+                players.Add(new Player(playerNames[i]));
+            }
+            return new GameController(
+                players,
+                CharactersLists.VanillaCharactersList,
+                DistrictLists.VanillaDistrictList,
+                Activator.CreateInstance(viewType) as IView);                       
         }
     }
 }

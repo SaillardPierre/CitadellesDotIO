@@ -11,5 +11,11 @@ namespace CitadellesDotIO.Extensions
             list.RemoveRange(0, indexOfNewFirst);
             list.AddRange(firstHalf);
         }
+
+        public static T DrawElement<T>(this List<T> list, T picked)
+        {
+            list.Remove(picked);
+            return picked;
+        }
     }
 }

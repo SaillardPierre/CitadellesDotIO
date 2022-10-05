@@ -10,6 +10,9 @@ using CitadellesDotIO.Model.Districts;
 
 namespace CitadellesDotIO.View
 {
+    /// <summary>
+    /// Classe héritant de IView proposant des réponses aléatoires aux comportements attendus
+    /// </summary>
     public class RandomActionView : IView
     {
         public Character PickCharacter(List<Character> characters)
@@ -22,9 +25,7 @@ namespace CitadellesDotIO.View
             => (UnorderedTurnChoice)(availableChoices.Count != 1 ? availableChoices[RandomNumberGenerator.GetInt32(0, availableChoices.Count - 1)] : availableChoices.Single());
 
         public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
-        {
-            return pool.OrderBy(d => RandomNumberGenerator.GetInt32(0, pool.Count)).Take(pickCount).ToList();
-        }
+            => pool.OrderBy(d => RandomNumberGenerator.GetInt32(0, pool.Count)).Take(pickCount).ToList();
 
         public District PickDistrictToBuild(List<District> buildables)
         {
