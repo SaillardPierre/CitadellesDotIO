@@ -62,12 +62,13 @@ namespace CitadellesDotIO.Model
                 }
 
                 // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
-                if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name)))
+                if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name && bd.IsBuilt)))
                 {
                     choices.Add(UnorderedTurnChoice.BuildDistrict);
-                } 
+                }
 
-                return choices.Except(TakenChoices).ToList();
+                choices.RemoveAll(c => TakenChoices.Contains(c));
+                return choices;
             }
         }
 

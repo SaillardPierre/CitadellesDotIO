@@ -21,10 +21,6 @@ namespace CitadellesDotIO.View
         public MandatoryTurnChoice PickMandatoryTurnChoice()
             => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
 
-        //public MandatoryTurnChoice PickMandatoryTurnChoice()
-        //=> MandatoryTurnChoice.BaseIncome;
-
-
         public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
             => availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count - 1)] : availableChoices.Single();
 

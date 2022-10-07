@@ -8,7 +8,7 @@ namespace CitadellesDotIO.Model.Characters
     {       
         public Assassin(int order) : base(order)
         {
-            this.Spell = new Murder();
+            this.Spell = new Murder(this.Player);
         }
 
         public new bool IsMurdered

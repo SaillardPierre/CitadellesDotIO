@@ -15,6 +15,5 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
         public override Spell Spell { get; set; }
-
     }
 }

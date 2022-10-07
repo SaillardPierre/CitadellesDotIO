@@ -16,9 +16,7 @@ namespace CitadellesDotIO.Model
         public int Order { get; set; }
         public abstract DistrictType? AssociatedDistrictType { get; }
         public bool HasAssociatedDistrictType => AssociatedDistrictType.HasValue;
-
-        public abstract Spell Spell { get; set; }
-
+        public virtual Spell Spell { get; set; }
         public bool HasSpell => Spell != null;
         public bool IsPicked => Player != null;
         public bool IsMurdered { get; set; }

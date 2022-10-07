@@ -8,7 +8,7 @@ namespace CitadellesDotIO.Model.Characters
     {        
         public Thief(int order) : base(order)
         {
-            this.Spell = new Steal();
+            this.Spell = new Steal(this.Player);
         }
 
         public new bool IsStolen

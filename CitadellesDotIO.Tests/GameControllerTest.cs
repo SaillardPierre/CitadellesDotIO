@@ -18,9 +18,18 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void GeneralTest()
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5);
-            this.gameControllerUnderTest.Run();
-            Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.BuiltDistricts.Count == 8));
+            try
+            {
+                this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5);
+                this.gameControllerUnderTest.Run();
+                Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.BuiltDistricts.Count == 8));
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
         }
 
 

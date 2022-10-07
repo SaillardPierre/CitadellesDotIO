@@ -137,6 +137,7 @@ namespace CitadellesDotIO.Controllers
         }
 
         public void Run(){
+            int turnCount = 0;
             this.GameState = GameState.CharacterPickPhase;
             while (this.GameState != GameState.Finished)
             {
@@ -151,12 +152,10 @@ namespace CitadellesDotIO.Controllers
                     case GameState.TableRoundPhase:
                         this.PlayTableRound();
                         break;
-                }        
+                }
+                turnCount++;
             }            
         }
-
-
-        
 
         private void PlayTableRound()
         {
@@ -233,7 +232,6 @@ namespace CitadellesDotIO.Controllers
                             this.BuildDistrict(character);
                             break;
                         case UnorderedTurnChoice.UseCharacterSpell:
-                            // TODO : Gérer le spell du perso
                             this.CastSpell(character.Spell);
                             break;
                         case UnorderedTurnChoice.EndTurn:
@@ -269,7 +267,7 @@ namespace CitadellesDotIO.Controllers
             // Les quartiers constructibles sont ceux que le joueur peut s'offrir et ceux qui ne sont pas déja construits
             List<District> buildables = character.Player.DistrictsDeck.Where(
                 d => d.BuildingCost <= character.Player.Gold
-                && !character.Player.BuiltDistricts.Any(bd=> bd.Name == d.Name)).ToList();
+                && !character.Player.BuiltDistricts.Any(bd=> bd.Name == d.Name && bd.IsBuilt)).ToList();
 
             District toBuild = this.View.PickDistrictToBuild(buildables);
             if (toBuild != null)
@@ -286,7 +284,6 @@ namespace CitadellesDotIO.Controllers
             {
                 ITarget target = this.PickSpellTarget(spell.Targets);
                 spell.Cast(target);
-                var bp = "bp";
             }
         }
         private void GatherSpellTargets(Spell spell)

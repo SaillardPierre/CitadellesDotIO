@@ -12,8 +12,9 @@ namespace CitadellesDotIO.Model.Spells
     {
         public override Type TargetType => typeof(Character);
 
-        public Murder()
+        public Murder(Player player)
         {
+            this.Caster = player;
             this.Targets = new List<ITarget>();
         }
 
@@ -29,7 +30,7 @@ namespace CitadellesDotIO.Model.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
-            this.Targets.Remove(targets.SingleOrDefault(t => typeof(Assassin).IsInstanceOfType(t)));            
+            this.Targets.Remove(targets.SingleOrDefault(t => t is Assassin));            
         }
     }
 }
