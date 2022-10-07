@@ -10,10 +10,11 @@ namespace CitadellesDotIO.Model.Characters
     {
         public Wizard(int order) : base(order)
         {
+            this.Spell = new Swap(this.Player);
         }
 
         public override DistrictType? AssociatedDistrictType => null;
+        public override Spell Spell { get; set; }
 
-        public override ISpell<ITarget> Spell => new Swap<ITarget>(this.Player);
     }
 }

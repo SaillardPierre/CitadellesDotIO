@@ -4,7 +4,7 @@ using System;
 
 namespace CitadellesDotIO.Model
 {
-    public abstract class Character : ICharacter
+    public abstract class Character : ICharacter, ITarget
     {
         protected Character() { }
         protected Character(int order)
@@ -16,7 +16,9 @@ namespace CitadellesDotIO.Model
         public int Order { get; set; }
         public abstract DistrictType? AssociatedDistrictType { get; }
         public bool HasAssociatedDistrictType => AssociatedDistrictType.HasValue;
-        public abstract ISpell<ITarget> Spell { get; }
+
+        public abstract Spell Spell { get; set; }
+
         public bool HasSpell => Spell != null;
         public bool IsPicked => Player != null;
         public bool IsMurdered { get; set; }
@@ -34,5 +36,6 @@ namespace CitadellesDotIO.Model
             IsStolen = false;
             Player = null;
         }
+        
     }
 }

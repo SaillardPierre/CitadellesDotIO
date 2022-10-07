@@ -5,9 +5,10 @@ using CitadellesDotIO.Model.Spells;
 namespace CitadellesDotIO.Model.Characters
 {
     public class Thief : Character
-    {
+    {        
         public Thief(int order) : base(order)
         {
+            this.Spell = new Steal();
         }
 
         public new bool IsStolen
@@ -18,6 +19,7 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
 
-        public override ISpell<ITarget> Spell => new Steal<Character>() as ISpell<ITarget>;
+        public override Spell Spell { get; set; }
+
     }
 }

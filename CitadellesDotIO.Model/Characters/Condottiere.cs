@@ -9,8 +9,9 @@ namespace CitadellesDotIO.Model.Characters
     {
         public Condottiere(int order) : base(order)
         {
+            this.Spell = new Demolish(this.Player);
         }
         public override DistrictType? AssociatedDistrictType => DistrictType.Warfare;
-        public override ISpell<ITarget> Spell => new Demolish<District>() as ISpell<ITarget>;
+        public override Spell Spell { get; set; }
     }
 }

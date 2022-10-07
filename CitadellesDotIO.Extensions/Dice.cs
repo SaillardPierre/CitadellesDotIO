@@ -1,7 +1,7 @@
 ﻿
 using System.Security.Cryptography;
 
-namespace CitadellesDotIO.Controllers
+namespace CitadellesDotIO.Extensions
 {
     public static class Dice
     {

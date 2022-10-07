@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Model
 {
-    public class Player : ITarget
+    public class Player : ITarget, ISwappable
     {
         public string Name { get; set; }
         public int Gold { get; set; }
@@ -22,6 +22,10 @@ namespace CitadellesDotIO.Model
         {
             this.Character = character;
             character.Player = this;
+            if(character.HasSpell)
+            {
+                character.Spell.Caster = this;
+            }
             this.TakenChoices = new List<UnorderedTurnChoice>();
         }
 
@@ -52,7 +56,7 @@ namespace CitadellesDotIO.Model
                 }
 
                 // Le personnage dispose d'un pouvoir à utiliser
-                if (this.Character.HasSpell)
+                if (this.Character.HasSpell && this.Character.Spell.HasTargets)
                 {
                     choices.Add(UnorderedTurnChoice.UseCharacterSpell);
                 }
@@ -66,5 +70,12 @@ namespace CitadellesDotIO.Model
                 return choices.Except(TakenChoices).ToList();
             }
         }
+
+        public void PickDistrict(District district)
+        {
+            district.Owner = this;
+            this.DistrictsDeck.Add(district);
+        }
+        public void PickDistricts(List<District> districts) => districts.ForEach(d => this.PickDistrict(d));
     }
 }

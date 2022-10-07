@@ -18,7 +18,7 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void GeneralTest()
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5, typeof(RandomActionView));
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(5);
             this.gameControllerUnderTest.Run();
             Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.BuiltDistricts.Count == 8));
         }
@@ -32,7 +32,7 @@ namespace CitadellesDotIO.Tests
         [DataRow(7)]
         public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers, typeof(RandomActionView));
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(xPlayers);
             this.gameControllerUnderTest.Run();
 
             Assert.AreEqual(true,
@@ -47,7 +47,7 @@ namespace CitadellesDotIO.Tests
         [DataRow(0,1,7)]
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers, new Mock<IView>().Object.GetType());
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(zPlayers);
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.CharactersBin.Count(c => c.IsVisible) == xVisible &&
                 this.gameControllerUnderTest.CharactersBin.Count(c => !c.IsVisible) == yHidden);
@@ -56,11 +56,11 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void DistrictList_ShouldHave50TestDistrict_AfterStartingNewVanillaGame()
         {
-            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4, new Mock<IView>().Object.GetType());
+            this.gameControllerUnderTest = this.GetGameControllerForPlayerNumber(4);
             Assert.IsTrue(gameControllerUnderTest.DistrictsDeck.Count == 50);
         }
 
-        public GameController GetGameControllerForPlayerNumber(int number, Type viewType)
+        public GameController GetGameControllerForPlayerNumber(int number)
         {
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
             List<Player> players = new List<Player>();
@@ -72,7 +72,7 @@ namespace CitadellesDotIO.Tests
                 players,
                 CharactersLists.VanillaCharactersList,
                 DistrictLists.TestDistrictList(),
-                Activator.CreateInstance(viewType) as IView);                       
+                new RandomActionView());                       
         }
     }
 }

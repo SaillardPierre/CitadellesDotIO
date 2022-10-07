@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Collections.Immutable;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -19,7 +20,7 @@ namespace CitadellesDotIO.Controllers
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
         private readonly int DistrictThreshold;
-        private bool IsLastTableRound => this.Players.Any(p => p.BuiltDistricts.Count == DistrictThreshold);
+        private bool IsLastTableRound => this.Players.Any(p => p.BuiltDistricts.Count(d=>d.IsBuilt) == DistrictThreshold);
         public IView View {get;set;} 
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
@@ -28,6 +29,7 @@ namespace CitadellesDotIO.Controllers
         public List<District> DistrictsBin { get; set; }
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
+        private ImmutableList<Character> CharactersRoaster;
         public GameController(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 8)
         {
             this.GameState = GameState.Starting;
@@ -43,6 +45,7 @@ namespace CitadellesDotIO.Controllers
             this.ShufflePlayers();
             this.PickInitialHandAndGold();
             // Gestion de la pioche et de la défausse des personnages
+            this.CharactersRoaster = characters.ToImmutableList();
             this.CharactersDeck = characters.ToList();
             this.CharactersBin = new List<Character>();
                  
@@ -207,6 +210,12 @@ namespace CitadellesDotIO.Controllers
                     this.PickDistrictInPool(character);   
                 }
 
+                // On récupère les cibles potentielles d'un sort
+                if(character.HasSpell)
+                {
+                    this.GatherSpellTargets(character.Spell);
+                }
+
                 // Tant que le joueur n'a pas terminé son tour
                 while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn)){
 
@@ -225,6 +234,7 @@ namespace CitadellesDotIO.Controllers
                             break;
                         case UnorderedTurnChoice.UseCharacterSpell:
                             // TODO : Gérer le spell du perso
+                            this.CastSpell(character.Spell);
                             break;
                         case UnorderedTurnChoice.EndTurn:
                             break;
@@ -242,7 +252,7 @@ namespace CitadellesDotIO.Controllers
             // Défausse des districts non choisis
             this.DistrictsBin.AddRange(districtPool.Except(pickedDistrics));
             // Ajout des districts choisis à la main du joueur
-            character.Player.DistrictsDeck.AddRange(pickedDistrics);
+            character.Player.PickDistricts(pickedDistrics);
         }
 
         private void PercieveBonusIncome(Character character)
@@ -264,10 +274,47 @@ namespace CitadellesDotIO.Controllers
             District toBuild = this.View.PickDistrictToBuild(buildables);
             if (toBuild != null)
             {
+                toBuild.IsBuilt = true;
                 character.Player.Gold -= toBuild.BuildingCost;
                 character.Player.BuiltDistricts.Add(toBuild);
             }
         }
+
+        private void CastSpell(Spell spell)
+        {
+            if (spell.HasTargets)
+            {
+                ITarget target = this.PickSpellTarget(spell.Targets);
+                spell.Cast(target);
+                var bp = "bp";
+            }
+        }
+        private void GatherSpellTargets(Spell spell)
+        {
+            // Liste contenant l'ensemble des cibles avant application des règles du Spell
+            List<ITarget> availableTargets = new List<ITarget>();
+            switch (spell.TargetType.Name)
+            {
+                case nameof(ISwappable):
+                    // Les swappables sont les joueurs et le deck des quartiers, on les ajoutes en cible
+                    availableTargets.Add(this.DistrictsDeck);
+                    availableTargets.AddRange(this.Players);
+                    break;
+                case nameof(District):
+                    availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
+                    break;
+                case nameof(Character):
+                    availableTargets.AddRange(this.CharactersRoaster.ToList());
+                    break;
+                case nameof(ITarget):
+                    break;
+                default: break;
+            }
+            // Calcul des cibles pour le spell en question
+            spell.GetAvailableTargets(availableTargets);
+        }
+
+        private ITarget PickSpellTarget(List<ITarget> availableTargets) => this.View.PickSpellTarget(availableTargets);
 
         private List<District> GenerateDistrictPool(int poolSize)
         {
@@ -276,19 +323,16 @@ namespace CitadellesDotIO.Controllers
             {
                 pool.Add(this.DistrictsDeck.PickCard());
             }
+            if(pool.Count<2)
+            {
+                var bp = "bp";
+            }
             return pool;
         }
-
-         
-
 
         private void ShufflePlayers()
         {
             this.Players = this.Players.OrderBy(_ => Dice.Roll(100)).ToList();
         }
-       
-        
-
-       
     }
 }

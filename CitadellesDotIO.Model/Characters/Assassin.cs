@@ -8,6 +8,7 @@ namespace CitadellesDotIO.Model.Characters
     {       
         public Assassin(int order) : base(order)
         {
+            this.Spell = new Murder();
         }
 
         public new bool IsMurdered
@@ -21,7 +22,6 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
 
-        public override ISpell<ITarget> Spell => new Murder<Character>() as ISpell<ITarget>;        
-
+        public override Spell Spell { get; set; }         
     }
 }

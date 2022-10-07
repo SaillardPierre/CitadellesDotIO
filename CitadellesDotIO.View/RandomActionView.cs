@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using CitadellesDotIO.Enums;
 using CitadellesDotIO.Enums.TurnChoices;
+using CitadellesDotIO.Extensions;
 using CitadellesDotIO.Model;
 using CitadellesDotIO.Model.Districts;
 
@@ -20,11 +21,15 @@ namespace CitadellesDotIO.View
         public MandatoryTurnChoice PickMandatoryTurnChoice()
             => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
 
+        //public MandatoryTurnChoice PickMandatoryTurnChoice()
+        //=> MandatoryTurnChoice.BaseIncome;
+
+
         public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
-            => (UnorderedTurnChoice)(availableChoices.Count != 1 ? availableChoices[RandomNumberGenerator.GetInt32(0, availableChoices.Count - 1)] : availableChoices.Single());
+            => availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count - 1)] : availableChoices.Single();
 
         public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
-            => pool.OrderBy(d => RandomNumberGenerator.GetInt32(0, pool.Count)).Take(pickCount).ToList();
+            => pool.OrderBy(d => Dice.Roll(pool.Count)).Take(pickCount).ToList();
 
         public District PickDistrictToBuild(List<District> buildables)
         {
@@ -38,5 +43,8 @@ namespace CitadellesDotIO.View
             }
             return buildables[RandomNumberGenerator.GetInt32(0, buildables.Count)]; 
         }
+
+        public ITarget PickSpellTarget(List<ITarget> targets)
+            => targets.Count != 1 ? targets[Dice.Roll(targets.Count - 1)] : targets.Single();
     }
 }

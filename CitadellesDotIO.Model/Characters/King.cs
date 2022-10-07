@@ -12,6 +12,6 @@ namespace CitadellesDotIO.Model.Characters
         {
         }
         public override DistrictType? AssociatedDistrictType => DistrictType.Noble;
-        public override ISpell<ITarget> Spell => null;
+        public override Spell Spell { get => null; set { value = null; } }
     }
 }

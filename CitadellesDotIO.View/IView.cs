@@ -16,5 +16,6 @@ namespace CitadellesDotIO.View
         public List<District> PickDistrictsFromPool(int pickCount, List<District> pool);
 
         public District PickDistrictToBuild(List<District> buildables);
+        public ITarget PickSpellTarget(List<ITarget> targets);
     }
 }

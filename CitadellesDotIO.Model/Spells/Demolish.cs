@@ -1,15 +1,41 @@
-﻿using CitadellesDotIO.Model.Districts;
+﻿using CitadellesDotIO.Exceptions;
+using CitadellesDotIO.Model.Characters;
+using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CitadellesDotIO.Model.Spells
 {
-    public class Demolish<T> : ISpell<T> where T : District
-    {    
-        public void Cast(ref T target)
+
+    public class Demolish : Spell
+    {
+        public override Type TargetType => typeof(District);
+
+        public Demolish(Player caster)
         {
-            target = null;
+            this.Caster = caster;
+            this.Targets = new List<ITarget>();
+        }
+
+        public override void Cast(ITarget target)
+        {
+            if (target is District district)
+            {
+                district.IsBuilt = false;
+            }
+            else throw new SpellTargetException("La cible à détruire n'est pas un quartier");
+        }
+
+        public override void GetAvailableTargets(List<ITarget> targets)
+        {
+            base.GetAvailableTargets(targets);
+            this.Targets.RemoveAll(t => 
+                t is District district &&
+                district.Owner.Name.Equals(nameof(Bishop)) &&
+                !district.CanBeDestroyed &&
+                district.DestructionCost <= this.Caster.Gold );
         }
     }
 }

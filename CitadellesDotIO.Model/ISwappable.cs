@@ -4,8 +4,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Model
 {
-    public interface ISpell<T> where T : ITarget
+    public interface ISwappable : ITarget
     {
-        public abstract void Cast(ref T target);
     }
 }
