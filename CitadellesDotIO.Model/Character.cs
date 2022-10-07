@@ -1,6 +1,7 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Model.Spells;
 using System;
+using System.Linq;
 
 namespace CitadellesDotIO.Model
 {
@@ -34,6 +35,15 @@ namespace CitadellesDotIO.Model
             IsStolen = false;
             Player = null;
         }
-        
+
+        public void PercieveBonusIncome()
+        {
+            if (this.HasAssociatedDistrictType)
+            {
+                int bonusIncome = this.Player.BuiltDistricts.Count(d => d.DistrictType == this.AssociatedDistrictType);
+                this.Player.Gold += bonusIncome;
+            }
+        }
+
     }
 }

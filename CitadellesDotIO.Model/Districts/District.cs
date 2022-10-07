@@ -12,5 +12,11 @@ namespace CitadellesDotIO.Model.Districts
         public bool IsBuilt { get; set; }
         public Player Owner { get; set; }
         public DistrictType DistrictType { get; set; }
+
+        public void Reset()
+        {
+            this.IsBuilt = false;
+            this.Owner = null;
+        }
     }
 }

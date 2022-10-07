@@ -16,10 +16,12 @@ namespace CitadellesDotIO.Controllers
 {
     public class GameController
     {
-        private readonly bool ApplyKingShuffleRule;
+        public int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
         private readonly int DistrictThreshold;
+        private readonly bool ApplyKingShuffleRule;
+        private readonly ImmutableList<Character> CharactersRoaster;
         private bool IsLastTableRound => this.Players.Any(p => p.BuiltDistricts.Count(d=>d.IsBuilt) == DistrictThreshold);
         public IView View {get;set;} 
         public GameState GameState { get; set; }
@@ -29,7 +31,6 @@ namespace CitadellesDotIO.Controllers
         public List<District> DistrictsBin { get; set; }
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
-        private ImmutableList<Character> CharactersRoaster;
         public GameController(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 8)
         {
             this.GameState = GameState.Starting;
@@ -46,7 +47,6 @@ namespace CitadellesDotIO.Controllers
             this.PickInitialHandAndGold();
             // Gestion de la pioche et de la défausse des personnages
             this.CharactersRoaster = characters.ToImmutableList();
-            this.CharactersDeck = characters.ToList();
             this.CharactersBin = new List<Character>();
                  
         }
@@ -67,7 +67,7 @@ namespace CitadellesDotIO.Controllers
             // Les index commencent à 0 mais les humains distribuent la première carte en disant 1
             for (int i = 1; i < InitialDeck; i++)
             {
-                p.DistrictsDeck.Add(this.DistrictsDeck.PickCard());
+                p.PickDistrict(this.DistrictsDeck.PickCard());
             }
             p.Gold = InitialGold;
         });
@@ -81,15 +81,17 @@ namespace CitadellesDotIO.Controllers
             {
                 this.Players.SetFirstElement(this.CurrentKing);
             }
+            this.Players.ForEach(p => p.Character = null);
         }
         private void ShuffleCharacters()
         {
             // Vidage de la défausse
-            this.CharactersDeck.AddRange(this.CharactersBin);
             this.CharactersBin.Clear();
             // Mélange aléatoire
+            this.CharactersDeck = new List<Character>(this.CharactersRoaster);
             this.CharactersDeck = this.CharactersDeck.OrderBy(_ => Dice.Roll(100)).ToList();
             this.CharactersDeck.ForEach(c => c.Reset());
+            this.Players.ForEach(p => p.Character = null);
         }
         private void PrepareCharactersDistribution()
         {
@@ -107,37 +109,38 @@ namespace CitadellesDotIO.Controllers
                     break;
                 case 6:
                 case 7:
-                    hiddenCharactersCount++;
+                    hiddenCharactersCount=1;
                     break;
                 default: throw new NotImplementedException("4 à 7 joueurs pour l'instant svp");
             }
             // Ajout des cartes faces visibles à la défausse
             this.CharactersBin.AddRange(this.CharactersDeck.GetRange(0, visibleCharactersCount));
-            this.CharactersBin.ForEach(c => c.Flip());
-            // Si le roi est parmis les cartes visibles, on remélange
-            // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface
-            if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King)))
-            {
-                this.PrepareCharactersDistribution();
-            }
+            this.CharactersBin.ForEach(c => c.Flip());         
 
             // Ajout des cartes cachées à la défausse
             this.CharactersBin.AddRange(this.CharactersDeck.GetRange(visibleCharactersCount, hiddenCharactersCount));
             // Suppression des cartes écartées du deck
             this.CharactersDeck.RemoveRange(0, visibleCharactersCount + hiddenCharactersCount);
+
+            // Si le roi est parmis les cartes visibles, on remélange
+            // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface   
+            if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King)))
+            {
+                this.ShuffleCharacters();
+                this.PrepareCharactersDistribution();
+            }
         }
         private void PickCharacters()
         {
             Players.ForEach(p =>
-            {
+            { 
                 Character pickedCharacter = this.View.PickCharacter(this.CharactersDeck);
                 p.PickCharacter(CharactersDeck.DrawElement(pickedCharacter));
             });
             this.GameState = GameState.TableRoundPhase;
         }
 
-        public void Run(){
-            int turnCount = 0;
+        public bool Run(){
             this.GameState = GameState.CharacterPickPhase;
             while (this.GameState != GameState.Finished)
             {
@@ -151,17 +154,17 @@ namespace CitadellesDotIO.Controllers
                         break;
                     case GameState.TableRoundPhase:
                         this.PlayTableRound();
+                        turnCount++;
                         break;
-                }
-                turnCount++;
-            }            
+                }                
+            }
+            return true;
         }
 
         private void PlayTableRound()
         {
             List<Character> characters = this.Players.Select(p=> p.Character).OrderBy(c=>c.Order).ToList();
-            characters.ForEach(c => this.PlayCharacterRound(c));
-            CharactersBin.AddRange(characters);
+            characters.ForEach(c => this.PlayCharacterRound(c));            
             // Après le tour de table, si personne n'as terminé, on repart sur la phase de séléction des personnages
             this.GameState = this.IsLastTableRound ? GameState.Finished : GameState.CharacterPickPhase;
         }
@@ -173,72 +176,20 @@ namespace CitadellesDotIO.Controllers
             {
                 character.Flip();
 
-                // Si le personnage est le roi, le joueur récupère la couronne
-                if(character is King)
-                {
-                    this.SetNewKing(character.Player);
-                }
+                this.HandleKingship(character);
 
-                // Le personnage détroussé l'est au début de son tour
-                if (character.IsStolen)
-                {
-                    // Récupération du butin
-                    int stolenGold = character.Player.Gold;
-                    // Mise à 0 du trésor de la victime
-                    character.Player.Gold = 0;
-                    // Ajout du butin au trésor du voleur
-                    this.Players.SingleOrDefault(p => p.Character is Thief).Gold += stolenGold;
-                }
+                this.HandleThievery(character);
 
-                // Le marchand prend une pièce bonus quoi qu'il arrive
-                if (character is Merchant)
-                {
-                    character.Player.Gold += 1;
-                }
+                this.HandleTrading(character);
 
-                MandatoryTurnChoice turnChoice = this.View.PickMandatoryTurnChoice();
+                this.HandleMandatoryTurnChoice(character);
 
-                // Le joueur prend l'argent
-                if(turnChoice == MandatoryTurnChoice.BaseIncome)
-                {
-                    character.Player.Gold += 2;                    
-                }
-                // Le joueur prend la pioche
-                else
-                {
-                    this.PickDistrictInPool(character);   
-                }
+                this.HandleSpellTargets(character);
 
-                // On récupère les cibles potentielles d'un sort
-                if(character.HasSpell)
-                {
-                    this.GatherSpellTargets(character.Spell);
-                }
+                this.HandleUnorderedTurnChoices(character);
 
-                // Tant que le joueur n'a pas terminé son tour
-                while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn)){
-
-                    UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
-
-                    // Ajout du choix courant à la liste des choix pris => Peut etre déplacer ca dans les actions associées
-                    character.Player.TakenChoices.Add(currentChoice);
-
-                    switch(currentChoice)
-                    {
-                        case UnorderedTurnChoice.BonusIncome:
-                            this.PercieveBonusIncome(character);
-                            break;
-                        case UnorderedTurnChoice.BuildDistrict:
-                            this.BuildDistrict(character);
-                            break;
-                        case UnorderedTurnChoice.UseCharacterSpell:
-                            this.CastSpell(character.Spell);
-                            break;
-                        case UnorderedTurnChoice.EndTurn:
-                            break;
-                    }                    
-                }                
-            }
+                this.CharactersBin.Add(character);
+            }            
         }
 
         private void PickDistrictInPool(Character character)
@@ -253,28 +204,12 @@ namespace CitadellesDotIO.Controllers
             character.Player.PickDistricts(pickedDistrics);
         }
 
-        private void PercieveBonusIncome(Character character)
-        {
-            if (character.HasAssociatedDistrictType)
-            {
-                int bonusIncome = character.Player.BuiltDistricts.Count(d => d.DistrictType == character.AssociatedDistrictType);
-                character.Player.Gold += bonusIncome;
-            }
-        }
-
         private void BuildDistrict(Character character)
-        {
-            // Les quartiers constructibles sont ceux que le joueur peut s'offrir et ceux qui ne sont pas déja construits
-            List<District> buildables = character.Player.DistrictsDeck.Where(
-                d => d.BuildingCost <= character.Player.Gold
-                && !character.Player.BuiltDistricts.Any(bd=> bd.Name == d.Name && bd.IsBuilt)).ToList();
-
-            District toBuild = this.View.PickDistrictToBuild(buildables);
+        {            
+            District toBuild = this.View.PickDistrictToBuild(character.Player.BuildableDistricts);
             if (toBuild != null)
             {
-                toBuild.IsBuilt = true;
-                character.Player.Gold -= toBuild.BuildingCost;
-                character.Player.BuiltDistricts.Add(toBuild);
+                character.Player.BuildDistrict(toBuild);               
             }
         }
 
@@ -286,29 +221,32 @@ namespace CitadellesDotIO.Controllers
                 spell.Cast(target);
             }
         }
-        private void GatherSpellTargets(Spell spell)
+        private void HandleSpellTargets(Character character)
         {
-            // Liste contenant l'ensemble des cibles avant application des règles du Spell
-            List<ITarget> availableTargets = new List<ITarget>();
-            switch (spell.TargetType.Name)
+            if(character.HasSpell)
             {
-                case nameof(ISwappable):
-                    // Les swappables sont les joueurs et le deck des quartiers, on les ajoutes en cible
-                    availableTargets.Add(this.DistrictsDeck);
-                    availableTargets.AddRange(this.Players);
-                    break;
-                case nameof(District):
-                    availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
-                    break;
-                case nameof(Character):
-                    availableTargets.AddRange(this.CharactersRoaster.ToList());
-                    break;
-                case nameof(ITarget):
-                    break;
-                default: break;
-            }
-            // Calcul des cibles pour le spell en question
-            spell.GetAvailableTargets(availableTargets);
+                // Liste contenant l'ensemble des cibles avant application des règles du Spell
+                List<ITarget> availableTargets = new List<ITarget>();
+                switch (character.Spell.TargetType.Name)
+                {
+                    case nameof(ISwappable):
+                        // Les swappables sont les joueurs et le deck des quartiers, on les ajoutes en cible
+                        availableTargets.Add(this.DistrictsDeck);
+                        availableTargets.AddRange(this.Players);
+                        break;
+                    case nameof(District):
+                        availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
+                        break;
+                    case nameof(Character):
+                        availableTargets.AddRange(this.CharactersRoaster.ToList());
+                        break;
+                    case nameof(ITarget):
+                        break;
+                    default: break;
+                }
+                // Calcul des cibles pour le spell en question
+                character.Spell.GetAvailableTargets(availableTargets);
+            }            
         }
 
         private ITarget PickSpellTarget(List<ITarget> availableTargets) => this.View.PickSpellTarget(availableTargets);
@@ -320,16 +258,89 @@ namespace CitadellesDotIO.Controllers
             {
                 pool.Add(this.DistrictsDeck.PickCard());
             }
-            if(pool.Count<2)
-            {
-                var bp = "bp";
-            }
+
             return pool;
         }
 
         private void ShufflePlayers()
         {
             this.Players = this.Players.OrderBy(_ => Dice.Roll(100)).ToList();
+        }
+
+        private void HandleKingship(Character character)
+        {
+            // Si le personnage est le roi, le joueur récupère la couronne
+            if (character is King)
+            {
+                this.SetNewKing(character.Player);
+            }
+        }
+
+        private void HandleThievery(Character character)
+        {
+            // Le personnage détroussé l'est au début de son tour
+            if (character.IsStolen)
+            {
+                // Récupération du butin
+                int stolenGold = character.Player.Gold;
+                // Mise à 0 du trésor de la victime
+                character.Player.Gold = 0;
+                // Ajout du butin au trésor du voleur
+                this.Players.SingleOrDefault(p => p.Character is Thief).Gold += stolenGold;
+            }
+        }
+
+        private void HandleTrading(Character character)
+        {
+            // Le marchand prend une pièce bonus quoi qu'il arrive
+            if (character is Merchant)
+            {
+                character.Player.Gold += 1;
+            }
+        }
+
+        private void HandleMandatoryTurnChoice(Character character)
+        {
+            MandatoryTurnChoice turnChoice = this.View.PickMandatoryTurnChoice();
+
+            // Le joueur prend l'argent
+            if (turnChoice == MandatoryTurnChoice.BaseIncome)
+            {
+                character.Player.Gold += 2;
+            }
+            // Le joueur prend la pioche
+            else
+            {
+                this.PickDistrictInPool(character);
+            }
+        }
+
+        private void HandleUnorderedTurnChoices(Character character)
+        {
+            // Tant que le joueur n'a pas terminé son tour
+            while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn))
+            {
+
+                UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
+
+                // Ajout du choix courant à la liste des choix pris => Peut etre déplacer ca dans les actions associées
+                character.Player.TakenChoices.Add(currentChoice);
+
+                switch (currentChoice)
+                {
+                    case UnorderedTurnChoice.BonusIncome:
+                        character.PercieveBonusIncome();
+                        break;
+                    case UnorderedTurnChoice.BuildDistrict:
+                        this.BuildDistrict(character);
+                        break;
+                    case UnorderedTurnChoice.UseCharacterSpell:
+                        this.CastSpell(character.Spell);
+                        break;
+                    case UnorderedTurnChoice.EndTurn:
+                        break;
+                }
+            }
         }
     }
 }

@@ -17,6 +17,12 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public List<District> BuiltDistricts { get; set; }
+        public List<District> BuildableDistricts => 
+            this.DistrictsDeck.Where(
+                d => d.BuildingCost <= this.Gold && 
+                !this.BuiltDistricts.Any(
+                    bd => bd.Name == d.Name &&
+                    bd.IsBuilt)).ToList();
         public List<District> DistrictsDeck { get; set; }
         public void PickCharacter(Character character)
         {
@@ -72,8 +78,17 @@ namespace CitadellesDotIO.Model
             }
         }
 
+
+        public void BuildDistrict(District district)
+        {
+            district.IsBuilt = true;
+            this.Gold -= district.BuildingCost;
+            this.BuiltDistricts.Add(district);
+        }
+
         public void PickDistrict(District district)
         {
+            district.Reset();
             district.Owner = this;
             this.DistrictsDeck.Add(district);
         }

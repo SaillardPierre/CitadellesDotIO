@@ -13,7 +13,7 @@ namespace CitadellesDotIO.Config
         public static List<District> TestDistrictList()
         {
             List<District> districts = new List<District>();
-            for(int i=0; i < 500; i++)
+            for(int i=0; i < 5000; i++)
             {
                 districts.Add(new TestDistrict());
             }

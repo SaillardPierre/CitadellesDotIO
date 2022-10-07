@@ -28,14 +28,21 @@ namespace CitadellesDotIO.Model.Spells
                     Caster.DistrictsDeck.Clear();
                     for (int i = 0; i < districtsInHand; i++)
                     {
-                        Caster.DistrictsDeck.Add(districtsDeck.PickCard());
+                        Caster.PickDistrict(districtsDeck.PickCard());
                     }
                 }
 
                 // Si la cible est un autre joueur, on échange les deux decks 
                 else if (target is Player targetPlayer)
                 {
-                    (targetPlayer.DistrictsDeck, Caster.DistrictsDeck) = (Caster.DistrictsDeck, targetPlayer.DistrictsDeck);
+                    // Copie (vidage) des cartes de la cible sur la table
+                    List<District> table = new List<District>(targetPlayer.DistrictsDeck);
+                    targetPlayer.DistrictsDeck.Clear();
+                    // Prise des cartes du caster par la cible
+                    this.Caster.DistrictsDeck.ForEach(d => targetPlayer.PickDistrict(d));
+                    this.Caster.DistrictsDeck.Clear();
+                    // Prise des cartes de la cible sur la table par le caster
+                    table.ForEach(d => this.Caster.PickDistrict(d));
                 }
             }
             else throw new SpellTargetException("La cible à échanger n'est ni la pioche ni le deck d'un autre joueur");

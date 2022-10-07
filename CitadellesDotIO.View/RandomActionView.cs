@@ -22,7 +22,7 @@ namespace CitadellesDotIO.View
             => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
 
         public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
-            => availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count - 1)] : availableChoices.Single();
+            => availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count)] : availableChoices.Single();
 
         public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
             => pool.OrderBy(d => Dice.Roll(pool.Count)).Take(pickCount).ToList();
@@ -41,6 +41,6 @@ namespace CitadellesDotIO.View
         }
 
         public ITarget PickSpellTarget(List<ITarget> targets)
-            => targets.Count != 1 ? targets[Dice.Roll(targets.Count - 1)] : targets.Single();
+            => targets.Count != 1 ? targets[Dice.Roll(targets.Count)] : targets.Single();
     }
 }
