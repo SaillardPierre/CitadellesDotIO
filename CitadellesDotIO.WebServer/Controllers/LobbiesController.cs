@@ -2,17 +2,19 @@
 using CitadellesDotIO.WebServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Diagnostics;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace CitadellesDotIO.WebServer.Controllers
 {
-    public class HomeController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class LobbiesController : ControllerBase
     {
         private readonly ILogger<HomeController> logger;
         private readonly IHubContext<LobbiesHub, ILobbiesHub> lobbiesHubContext;
         private readonly ILobbiesService lobbiesService;
-
-        public HomeController(
+        public LobbiesController(
             ILogger<HomeController> logger,
             IHubContext<LobbiesHub, ILobbiesHub> lobbiesHubContext,
             ILobbiesService lobbiesService)
@@ -20,17 +22,6 @@ namespace CitadellesDotIO.WebServer.Controllers
             this.lobbiesHubContext = lobbiesHubContext;
             this.logger = logger;
             this.lobbiesService = lobbiesService;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

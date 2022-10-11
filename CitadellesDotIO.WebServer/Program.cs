@@ -1,10 +1,12 @@
+using CitadellesDotIO.WebServer;
 using CitadellesDotIO.WebServer.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddNewtonsoftJsonProtocol();
+builder.Services.AddSingleton<ILobbiesService, LobbiesService>();
 
 var app = builder.Build();
 

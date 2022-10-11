@@ -1,9 +1,13 @@
-﻿namespace CitadellesDotIO.WebServer.Hubs
+﻿using CitadellesDotIO.WebServer.Models;
+using Microsoft.AspNetCore.SignalR;
+
+namespace CitadellesDotIO.WebServer.Hubs
 {
     public interface ILobbiesHub
     {
-        public Task GetLobbies(List<Lobby> lobbies);
-
-        public Task CreateLobby(string lobbyName);
+        // Méthodes dont le comportement est défini en js dans connection.on("nomDeLaMethode",(mesParametres) =>{lambda de fou});
+        // Sont executées quand LobbiesHub les appelle sur les clients concernés
+        [HubMethodName("PullLobbies")]
+        public Task PullLobbies(IEnumerable<Lobby> lobbies);
     }
 }

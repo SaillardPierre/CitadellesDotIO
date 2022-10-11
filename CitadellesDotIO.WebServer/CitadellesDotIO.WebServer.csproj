@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="6.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Model\CitadellesDotIO.Model.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.View\CitadellesDotIO.View.csproj" />
   </ItemGroup>
 
 </Project>

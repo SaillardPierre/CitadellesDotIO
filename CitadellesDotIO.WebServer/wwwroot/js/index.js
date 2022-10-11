@@ -1,7 +1,16 @@
 ﻿const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/lobbieshub")
+    .withUrl("/lobbieshub")    
     .configureLogging(signalR.LogLevel.Information)
     .build();
+
+// Définition du corportement
+connection.on("PullLobbies", (lobbies) => {
+    console.log(lobbies);
+    $("#lobbiesDiv").empty();
+    lobbies.forEach((lobby) => {
+        $("#lobbiesDiv").append("<p>" + lobby.name + "<p>");
+    });
+});
 
 async function start() {
     try {
@@ -18,17 +27,15 @@ connection.onclose(async () => {
 });
 
 // Start the connection.
-start().then(async () => {
-    $.get("/home/get");
-    connection.on("getLobbies", (lobbies) => {
-        console.log(lobbies);
-        $("#lobbiesDiv").empty();
-        lobbies.forEach((lobby) => {
-            $("#lobbiesDiv").append("<p>" + lobby.name + "<p>");
+start().then(async () => {   
+    getLobbies();
+    $("#createLobbyButton").click(() => {        
+        connection.invoke("CreateLobby", newLobby ={
+            Name: 'NewRandomLobbyName'
         });
     });
-
-    $("#createLobbyButton").click(() => {
-        $.get("/home/CreateLobby", { newLobbyName: 'NewRandomLobbyName' });
-    });
 });
+
+function getLobbies() {
+    connection.invoke("GetLobbies");
+}
