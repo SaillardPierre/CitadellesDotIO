@@ -1,5 +1,4 @@
-﻿using CitadellesDotIO.Config;
-using CitadellesDotIO.Enums;
+﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Extensions;
 using CitadellesDotIO.Model.Characters;
@@ -9,20 +8,21 @@ using CitadellesDotIO.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CitadellesDotIO.Controllers
 {
-    public class GameController
+    public class Game
     {
-        public int turnCount = 0;
+        private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
         private readonly int DistrictThreshold;
         private readonly bool ApplyKingShuffleRule;
         private readonly ImmutableList<Character> CharactersRoaster;
         private bool IsLastTableRound => this.Players.Any(p => p.BuiltDistricts.Count(d=>d.IsBuilt) == DistrictThreshold);
+        [NotMapped]
         public IView View {get;set;} 
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
@@ -31,7 +31,11 @@ namespace CitadellesDotIO.Controllers
         public List<District> DistrictsBin { get; set; }
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
-        public GameController(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 8)
+
+        public Game()
+        {
+        }
+        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 8)
         {
             this.GameState = GameState.Starting;
             this.View = view;
@@ -48,7 +52,6 @@ namespace CitadellesDotIO.Controllers
             // Gestion de la pioche et de la défausse des personnages
             this.CharactersRoaster = characters.ToImmutableList();
             this.CharactersBin = new List<Character>();
-                 
         }
         private void SetNewKing(Player newKing)
         {
@@ -123,8 +126,7 @@ namespace CitadellesDotIO.Controllers
             this.CharactersDeck.RemoveRange(0, visibleCharactersCount + hiddenCharactersCount);
 
             // Si le roi est parmis les cartes visibles, on remélange
-            // TODO : Voir comment faire pour notifier l'interface / Si on notifie l'interface   
-            if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.Name == nameof(King)))
+            if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.IsVisible && c.Name == nameof(King)))
             {
                 this.ShuffleCharacters();
                 this.PrepareCharactersDistribution();

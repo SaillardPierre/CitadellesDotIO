@@ -1,4 +1,5 @@
 using CitadellesDotIO.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CitadellesDotIO.Model.Districts
 {
@@ -10,6 +11,7 @@ namespace CitadellesDotIO.Model.Districts
         public int DestructionCost => this.BuildingCost - 1;
         public bool CanBeDestroyed => IsBuilt && Owner != null;
         public bool IsBuilt { get; set; }
+        [NotMapped]
         public Player Owner { get; set; }
         public DistrictType DistrictType { get; set; }
 

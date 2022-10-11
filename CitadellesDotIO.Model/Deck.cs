@@ -4,6 +4,7 @@ namespace CitadellesDotIO.Model
 {
     public class Deck<T> : Queue, ISwappable, ITarget
     {
+        public Deck() : base() { }
         public Deck(ICollection values) : base (values) { }
         public T PickCard() => (T)this.Dequeue();
     }

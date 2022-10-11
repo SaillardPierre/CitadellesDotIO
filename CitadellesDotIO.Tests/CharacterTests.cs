@@ -40,7 +40,7 @@ namespace CitadellesDotIO.Tests
 
         public void Character_Gold_Is0_After_Being_Stolen_By_Thief()
         {
-            Mock<GameController> gc = new Mock<GameController>();
+            Mock<Game> gc = new Mock<Game>();
             Mock<Thief> thief = new Mock<Thief>();
             Mock<Character> target = new Mock<Character>();
         }

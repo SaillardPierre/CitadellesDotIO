@@ -3,17 +3,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
 using CitadellesDotIO.Model;
-using Moq;
 using CitadellesDotIO.View;
 using System;
-using CitadellesDotIO.Config;
+using CitadellesDotIO.Factories;
 
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
     public class GameControllerTest
     {
-        GameController gameControllerUnderTest;
+        Game gameControllerUnderTest;
 
         [TestMethod]
         public void GeneralTest()
@@ -69,7 +68,7 @@ namespace CitadellesDotIO.Tests
             Assert.IsTrue(gameControllerUnderTest.DistrictsDeck.Count == 50);
         }
 
-        public GameController GetGameControllerForPlayerNumber(int number)
+        public Game GetGameControllerForPlayerNumber(int number)
         {
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
             List<Player> players = new List<Player>();
@@ -77,11 +76,7 @@ namespace CitadellesDotIO.Tests
             {
                 players.Add(new Player(playerNames[i]));
             }
-            return new GameController(
-                players,
-                CharactersLists.VanillaCharactersList,
-                DistrictLists.TestDistrictList(),
-                new RandomActionView());                       
+            return GameFactory.VanillaGame(players);
         }
     }
 }

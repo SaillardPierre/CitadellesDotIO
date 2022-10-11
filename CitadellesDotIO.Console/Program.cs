@@ -1,7 +1,6 @@
-﻿using CitadellesDotIO.Config;
-using CitadellesDotIO.Controllers;
+﻿using CitadellesDotIO.Controllers;
+using CitadellesDotIO.Factories;
 using CitadellesDotIO.Model;
-using CitadellesDotIO.View;
 using System;
 using System.Collections.Generic;
 
@@ -18,11 +17,7 @@ namespace CitadellesDotIO
             {
                 players.Add(new Player(playerNames[i]));
             }
-            GameController gc = new GameController(
-                players,
-                CharactersLists.VanillaCharactersList,
-                DistrictLists.TestDistrictList(),
-                new RandomActionView());
+            Game gc = GameFactory.VanillaGame(players);
             if (gc.Run())
             {
                 Console.WriteLine("La partie est terminée");

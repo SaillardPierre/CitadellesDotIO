@@ -17,9 +17,9 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public List<District> BuiltDistricts { get; set; }
-        public List<District> BuildableDistricts => 
+        public List<District> BuildableDistricts =>
             this.DistrictsDeck.Where(
-                d => d.BuildingCost <= this.Gold && 
+                d => d.BuildingCost <= this.Gold &&
                 !this.BuiltDistricts.Any(
                     bd => bd.Name == d.Name &&
                     bd.IsBuilt)).ToList();
@@ -28,7 +28,7 @@ namespace CitadellesDotIO.Model
         {
             this.Character = character;
             character.Player = this;
-            if(character.HasSpell)
+            if (character.HasSpell)
             {
                 character.Spell.Caster = this;
             }
@@ -51,26 +51,28 @@ namespace CitadellesDotIO.Model
             {
                 // Le joueur peut toujours choisir de terminer son tour
                 List<UnorderedTurnChoice> choices = new List<UnorderedTurnChoice>() {
-                    UnorderedTurnChoice.EndTurn 
+                    UnorderedTurnChoice.EndTurn
                 };
-
-                // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
-                if (this.Character.HasAssociatedDistrictType &&
-                    BuiltDistricts.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
+                if (this.Character != null)
                 {
-                    choices.Add(UnorderedTurnChoice.BonusIncome);
-                }
+                    // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
+                    if (this.Character.HasAssociatedDistrictType &&
+                        BuiltDistricts.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
+                    {
+                        choices.Add(UnorderedTurnChoice.BonusIncome);
+                    }
 
-                // Le personnage dispose d'un pouvoir à utiliser
-                if (this.Character.HasSpell && this.Character.Spell.HasTargets)
-                {
-                    choices.Add(UnorderedTurnChoice.UseCharacterSpell);
-                }
+                    // Le personnage dispose d'un pouvoir à utiliser
+                    if (this.Character.HasSpell && this.Character.Spell.HasTargets)
+                    {
+                        choices.Add(UnorderedTurnChoice.UseCharacterSpell);
+                    }
 
-                // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
-                if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name && bd.IsBuilt)))
-                {
-                    choices.Add(UnorderedTurnChoice.BuildDistrict);
+                    // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
+                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name && bd.IsBuilt)))
+                    {
+                        choices.Add(UnorderedTurnChoice.BuildDistrict);
+                    }
                 }
 
                 choices.RemoveAll(c => TakenChoices.Contains(c));
