@@ -15,7 +15,9 @@ namespace CitadellesDotIO.Model.Characters
             this.Spell = new Steal(this.Player);
         }
 
+        #pragma warning disable CA1822 // Marquer les membres comme étant static
         public new bool IsStolen
+        #pragma warning restore CA1822 // Marquer les membres comme étant static
         {
             get { return false; }
             set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }
