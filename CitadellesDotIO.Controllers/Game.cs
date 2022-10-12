@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
+using CitadellesDotIO.Exceptions;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -31,7 +32,7 @@ namespace CitadellesDotIO.Controllers
         public List<District> DistrictsBin { get; set; }
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
-
+        public int TurnCount => this.turnCount;
         public Game()
         {
         }
@@ -182,7 +183,7 @@ namespace CitadellesDotIO.Controllers
 
                 this.HandleThievery(character);
 
-                this.HandleTrading(character);
+                HandleTrading(character);
 
                 this.HandleMandatoryTurnChoice(character);
 
@@ -280,6 +281,11 @@ namespace CitadellesDotIO.Controllers
 
         private void HandleThievery(Character character)
         {
+            Player thief = this.Players.SingleOrDefault(p => p.Character is Thief);           
+            if(thief == null)
+            {
+                throw new CharacterBehaviourException("Un personnage a été volé mais il n'y a pas de voleur");
+            }
             // Le personnage détroussé l'est au début de son tour
             if (character.IsStolen)
             {
@@ -288,11 +294,11 @@ namespace CitadellesDotIO.Controllers
                 // Mise à 0 du trésor de la victime
                 character.Player.Gold = 0;
                 // Ajout du butin au trésor du voleur
-                this.Players.SingleOrDefault(p => p.Character is Thief).Gold += stolenGold;
+                thief.Gold += stolenGold;
             }
         }
 
-        private void HandleTrading(Character character)
+        private static void HandleTrading(Character character)
         {
             // Le marchand prend une pièce bonus quoi qu'il arrive
             if (character is Merchant)

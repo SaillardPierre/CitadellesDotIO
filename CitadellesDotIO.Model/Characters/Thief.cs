@@ -11,7 +11,7 @@ namespace CitadellesDotIO.Model.Characters
             this.Spell = new Steal(this.Player);
         }
 
-        public new bool IsStolen
+        public new static bool IsStolen
         {
             get { return false; }
             set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }

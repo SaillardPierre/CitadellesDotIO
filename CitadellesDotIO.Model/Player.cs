@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Model
 {
-    public class Player : ITarget, ISwappable
+    public class Player : ISwappable
     {
         public string Name { get; set; }
         public int Gold { get; set; }
@@ -17,8 +17,9 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public List<District> BuiltDistricts { get; set; }
-        public List<District> BuildableDistricts =>
-            this.DistrictsDeck.Where(
+        public List<District> BuildableDistricts => this.GetBuildableDistricts();
+        private List<District> GetBuildableDistricts()
+            => this.DistrictsDeck.Where(
                 d => d.BuildingCost <= this.Gold &&
                 !this.BuiltDistricts.Any(
                     bd => bd.Name == d.Name &&

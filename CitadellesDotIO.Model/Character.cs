@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CitadellesDotIO.Model
 {
-    public abstract class Character : ICharacter, ITarget
+    public abstract class Character : ITarget
     {
         protected Character() { }
         protected Character(int order)

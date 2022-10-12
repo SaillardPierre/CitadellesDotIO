@@ -5,6 +5,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Exceptions
 {
+    [Serializable]
     public class SpellTargetException : Exception
     {
         public SpellTargetException()

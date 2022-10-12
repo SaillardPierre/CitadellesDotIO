@@ -27,12 +27,13 @@ connection.onclose(async () => {
 });
 
 // Start the connection.
-start().then(async () => {   
+start().then(async () => {
     getLobbies();
-    $("#createLobbyButton").click(() => {        
-        connection.invoke("CreateLobby", newLobby ={
-            Name: 'NewRandomLobbyName'
-        });
+    $("#createLobbyButton").click(() => {
+        const newLobby = {
+            Name: "NewRandomLobbyName"
+        };
+        connection.invoke("CreateLobby", newLobby);
     });
 });
 
