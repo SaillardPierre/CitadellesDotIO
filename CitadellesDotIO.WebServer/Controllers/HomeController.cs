@@ -1,5 +1,7 @@
 ﻿using CitadellesDotIO.WebServer.Hubs;
+using CitadellesDotIO.WebServer.HubsClients;
 using CitadellesDotIO.WebServer.Models;
+using CitadellesDotIO.WebServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Diagnostics;
@@ -9,12 +11,12 @@ namespace CitadellesDotIO.WebServer.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
-        private readonly IHubContext<LobbiesHub, ILobbiesHub> lobbiesHubContext;
+        private readonly IHubContext<LobbiesHub, ILobbiesHubClient> lobbiesHubContext;
         private readonly ILobbiesService lobbiesService;
 
         public HomeController(
             ILogger<HomeController> logger,
-            IHubContext<LobbiesHub, ILobbiesHub> lobbiesHubContext,
+            IHubContext<LobbiesHub, ILobbiesHubClient> lobbiesHubContext,
             ILobbiesService lobbiesService)
         {
             this.lobbiesHubContext = lobbiesHubContext;

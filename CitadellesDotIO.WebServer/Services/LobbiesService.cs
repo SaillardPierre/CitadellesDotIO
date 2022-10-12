@@ -1,21 +1,21 @@
 ﻿using CitadellesDotIO.WebServer.Models;
 
-namespace CitadellesDotIO.WebServer
+namespace CitadellesDotIO.WebServer.Services
 {
     public class LobbiesService : ILobbiesService
     {
         private List<Lobby> Lobbies { get; set; }
         public LobbiesService()
         {
-            this.Lobbies = new List<Lobby>() { new Lobby(Guid.NewGuid().ToString()) };
+            Lobbies = new List<Lobby>() { new Lobby(Guid.NewGuid().ToString()) };
         }
 
         public IList<Lobby> GetLobbies()
-            => this.Lobbies;
+            => Lobbies;
 
         public bool CreateLobby(Lobby newLobby)
         {
-            this.Lobbies.Add(newLobby);
+            Lobbies.Add(newLobby);
             return true;
         }
     }

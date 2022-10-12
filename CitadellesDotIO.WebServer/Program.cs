@@ -1,5 +1,5 @@
-using CitadellesDotIO.WebServer;
 using CitadellesDotIO.WebServer.Hubs;
+using CitadellesDotIO.WebServer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
