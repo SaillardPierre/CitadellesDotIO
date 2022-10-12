@@ -22,7 +22,6 @@ namespace CitadellesDotIO.Model
         public bool IsPicked => Player != null;
         public bool IsMurdered { get; set; }
         public bool IsStolen { get; set; }
-
         public bool IsVisible { get; set; }
         public void Flip()
         {
@@ -40,7 +39,7 @@ namespace CitadellesDotIO.Model
         {
             if (this.HasAssociatedDistrictType)
             {
-                int bonusIncome = this.Player.BuiltDistricts.Count(d => d.DistrictType == this.AssociatedDistrictType);
+                int bonusIncome = this.Player.City.Count(d => d.DistrictType == this.AssociatedDistrictType);
                 this.Player.Gold += bonusIncome;
             }
         }

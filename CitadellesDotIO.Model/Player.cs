@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Enums.TurnChoices;
+﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,17 @@ namespace CitadellesDotIO.Model
         public bool HasPickedCharacter => this.Character != null;
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
+        public bool IsFirstReachingDistrictThreshold { get; set; }
+        public bool HasReachedDistrictThreshold => this.City.Count() == 8;
+        public int Score { get; set; }
         public List<District> BuiltDistricts { get; set; }
+        public IEnumerable<District> City =>
+            this.BuiltDistricts.Where(d => d.IsBuilt);
         public List<District> BuildableDistricts => this.GetBuildableDistricts();
         private List<District> GetBuildableDistricts()
             => this.DistrictsDeck.Where(
-                d => d.BuildingCost <= this.Gold &&
-                !this.BuiltDistricts.Any(
-                    bd => bd.Name == d.Name &&
-                    bd.IsBuilt)).ToList();
+                    d => d.BuildingCost <= this.Gold &&
+                    !this.City.Any(bd => bd.Name == d.Name)).ToList();
         public List<District> DistrictsDeck { get; set; }
         public void PickCharacter(Character character)
         {
@@ -36,13 +40,15 @@ namespace CitadellesDotIO.Model
             this.TakenChoices = new List<UnorderedTurnChoice>();
         }
 
+        public Player() : this("AnonymousPlayer") { }
         public Player(string name)
         {
-            Name = name;
-            IsCurrentKing = false;
-            BuiltDistricts = new List<District>();
-            DistrictsDeck = new List<District>();
+            this.Name = name;
+            this.IsCurrentKing = false;
+            this.BuiltDistricts = new List<District>();
+            this.DistrictsDeck = new List<District>();
             this.TakenChoices = new List<UnorderedTurnChoice>();
+            this.Score = 0;
         }
 
         public List<UnorderedTurnChoice> TakenChoices { get; set; }
@@ -58,7 +64,7 @@ namespace CitadellesDotIO.Model
                 {
                     // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
                     if (this.Character.HasAssociatedDistrictType &&
-                        BuiltDistricts.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
+                        City.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
                     {
                         choices.Add(UnorderedTurnChoice.BonusIncome);
                     }
@@ -70,7 +76,7 @@ namespace CitadellesDotIO.Model
                     }
 
                     // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
-                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !BuiltDistricts.Any(bd => bd.Name == d.Name && bd.IsBuilt)))
+                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !this.City.Any(bd => bd.Name == d.Name)))
                     {
                         choices.Add(UnorderedTurnChoice.BuildDistrict);
                     }
@@ -81,6 +87,31 @@ namespace CitadellesDotIO.Model
             }
         }
 
+        public void ComputeScore()
+        {
+            // Somme des valeurs des quartiers de la cité
+            this.Score = this.City.Sum(d => d.ScoreValue);
+
+            // Si le joueur est le premier a atteindre le seuil de quartiers
+            if (this.IsFirstReachingDistrictThreshold)
+            {
+                this.Score += 4;
+            }
+
+            // Si le joueur a atteint le seuil de quartiers
+            if (this.HasReachedDistrictThreshold)
+            {
+                this.Score += 2;
+            }
+
+            // Si la cité contient des quartiers de 5 couleurs différentes
+            IEnumerable<DistrictType> builtTypes = this.City.Select(d => d.DistrictType).Distinct().OrderBy(dt => dt);
+            IEnumerable<DistrictType> buildableTypes = Enum.GetValues(typeof(DistrictType)).Cast<DistrictType>().OrderBy(dt => dt);
+            if (Enumerable.SequenceEqual(builtTypes, buildableTypes))
+            {
+                this.Score += 3;
+            }
+        }
 
         public void BuildDistrict(District district)
         {

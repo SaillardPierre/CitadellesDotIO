@@ -31,11 +31,16 @@ namespace CitadellesDotIO.Model.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
-            this.Targets.RemoveAll(t => 
+            // On écarte les cibles qui sont :
+            // des districts et
+            // qui appartiennent à l'eveque ou
+            // qui ne peuvent être détruits ou
+            // qui sont trop chers à détruire
+            this.Targets.RemoveAll(t =>
                 t is District district &&
-                district.Owner.Name.Equals(nameof(Bishop)) &&
-                !district.CanBeDestroyed &&
-                district.DestructionCost <= this.Caster.Gold );
+                (district.Owner.Character.Name.Equals(nameof(Bishop)) ||
+                !district.CanBeDestroyed ||
+                district.DestructionCost > this.Caster.Gold));
         }
     }
 }

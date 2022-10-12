@@ -17,9 +17,9 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public void GeneralTest()
         {
-            this.gameControllerUnderTest = GetGameControllerForPlayerNumber(5);
-            this.gameControllerUnderTest.Run();
-            Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.BuiltDistricts.Count == 8));
+            this.gameControllerUnderTest = GetGameControllerForPlayerNumber(5);            
+            Assert.IsTrue(this.gameControllerUnderTest.Run());
+            Assert.IsTrue(this.gameControllerUnderTest.Players.Any(p => p.HasReachedDistrictThreshold));
         }
 
         [TestMethod]
@@ -48,13 +48,6 @@ namespace CitadellesDotIO.Tests
             Assert.AreEqual(true,
                 this.gameControllerUnderTest.CharactersBin.Count(c => c.IsVisible) == xVisible &&
                 this.gameControllerUnderTest.CharactersBin.Count(c => !c.IsVisible) == yHidden);
-        }
-
-        [TestMethod]
-        public void DistrictList_ShouldHave50TestDistrict_AfterStartingNewVanillaGame()
-        {
-            this.gameControllerUnderTest = GetGameControllerForPlayerNumber(4);
-            Assert.IsTrue(gameControllerUnderTest.DistrictsDeck.Count == 50);
         }
 
         public static Game GetGameControllerForPlayerNumber(int number)

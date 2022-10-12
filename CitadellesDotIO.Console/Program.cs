@@ -3,10 +3,11 @@ using CitadellesDotIO.Factories;
 using CitadellesDotIO.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CitadellesDotIO
 {
-    public class Program
+    public static class Program
     {
         static void Main(string[] args)
         {            
@@ -21,6 +22,16 @@ namespace CitadellesDotIO
             if (gc.Run())
             {
                 Console.WriteLine("La partie est terminée");
+                int rank = 1;
+                gc.GetRanking().ToList().ForEach(p =>
+                {
+                    Console.WriteLine($"{rank} : {p.Name} with {p.Score} points and {p.City.Count()} districts");
+                    p.City.ToList().ForEach(d =>
+                    {
+                        Console.WriteLine($"\t {d.Name} {d.ScoreValue}");
+                    });
+                    rank++;
+                });
             }
             Console.ReadKey();
         }        

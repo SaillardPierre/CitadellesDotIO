@@ -22,8 +22,7 @@ namespace CitadellesDotIO.Controllers
         private readonly int DistrictThreshold;
         private readonly bool ApplyKingShuffleRule;
         private readonly ImmutableList<Character> CharactersRoaster;
-        private bool IsLastTableRound => this.Players.Any(p => p.BuiltDistricts.Count(d=>d.IsBuilt) == DistrictThreshold);
-        [NotMapped]
+        private bool IsLastTableRound => this.Players.Any(p => p.City.Count() == DistrictThreshold);
         public IView View {get;set;} 
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
@@ -161,9 +160,14 @@ namespace CitadellesDotIO.Controllers
                         break;
                 }                
             }
+            this.ComputeScores();
             return true;
         }
 
+        private void ComputeScores() => 
+            this.Players.ForEach(p => p.ComputeScore());
+        public IEnumerable<Player> GetRanking()
+            => this.Players.OrderByDescending(p => p.Score);
         private void PlayTableRound()
         {
             List<Character> characters = this.Players.Select(p=> p.Character).OrderBy(c=>c.Order).ToList();
@@ -212,7 +216,14 @@ namespace CitadellesDotIO.Controllers
             District toBuild = this.View.PickDistrictToBuild(character.Player.BuildableDistricts);
             if (toBuild != null)
             {
-                character.Player.BuildDistrict(toBuild);               
+                character.Player.BuildDistrict(toBuild);
+                
+                // Si le joueur atteint le seuil de districts à construire et qu'aucun autre joueur ne l'a atteint
+                if(IsLastTableRound &&
+                   !this.Players.Any(p=>p.IsFirstReachingDistrictThreshold))                    
+                {
+                    character.Player.IsFirstReachingDistrictThreshold = true;
+                }
             }
         }
 
@@ -238,7 +249,7 @@ namespace CitadellesDotIO.Controllers
                         availableTargets.AddRange(this.Players);
                         break;
                     case nameof(District):
-                        availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
+                        availableTargets.AddRange(this.Players.Select(p => p.City).Flatten());
                         break;
                     case nameof(Character):
                         availableTargets.AddRange(this.CharactersRoaster.ToList());
@@ -280,15 +291,15 @@ namespace CitadellesDotIO.Controllers
         }
 
         private void HandleThievery(Character character)
-        {
-            Player thief = this.Players.SingleOrDefault(p => p.Character is Thief);           
-            if(thief == null)
-            {
-                throw new CharacterBehaviourException("Un personnage a été volé mais il n'y a pas de voleur");
-            }
+        {            
             // Le personnage détroussé l'est au début de son tour
             if (character.IsStolen)
             {
+                Player thief = this.Players.SingleOrDefault(p => p.Character is Thief);
+                if (thief == null)
+                {
+                    throw new CharacterBehaviourException("Un personnage a été volé mais il n'y a pas de voleur");
+                }
                 // Récupération du butin
                 int stolenGold = character.Player.Gold;
                 // Mise à 0 du trésor de la victime

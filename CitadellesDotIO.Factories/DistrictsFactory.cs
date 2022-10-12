@@ -1,19 +1,18 @@
 ﻿using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace CitadellesDotIO.Config
+namespace CitadellesDotIO.Factories
 {
-    public static class DistrictLists
+    public static class DistrictsFactory
     {
-        // A peupler avec les district de la boite
-        public static List<District> VanillaDistrictList => new List<District>();
-
-        public static List<District> TestDistrictList()
+        public static List<District> TestDistrictList(int listSize)
         {
             List<District> districts = new List<District>();
-            for(int i=0; i < 5000; i++)
+            for (int i = 0; i < listSize; i++)
             {
                 districts.Add(new TestDistrict());
             }

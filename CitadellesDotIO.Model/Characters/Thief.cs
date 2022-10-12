@@ -6,12 +6,16 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Thief : Character
     {        
+        protected Thief() : base()
+        {
+            this.Spell = new Murder(this.Player);
+        }
         public Thief(int order) : base(order)
         {
             this.Spell = new Steal(this.Player);
         }
 
-        public new static bool IsStolen
+        public new bool IsStolen
         {
             get { return false; }
             set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }

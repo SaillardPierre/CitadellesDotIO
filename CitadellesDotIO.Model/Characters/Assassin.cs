@@ -5,7 +5,11 @@ using CitadellesDotIO.Model.Spells;
 namespace CitadellesDotIO.Model.Characters
 {
     public class Assassin : Character
-    {       
+    {
+        protected Assassin() : base()
+        {
+            this.Spell = new Murder(this.Player);
+        }
         public Assassin(int order) : base(order)
         {
             this.Spell = new Murder(this.Player);
@@ -22,6 +26,6 @@ namespace CitadellesDotIO.Model.Characters
 
         public override DistrictType? AssociatedDistrictType => null;
 
-        public override Spell Spell { get; set; }         
+        public override Spell Spell { get; set; }
     }
 }
