@@ -14,11 +14,4 @@
     <ProjectReference Include="..\CitadellesDotIO.Model\CitadellesDotIO.Model.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.View\CitadellesDotIO.View.csproj" />
   </ItemGroup>
-
-	<ItemGroup>
-		<SonarQubeSetting Include="sonar.exclusions">
-			<Value>/wwwroot/lib/*</Value>
-		</SonarQubeSetting>
-	</ItemGroup>
-
 </Project>
