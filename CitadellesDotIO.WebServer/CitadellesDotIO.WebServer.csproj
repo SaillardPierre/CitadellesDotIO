@@ -17,7 +17,7 @@
 
 	<ItemGroup>
 		<SonarQubeSetting Include="sonar.exclusions">
-			<Value>**/wwwroot/lib/*</Value>
+			<Value>/wwwroot/lib/*</Value>
 		</SonarQubeSetting>
 	</ItemGroup>
 
