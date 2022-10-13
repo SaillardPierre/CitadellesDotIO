@@ -17,6 +17,14 @@ namespace CitadellesDotIO.Extensions
             list.Remove(picked);
             return picked;
         }
+
+        public static List<T> DrawElements<T>(this List<T> list, int count)
+        {
+            List<T> pickedElements = list.GetRange(0, count);
+            list.RemoveRange(0, count);
+            return pickedElements;
+        }
+
         public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> sequence)
         {
             foreach (var child in sequence)

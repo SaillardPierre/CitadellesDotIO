@@ -35,7 +35,7 @@ namespace CitadellesDotIO.Controllers
         public Game()
         {
         }
-        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 8)
+        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 7)
         {
             this.GameState = GameState.Starting;
             this.View = view;
@@ -116,15 +116,17 @@ namespace CitadellesDotIO.Controllers
                     break;
                 default: throw new NotImplementedException("4 à 7 joueurs pour l'instant svp");
             }
-            // Ajout des cartes faces visibles à la défausse
-            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(0, visibleCharactersCount));
-            this.CharactersBin.ForEach(c => c.Flip());         
 
             // Ajout des cartes cachées à la défausse
-            this.CharactersBin.AddRange(this.CharactersDeck.GetRange(visibleCharactersCount, hiddenCharactersCount));
-            // Suppression des cartes écartées du deck
-            this.CharactersDeck.RemoveRange(0, visibleCharactersCount + hiddenCharactersCount);
+            this.CharactersBin.AddRange(this.CharactersDeck.DrawElements(hiddenCharactersCount));
 
+            // Ajout des cartes faces visibles à la défausse
+            List<Character> visibleCharacters = this.CharactersDeck.DrawElements(visibleCharactersCount);
+            visibleCharacters.ForEach(c => {
+                c.Flip();
+                this.CharactersBin.Add(c);
+            });
+            
             // Si le roi est parmis les cartes visibles, on remélange
             if (ApplyKingShuffleRule && this.CharactersBin.Any(c => c.IsVisible && c.Name == nameof(King)))
             {
