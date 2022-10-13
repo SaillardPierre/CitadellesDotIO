@@ -12,44 +12,91 @@ using System.Linq;
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
-    public class SpellCastTests
+    public class CharactersSpellsTests
     {
         [TestMethod]
-        public void MurderCast_CharacterIsMurdered_AssassinIsNotMurdered()
+        public void MurderCast_Assassin_NotInTargets()
         {
             // Arrange
             Assassin caster = new(0);
             Mock<Assassin> unmurderable = new();
+
+            // Act
+            caster.Spell.GetAvailableTargets(new List<ITarget>()
+            {
+                unmurderable.Object
+            });
+
+            // Assert
+            Assert.IsFalse(caster.Spell.HasTargets);
+        }
+
+        [TestMethod]
+        public void MurderCast_Character_IsMurdered()
+        {
+            // Arrange
+            Assassin caster = new(0);
             Mock<Character> murderable = new();
 
             // Act
-            caster.Spell.Cast(unmurderable.Object);
             caster.Spell.Cast(murderable.Object);
 
             // Assert
-            Assert.IsFalse(unmurderable.Object.IsMurdered);
             Assert.IsTrue(murderable.Object.IsMurdered);
         }
 
         [TestMethod]
-        public void StealCast_CharacterIsStolen_ThiefIsNotStolen()
+        public void StealCast_Character_IsStolen()
         {
             // Arrange
             Thief caster = new(0);
-            Mock<Thief> unstealable = new();
             Mock<Character> stealable = new();
 
             // Act
-            caster.Spell.Cast(unstealable.Object);
             caster.Spell.Cast(stealable.Object);
 
             // Assert
-            Assert.IsFalse(unstealable.Object.IsStolen);
             Assert.IsTrue(stealable.Object.IsStolen);
         }
 
         [TestMethod]
-        public void SwapCast_TableDistrictDeckIsSwapped()
+        public void StealCast_Thief_NotInTargets()
+        {
+            // Arrange
+            Thief caster = new(0);
+            Mock<Thief> unstealable = new();
+
+            // Act
+            caster.Spell.GetAvailableTargets(new List<ITarget>()
+            {
+                unstealable.Object
+            });
+
+            // Assert
+            Assert.IsFalse(caster.Spell.HasTargets);
+        }
+
+        [TestMethod]
+        public void StealCast_MurderedCharacter_NotInTargets()
+        {
+            // Arrange
+            Assassin assassin = new(0);
+            Thief caster = new(1);
+            Mock<Character> unstealable = new();
+
+            // Act
+            assassin.Spell.Cast(unstealable.Object);
+            caster.Spell.GetAvailableTargets(new List<ITarget>()
+            {
+                unstealable.Object
+            });
+
+            // Assert
+            Assert.IsFalse(caster.Spell.HasTargets);
+        }
+
+        [TestMethod]
+        public void SwapCast_TableDistrictDeck_IsSwapped()
         {
             // Arrange
             Mock<Player> player = new("WizardTestPlayer");
@@ -68,7 +115,7 @@ namespace CitadellesDotIO.Tests
         }
 
         [TestMethod]
-        public void SwapCast_PlayerDistrictDeckIsSwapped()
+        public void SwapCast_PlayerDistrictDeck_IsSwapped()
         {
             // Arrange
             Mock<Player> player = new("WizardTestPlayer");
@@ -93,7 +140,7 @@ namespace CitadellesDotIO.Tests
         }
 
         [TestMethod]
-        public void DemolishCast_PlayerDistrictIsDestroyed()
+        public void DemolishCast_PlayerDistrict_IsDestroyed()
         {
             // Arrange
             Mock<Player> player = new("CondotierreTestPlayer");
@@ -113,7 +160,7 @@ namespace CitadellesDotIO.Tests
         }
 
         [TestMethod]
-        public void DemolishCast_BishopDistrictsNotInTargets()
+        public void DemolishCast_BishopDistricts_NotInTargets()
         {
             Mock<Player> player = new("CondotierreTestPlayer");
             player.Object.Gold = 99;

@@ -183,9 +183,7 @@ namespace CitadellesDotIO.Controllers
             // On montre la carte du personnage courant s'il n'est pas assassiné
             if (!character.IsMurdered)
             {
-                character.Flip();
-
-                this.HandleKingship(character);
+                character.Flip();                
 
                 this.HandleThievery(character);
 
@@ -198,7 +196,10 @@ namespace CitadellesDotIO.Controllers
                 this.HandleUnorderedTurnChoices(character);
 
                 this.CharactersBin.Add(character);
-            }            
+            }
+
+            // La couronne passe même si le roi a été assassiné
+            this.HandleKingship(character);
         }
 
         private void PickDistrictInPool(Character character)
