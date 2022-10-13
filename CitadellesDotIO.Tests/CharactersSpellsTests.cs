@@ -32,6 +32,20 @@ namespace CitadellesDotIO.Tests
         }
 
         [TestMethod]
+        public void MurderCast_Assassin_IsNotMurdered()
+        {
+            // Arrange
+            Assassin caster = new(0);
+            Mock<Assassin> unmurderable = new();
+
+            // Act
+            caster.Spell.Cast(unmurderable.Object);
+
+            // Assert
+            Assert.IsFalse(unmurderable.Object.IsMurdered);
+        }
+
+        [TestMethod]
         public void MurderCast_Character_IsMurdered()
         {
             // Arrange
@@ -57,6 +71,20 @@ namespace CitadellesDotIO.Tests
 
             // Assert
             Assert.IsTrue(stealable.Object.IsStolen);
+        }
+
+        [TestMethod]
+        public void StealCast_Thief_IsNotStolen()
+        {
+            // Arrange
+            Thief caster = new(0);
+            Mock<Thief> unstealable = new();
+
+            // Act
+            caster.Spell.Cast(unstealable.Object);            
+
+            // Assert
+            Assert.IsFalse(unstealable.Object.IsStolen);
         }
 
         [TestMethod]

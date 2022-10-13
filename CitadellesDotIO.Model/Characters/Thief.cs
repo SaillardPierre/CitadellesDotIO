@@ -16,12 +16,8 @@ namespace CitadellesDotIO.Model.Characters
         }
 
         #pragma warning disable CA1822 // Marquer les membres comme étant static
-        public new bool IsStolen
-        #pragma warning restore CA1822 // Marquer les membres comme étant static
-        {
-            get { return false; }
-            set { throw new CharacterBehaviourException("Le voleur ne peut être volé"); }
-        }
+        public new bool IsStolen => false;
+        #pragma warning restore CA1822 // Marquer les membres comme étant static        
 
         public override DistrictType? AssociatedDistrictType => null;
 

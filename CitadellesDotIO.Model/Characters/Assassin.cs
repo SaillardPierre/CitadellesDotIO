@@ -16,23 +16,8 @@ namespace CitadellesDotIO.Model.Characters
         }
 
         #pragma warning disable CA1822 // Marquer les membres comme étant static
-        public new bool IsMurdered       
-        {
-            get { return false; }
-            set
-            {
-                throw new CharacterBehaviourException("L'assassin ne peut être assassiné");
-            }
-        }
-
-        public new bool IsStolen
-        {
-            get { return false; }
-            set
-            {
-                throw new CharacterBehaviourException("L'assassin ne peut être détroussé");
-            }
-        }
+        public new bool IsMurdered => false;
+        public new bool IsStolen => false;        
         #pragma warning restore CA1822 // Marquer les membres comme étant static
         public override DistrictType? AssociatedDistrictType => null;
 
