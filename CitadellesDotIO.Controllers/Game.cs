@@ -208,8 +208,8 @@ namespace CitadellesDotIO.Controllers
             List<District> districtPool = this.GenerateDistrictPool(2);
             // Choix des districts à garder
             List<District> pickedDistrics = this.View.PickDistrictsFromPool(1, districtPool);
-            // Défausse des districts non choisis
-            this.DistrictsBin.AddRange(districtPool.Except(pickedDistrics));
+            // Défausse des districts non choisis sous la pioche
+            pickedDistrics.ForEach(d => this.DistrictsDeck.Enqueue(d));
             // Ajout des districts choisis à la main du joueur
             character.Player.PickDistricts(pickedDistrics);
         }

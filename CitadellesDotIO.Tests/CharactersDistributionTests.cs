@@ -7,7 +7,7 @@ using PrivateObjectExtension;
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
-    public class CharacterDistributionTests
+    public class CharactersDistributionTests
     {
         private Game GameUnderTest;
         private PrivateObject PrivateGameUnderTest;
