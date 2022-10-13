@@ -39,8 +39,8 @@ jobs:
       - name: Install dotnet-coverage
         shell: powershell
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool install dotnet-sonarscanner
+          New-Item -Path .\dotnet-coverage -ItemType Directory
+          dotnet tool install dotnet-coverage
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
