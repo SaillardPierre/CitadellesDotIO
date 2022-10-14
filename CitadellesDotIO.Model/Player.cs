@@ -38,7 +38,7 @@ namespace CitadellesDotIO.Model
             {
                 character.Spell.Caster = this;
             }
-            this.TakenChoices = new List<UnorderedTurnChoice>();
+            this.TakenChoices = new();
         }
 
         public Player() : this("AnonymousPlayer") { }
@@ -46,19 +46,23 @@ namespace CitadellesDotIO.Model
         {
             this.Name = name;
             this.IsCurrentKing = false;
-            this.BuiltDistricts = new List<District>();
-            this.DistrictsDeck = new List<District>();
-            this.TakenChoices = new List<UnorderedTurnChoice>();
+            this.BuiltDistricts = new();
+            this.DistrictsDeck = new();
+            this.TakenChoices = new();
             this.Score = 0;
         }
 
-        public List<UnorderedTurnChoice> TakenChoices { get; set; }
+        // La liste des districts construits, ayant un Spell et n'ayant pas été utilisés ce tour
+        public IEnumerable<District> DistrictSpellSources => this.City.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name));
+
+        public List<string> TakenChoices { get; set; }
+
         public List<UnorderedTurnChoice> AvailableChoices
         {
             get
             {
                 // Le joueur peut toujours choisir de terminer son tour
-                List<UnorderedTurnChoice> choices = new List<UnorderedTurnChoice>() {
+                List<UnorderedTurnChoice> choices = new() {
                     UnorderedTurnChoice.EndTurn
                 };
                 if (this.Character != null)
@@ -73,7 +77,7 @@ namespace CitadellesDotIO.Model
                     // Le personnage dispose d'un pouvoir à utiliser
                     if (this.Character.HasSpell && this.Character.Spell.HasTargets)
                     {
-                        choices.Add(UnorderedTurnChoice.UseCharacterSpell);
+                        choices.Add(UnorderedTurnChoice.CastCharacterSpell);
                     }
 
                     // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
@@ -83,7 +87,13 @@ namespace CitadellesDotIO.Model
                     }
                 }
 
-                choices.RemoveAll(c => TakenChoices.Contains(c));
+                // Le joueur dispose d'un quartier disposant d'un pouvoir à utiliser
+                if (this.DistrictSpellSources.Any(d => d.Spell.HasTargets))
+                {
+                    choices.Add(UnorderedTurnChoice.CastDistrictSpell);
+                }
+
+                choices.RemoveAll(c => TakenChoices.Contains(c.ToString()));
                 return choices;
             }
         }
@@ -123,11 +133,14 @@ namespace CitadellesDotIO.Model
             this.Gold -= district.BuildingCost;
             this.BuiltDistricts.Add(district);
         }
-
         public void PickDistrict(District district)
         {
             district.Reset();
             district.Owner = this;
+            if(district.HasSpell)
+            {
+                district.Spell.Caster = this;
+            }
             this.DistrictsDeck.Add(district);
         }
         public void PickDistricts(List<District> districts) => districts.ForEach(d => this.PickDistrict(d));

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CitadellesDotIO.Model.Districts
 {
-    public abstract class District : ITarget
+    public abstract class District : IDealable
     {
         public virtual string Name { get; set; }
         public virtual int BuildingCost { get; set; }
@@ -19,6 +19,10 @@ namespace CitadellesDotIO.Model.Districts
         {
             this.IsBuilt = false;
             this.Owner = null;
+            if (this.HasSpell)
+            {
+                this.Spell.Caster = null;
+            }
         }
     }
 }

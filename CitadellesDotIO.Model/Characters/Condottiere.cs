@@ -7,6 +7,9 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Condottiere : Character
     {
+        public Condottiere() : base() {
+            this.Spell = new Demolish(this.Player);
+        }
         public Condottiere(int order) : base(order)
         {
             this.Spell = new Demolish(this.Player);

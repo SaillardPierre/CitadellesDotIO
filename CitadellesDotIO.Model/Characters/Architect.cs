@@ -5,6 +5,7 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Architect : Character
     {
+        public Architect() : base() { }
         public Architect(int order) : base(order)
         {
         }

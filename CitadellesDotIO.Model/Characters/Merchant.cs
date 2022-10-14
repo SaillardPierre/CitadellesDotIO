@@ -8,6 +8,7 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Merchant : Character
     {
+        public Merchant() : base() { }
         public Merchant(int order) : base(order)
         {
         }

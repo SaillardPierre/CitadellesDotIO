@@ -5,60 +5,69 @@ namespace CitadellesDotIO.Factories
 {
     public static class DeckFactory
     {
-        public static Deck<District> VanillaDistrictsDeck()
+        public static List<District> VanillaDistrictsDeck()
         {
-            Deck<District> deck = new();
+            List<District> deck = new()
+            {
+                // Ajout des cartes uniques au deck
+                new CourtOfMiracles(),
+                new Laboratory(),
+                new Manufacture(),
+                new Observatory(),
+                new Graveyard(),
+                new Library(),
+                new MagicAcademy(),
+                new University(),
+                new DragonPort()
+            };
 
-            // Ajout des cartes uniques au deck
-            deck.Enqueue(new CourtOfMiracles());
-            deck.Enqueue(new Laboratory());
-            deck.Enqueue(new Manufacture());
-            deck.Enqueue(new Observatory());
-            deck.Enqueue(new Graveyard());
-            deck.Enqueue(new Library());
-            deck.Enqueue(new MagicAcademy());
-            deck.Enqueue(new University());
-            deck.Enqueue(new DragonPort());
-            
             // Ajout des cartes à deux exemplaires au deck
             for (int i = 0; i<2 ; i++)
             {
-                deck.Enqueue(new Cathedral());
-                deck.Enqueue(new Palace());
-                deck.Enqueue(new CityHall());
-                deck.Enqueue(new Fortress());
-                deck.Enqueue(new Dungeon());
+                deck.Add(new Cathedral());
+                deck.Add(new Palace());
+                deck.Add(new CityHall());
+                deck.Add(new Fortress());
+                deck.Add(new Dungeon());
             }
 
             // Ajout des cartes à trois exemplaires au deck
             for (int i = 0; i < 3; i++)
             {
-                deck.Enqueue(new Temple());
-                deck.Enqueue(new Monastery());
-                deck.Enqueue(new Shop());
-                deck.Enqueue(new Counter());
-                deck.Enqueue(new Harbor());
-                deck.Enqueue(new Watchtower());
-                deck.Enqueue(new Prison());
-                deck.Enqueue(new Barracks());
+                deck.Add(new Temple());
+                deck.Add(new Monastery());
+                deck.Add(new Shop());
+                deck.Add(new Counter());
+                deck.Add(new Harbor());
+                deck.Add(new Watchtower());
+                deck.Add(new Prison());
+                deck.Add(new Barracks());
             }
             // Ajout des cartes à quatre exemplaires au deck
             for (int i = 0; i < 4; i++)
             {
-                deck.Enqueue(new Church());
-                deck.Enqueue(new Castle());
-                deck.Enqueue(new Market());
+                deck.Add(new Church());
+                deck.Add(new Castle());
+                deck.Add(new Market());
 
             }
 
             // Ajout des cartes à cinq exemplaires au deck
             for (int i = 0; i < 5; i++)
             {
-                deck.Enqueue(new Manor());
-                deck.Enqueue(new Tavern());
+                deck.Add(new Manor());
+                deck.Add(new Tavern());
             }
             
             return deck;
+        }
+
+        public static IEnumerable<District> Laboratories()
+        {
+            for (int i=0;i<500;i++)
+            {
+                yield return new Laboratory();
+            }
         }
 
         public static Deck<District> TestDistrictDeck(int deckSize)

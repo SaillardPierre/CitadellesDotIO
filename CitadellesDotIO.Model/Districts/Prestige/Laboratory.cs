@@ -8,7 +8,7 @@ namespace CitadellesDotIO.Model.Districts
         {
             this.Name = "Laboratory";
             this.BuildingCost = 5;
-            this.Spell = new Discard();
+            this.Spell = new Discard(this.Owner);
         }
     }
 }

@@ -8,6 +8,10 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Wizard : Character
     {
+        public Wizard() : base()
+        {
+            this.Spell = new Swap(this.Player);
+        }
         public Wizard(int order) : base(order)
         {
             this.Spell = new Swap(this.Player);

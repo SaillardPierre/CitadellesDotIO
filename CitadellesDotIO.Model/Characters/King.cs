@@ -8,6 +8,7 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class King : Character
     {
+        public King() : base() { }
         public King(int order) : base(order)
         {
         }

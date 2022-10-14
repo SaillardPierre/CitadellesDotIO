@@ -14,10 +14,11 @@ namespace CitadellesDotIO.Enums.TurnChoices
 
     public enum UnorderedTurnChoice
     {
+        EndTurn,
         BonusIncome,
-        UseCharacterSpell,
-        BuildDistrict,
-        EndTurn
+        CastCharacterSpell,
+        CastDistrictSpell,
+        BuildDistrict
     }
 
     public static class Consts {

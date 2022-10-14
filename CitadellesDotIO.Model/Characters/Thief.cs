@@ -6,7 +6,7 @@ namespace CitadellesDotIO.Model.Characters
 {
     public class Thief : Character
     {        
-        protected Thief() : base()
+        public Thief() : base()
         {
             this.Spell = new Murder(this.Player);
         }

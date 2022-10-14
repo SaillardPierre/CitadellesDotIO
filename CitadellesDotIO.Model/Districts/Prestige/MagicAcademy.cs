@@ -1,4 +1,6 @@
-﻿namespace CitadellesDotIO.Model.Districts
+﻿using CitadellesDotIO.Enums;
+
+namespace CitadellesDotIO.Model.Districts
 {
     public class MagicAcademy : PrestigeDistrict
     {
@@ -6,7 +8,21 @@
         {
             this.Name = "Magic Academy";
             this.BuildingCost = 6;
-            // TODO ajouter le passif
         }
+
+        public override DistrictType DistrictType
+        {
+            get
+            {
+                if (this.Owner != null &&
+                    this.Owner.Character != null &&
+                    this.Owner.Character.HasAssociatedDistrictType)
+                {
+                    return this.Owner.Character.AssociatedDistrictType.Value;
+                }
+                else return base.DistrictType;
+            }
+        }
+
     }
 }

@@ -11,7 +11,8 @@ namespace CitadellesDotIO.Factories
             return new Game(
                 players,
                 CharactersFactory.VanillaCharactersList,
-                DistrictsFactory.TestDistrictList(districtDeckSize > 0 ? districtDeckSize : 100),
+                //DeckFactory.Laboratories().ToList(),
+                DeckFactory.VanillaDistrictsDeck(),
                 new RandomActionView());
         }
     }
