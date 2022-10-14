@@ -19,10 +19,9 @@ namespace CitadellesDotIO.Controllers
         private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
-        private readonly int DistrictThreshold;
         private readonly bool ApplyKingShuffleRule;
         private readonly ImmutableList<Character> CharactersRoaster;
-        private bool IsLastTableRound => this.Players.Any(p => p.City.Count() == DistrictThreshold);
+        private bool IsLastTableRound => this.Players.Any(p => p.HasReachedDistrictThreshold);
         public IView View {get;set;} 
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
@@ -40,13 +39,13 @@ namespace CitadellesDotIO.Controllers
             this.GameState = GameState.Starting;
             this.View = view;
             this.ApplyKingShuffleRule = applyKingShuffleRule;
-            this.DistrictThreshold = districtThreshold;
 
             // Gestion de la pioche et de la défausse des districts
             this.DistrictsDeck = new Deck<District>(districts.OrderBy(_ => Dice.Roll(100)).ToList());
             this.DistrictsBin = new List<District>();
             // Gestion des joueurs
             this.Players = players.ToList();
+            this.Players.ForEach(p => p.DistrictThreshold = districtThreshold);
             this.ShufflePlayers();
             this.PickInitialHandAndGold();
             // Gestion de la pioche et de la défausse des personnages
@@ -345,7 +344,7 @@ namespace CitadellesDotIO.Controllers
 
                 UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
 
-                // Ajout du choix courant à la liste des choix pris => Peut etre déplacer ca dans les actions associées
+                // Ajout du choix courant à la liste des choix pris
                 character.Player.TakenChoices.Add(currentChoice);
 
                 switch (currentChoice)

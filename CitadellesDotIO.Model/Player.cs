@@ -18,7 +18,8 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public bool IsFirstReachingDistrictThreshold { get; set; }
-        public bool HasReachedDistrictThreshold => this.City.Count() == 8;
+        public bool HasReachedDistrictThreshold => this.City.Count() == this.DistrictThreshold;
+        public int DistrictThreshold { get; set; }
         public int Score { get; set; }
         public List<District> BuiltDistricts { get; set; }
         public IEnumerable<District> City =>
@@ -103,6 +104,9 @@ namespace CitadellesDotIO.Model
             {
                 this.Score += 2;
             }
+
+            // TODO Gérer les quartiers spéciaux
+
 
             // Si la cité contient des quartiers de 5 couleurs différentes
             IEnumerable<DistrictType> builtTypes = this.City.Select(d => d.DistrictType).Distinct().OrderBy(dt => dt);

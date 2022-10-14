@@ -35,12 +35,14 @@ namespace CitadellesDotIO.Model.Spells
             // des districts et
             // qui appartiennent à l'eveque ou
             // qui ne peuvent être détruits ou
-            // qui sont trop chers à détruire
+            // qui sont trop chers à détruire ou
+            // qui appartiennent à une cité terminée
             this.Targets.RemoveAll(t =>
                 t is District district &&
                 (district.Owner.Character.Name.Equals(nameof(Bishop)) ||
                 !district.CanBeDestroyed ||
-                district.DestructionCost > this.Caster.Gold));
+                district.DestructionCost > this.Caster.Gold ||
+                district.Owner.HasReachedDistrictThreshold));
         }
     }
 }

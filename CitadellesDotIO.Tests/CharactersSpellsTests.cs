@@ -132,7 +132,7 @@ namespace CitadellesDotIO.Tests
             player.Object.PickCharacter(caster);
             Deck<District> deck = DeckFactory.TestDistrictDeck(50);
             player.Object.PickDistricts(deck.PickCards(Dice.Roll(25)).ToList());
-            List<District> oldCastersDeck = new List<District>(caster.Player.DistrictsDeck);
+            List<District> oldCastersDeck = new(caster.Player.DistrictsDeck);
 
             // Act
             caster.Spell.Cast(deck);
@@ -157,8 +157,8 @@ namespace CitadellesDotIO.Tests
             target.Object.PickDistricts(deck.PickCards(Dice.Roll(25)).ToList());
 
             // Act
-            List<District> oldCastersDeck = new List<District>(caster.Player.DistrictsDeck);
-            List<District> oldTargetDeck = new List<District>(target.Object.DistrictsDeck);
+            List<District> oldCastersDeck = new(caster.Player.DistrictsDeck);
+            List<District> oldTargetDeck = new(target.Object.DistrictsDeck);
 
             caster.Spell.Cast(target.Object);
 
@@ -199,8 +199,7 @@ namespace CitadellesDotIO.Tests
             target.Object.Gold = 99;
             Bishop bishop = new(1);
             target.Object.PickCharacter(bishop);
-            Deck<District> deck = DeckFactory.TestDistrictDeck(50);
-            target.Object.PickDistrict(deck.PickCard());
+            target.Object.PickDistrict(new Church());
             target.Object.BuildDistrict(target.Object.BuildableDistricts.First());
 
             List<ITarget> targets = new();

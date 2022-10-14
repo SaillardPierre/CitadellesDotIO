@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
-    public class GameTest
+    public class GameTests
     {
         [DataRow(4)]
         [DataRow(5)]
