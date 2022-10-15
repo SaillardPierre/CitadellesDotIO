@@ -11,13 +11,13 @@ namespace CitadellesDotIO.Model.Spells
         public Discard(Player player)
         {
             this.Caster = player;
-            this.Targets = new List<ITarget>();
         }
-        public override Type TargetType => typeof(IDealable);
+        public override Type TargetType => typeof(Deck<District>);
 
         public override void Cast(ITarget target)
         {
-            District toDiscard = target as District; 
+            District toDiscard = target as District;
+            toDiscard.Reset();
             this.Caster.DistrictsDeck.Remove(toDiscard);
             this.TableDeck.Enqueue(toDiscard);
             this.Caster.Gold += 2;            
@@ -27,7 +27,7 @@ namespace CitadellesDotIO.Model.Spells
         {
             base.GetAvailableTargets(targets);
             this.TableDeck = targets.SingleOrDefault(t => t is Deck<District>) as Deck<District>;
-            targets.Remove(this.TableDeck);
+            this.Targets = new List<ITarget>(this.Caster.BuildableDistricts);
         }
     }
 }

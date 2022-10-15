@@ -32,6 +32,7 @@ namespace CitadellesDotIO.Tests.Factories
             District toBuild = Activator.CreateInstance(districtType) as District;
             player.Object.PickDistrict(toBuild);
             player.Object.BuildDistrict(player.Object.BuildableDistricts.First());
+            player.Object.Gold = initialGold;
             return player;
         }
 
@@ -41,6 +42,7 @@ namespace CitadellesDotIO.Tests.Factories
             District toBuild = Activator.CreateInstance(districtType) as District;
             player.Object.PickDistrict(toBuild);
             player.Object.BuildDistrict(player.Object.BuildableDistricts.First());
+            player.Object.Gold = initialGold;
             return player;
         }
     }
