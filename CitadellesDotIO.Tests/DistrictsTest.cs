@@ -1,16 +1,11 @@
-﻿using CitadellesDotIO.Controllers;
-using CitadellesDotIO.Factories;
-using CitadellesDotIO.Model;
+﻿using CitadellesDotIO.Model;
 using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PrivateObjectExtension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Tests
 {
@@ -44,7 +39,7 @@ namespace CitadellesDotIO.Tests
             player.Object.Character.PercieveBonusIncome();
 
             // Assert
-            int expectedGold = InitialGold - player.Object.City.First().BuildingCost + 1;
+            int expectedGold = InitialGold - player.Object.BuiltDistricts.First().BuildingCost + 1;
             Assert.AreEqual(expectedGold, player.Object.Gold);
         }
 
@@ -62,7 +57,7 @@ namespace CitadellesDotIO.Tests
             player.Object.Character.PercieveBonusIncome();
 
             // Assert
-            int expectedGold = InitialGold - player.Object.City.First().BuildingCost;
+            int expectedGold = InitialGold - player.Object.BuiltDistricts.First().BuildingCost;
             Assert.AreEqual(expectedGold, player.Object.Gold);
         }
 
@@ -85,7 +80,7 @@ namespace CitadellesDotIO.Tests
 
             // Act
             caster.Object.Character.Spell.GetAvailableTargets(new List<ITarget>(){
-                target.Object.City.First()
+                target.Object.BuiltDistricts.First()
             });
 
             // Assert

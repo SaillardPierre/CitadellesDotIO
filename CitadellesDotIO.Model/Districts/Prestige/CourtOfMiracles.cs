@@ -8,8 +8,7 @@ namespace CitadellesDotIO.Model.Districts
         {
             this.Name = "Court of miracles";
             this.BuildingCost = 2;
-            //this.Spell = new ColorShift();
+            this.Spell = new ColorShift(this);
         }
-        // TODO Gérer l'histoire de pas utilisable pendant ce tour de jeu
     }
 }

@@ -47,5 +47,11 @@ namespace CitadellesDotIO.Model.Spells
             }
             else throw new SpellTargetException("La cible à échanger n'est ni la pioche ni le deck d'un autre joueur");
         }
+
+        public override void GetAvailableTargets(List<ITarget> targets)
+        {
+            base.GetAvailableTargets(targets);
+            this.Targets = targets;
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using CitadellesDotIO.Controllers;
-using CitadellesDotIO.Factories;
+using CitadellesDotIO.Controllers.Factory;
 using CitadellesDotIO.Model;
 using System;
 using System.Collections.Generic;

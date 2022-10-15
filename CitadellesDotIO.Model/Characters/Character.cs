@@ -3,7 +3,7 @@ using CitadellesDotIO.Model.Spells;
 using System;
 using System.Linq;
 
-namespace CitadellesDotIO.Model
+namespace CitadellesDotIO.Model.Characters
 {
     public abstract class Character : ITarget
     {
@@ -39,7 +39,7 @@ namespace CitadellesDotIO.Model
         {
             if (this.HasAssociatedDistrictType)
             {
-                int bonusIncome = this.Player.City.Count(d => d.DistrictType == this.AssociatedDistrictType);
+                int bonusIncome = this.Player.BuiltDistricts.Count(d => d.DistrictType == this.AssociatedDistrictType);
                 this.Player.Gold += bonusIncome;
             }
         }

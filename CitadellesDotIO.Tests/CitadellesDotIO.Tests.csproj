@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CitadellesDotIO.Factories\CitadellesDotIO.Factories.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.Model\CitadellesDotIO.Model.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.Controllers\CitadellesDotIO.Controllers.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.View\CitadellesDotIO.View.csproj" />

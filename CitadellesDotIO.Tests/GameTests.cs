@@ -1,12 +1,9 @@
 ﻿using CitadellesDotIO.Controllers;
+using CitadellesDotIO.Controllers.Factory;
 using CitadellesDotIO.Enums;
-using CitadellesDotIO.Factories;
+using CitadellesDotIO.Model.Factories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Tests
 {

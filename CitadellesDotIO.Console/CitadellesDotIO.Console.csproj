@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Controllers\CitadellesDotIO.Controllers.csproj" />
-    <ProjectReference Include="..\CitadellesDotIO.Factories\CitadellesDotIO.Factories.csproj" />
   </ItemGroup>
 
 </Project>

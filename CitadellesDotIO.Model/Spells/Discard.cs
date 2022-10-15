@@ -1,10 +1,7 @@
-﻿using CitadellesDotIO.Model.Characters;
-using CitadellesDotIO.Model.Districts;
+﻿using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Model.Spells
 {
@@ -28,9 +25,9 @@ namespace CitadellesDotIO.Model.Spells
 
         public override void GetAvailableTargets(List<ITarget> targets)
         {
+            base.GetAvailableTargets(targets);
             this.TableDeck = targets.SingleOrDefault(t => t is Deck<District>) as Deck<District>;
             targets.Remove(this.TableDeck);
-            base.GetAvailableTargets(targets);
         }
     }
 }

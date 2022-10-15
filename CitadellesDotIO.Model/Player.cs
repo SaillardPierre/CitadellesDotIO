@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Enums.TurnChoices;
+using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
 using System;
 using System.Collections.Generic;
@@ -18,17 +19,20 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public bool IsFirstReachingDistrictThreshold { get; set; }
-        public bool HasReachedDistrictThreshold => this.City.Count() == this.DistrictThreshold;
+        public bool HasReachedDistrictThreshold => this.BuiltDistricts.Count == this.DistrictThreshold;
+        public bool HasAllDistrictTypesBonus => this.BuiltDistricts.Select(d => d.DistrictType).Distinct().Count() == Enum.GetNames(typeof(DistrictType)).Length;
         public int DistrictThreshold { get; set; }
         public int Score { get; set; }
-        public List<District> BuiltDistricts { get; set; }
-        public IEnumerable<District> City =>
-            this.BuiltDistricts.Where(d => d.IsBuilt);
+
+        public List<District> City { get; set; }
+
+        public List<District> BuiltDistricts => this.City.Where(d => d.IsBuilt).ToList();
+
         public List<District> BuildableDistricts => this.GetBuildableDistricts();
         private List<District> GetBuildableDistricts()
             => this.DistrictsDeck.Where(
                     d => d.BuildingCost <= this.Gold &&
-                    !this.City.Any(bd => bd.Name == d.Name)).ToList();
+                    !this.BuiltDistricts.Any(bd => bd.Name == d.Name)).ToList();
         public List<District> DistrictsDeck { get; set; }
         public void PickCharacter(Character character)
         {
@@ -46,14 +50,24 @@ namespace CitadellesDotIO.Model
         {
             this.Name = name;
             this.IsCurrentKing = false;
-            this.BuiltDistricts = new();
+            this.City = new();
             this.DistrictsDeck = new();
             this.TakenChoices = new();
             this.Score = 0;
         }
 
         // La liste des districts construits, ayant un Spell et n'ayant pas été utilisés ce tour
-        public IEnumerable<District> DistrictSpellSources => this.City.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name));
+        public IEnumerable<District> DistrictSpellSources
+        {
+            get
+            {
+                if (this.BuiltDistricts.Where(d => d.HasSpell).Count() > 0)
+                {
+                    var bp = "bp";
+                }
+                return this.BuiltDistricts.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name)).ToList();
+            }
+        }
 
         public List<string> TakenChoices { get; set; }
 
@@ -69,7 +83,7 @@ namespace CitadellesDotIO.Model
                 {
                     // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
                     if (this.Character.HasAssociatedDistrictType &&
-                        City.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
+                        BuiltDistricts.Any(d => d.DistrictType == this.Character.AssociatedDistrictType))
                     {
                         choices.Add(UnorderedTurnChoice.BonusIncome);
                     }
@@ -81,7 +95,7 @@ namespace CitadellesDotIO.Model
                     }
 
                     // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
-                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !this.City.Any(bd => bd.Name == d.Name)))
+                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !this.BuiltDistricts.Any(bd => bd.Name == d.Name)))
                     {
                         choices.Add(UnorderedTurnChoice.BuildDistrict);
                     }
@@ -101,7 +115,7 @@ namespace CitadellesDotIO.Model
         public void ComputeScore()
         {
             // Somme des valeurs des quartiers de la cité
-            this.Score = this.City.Sum(d => d.ScoreValue);
+            this.Score = this.BuiltDistricts.Sum(d => d.ScoreValue);
 
             // Si le joueur est le premier a atteindre le seuil de quartiers
             if (this.IsFirstReachingDistrictThreshold)
@@ -117,11 +131,8 @@ namespace CitadellesDotIO.Model
 
             // TODO Gérer les quartiers spéciaux
 
-
             // Si la cité contient des quartiers de 5 couleurs différentes
-            IEnumerable<DistrictType> builtTypes = this.City.Select(d => d.DistrictType).Distinct().OrderBy(dt => dt);
-            IEnumerable<DistrictType> buildableTypes = Enum.GetValues(typeof(DistrictType)).Cast<DistrictType>().OrderBy(dt => dt);
-            if (Enumerable.SequenceEqual(builtTypes, buildableTypes))
+            if (this.HasAllDistrictTypesBonus)
             {
                 this.Score += 3;
             }
@@ -130,8 +141,13 @@ namespace CitadellesDotIO.Model
         public void BuildDistrict(District district)
         {
             district.IsBuilt = true;
+            if (district.HasSpell)
+            {
+                district.Spell.Caster = this;
+            }
             this.Gold -= district.BuildingCost;
-            this.BuiltDistricts.Add(district);
+            this.DistrictsDeck.Remove(district);
+            this.City.Add(district);
         }
         public void PickDistrict(District district)
         {

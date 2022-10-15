@@ -15,7 +15,6 @@ namespace CitadellesDotIO.Model.Spells
         public Murder(Player player)
         {
             this.Caster = player;
-            this.Targets = new List<ITarget>();
         }
 
         public override void Cast(ITarget target)
@@ -30,7 +29,8 @@ namespace CitadellesDotIO.Model.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
-            this.Targets.Remove(targets.SingleOrDefault(t => t is Assassin));            
+            targets.RemoveAll(t => t is Assassin || (t is Character c &&  c.IsMurdered));
+            this.Targets = targets;
         }
     }
 }

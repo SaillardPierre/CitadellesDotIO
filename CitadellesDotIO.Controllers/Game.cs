@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using CitadellesDotIO.Exceptions;
+using CitadellesDotIO.Model.Spells;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -22,12 +23,12 @@ namespace CitadellesDotIO.Controllers
         private readonly bool ApplyKingShuffleRule;
         private readonly ImmutableList<Character> CharactersRoaster;
         private bool IsLastTableRound => this.Players.Any(p => p.HasReachedDistrictThreshold);
+        private static IEnumerable<DistrictType> DistrictTypes = Enum.GetValues(typeof(DistrictType)).Cast<DistrictType>().OrderBy(dt => dt);
         public IView View { get; set; }
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
         public List<Character> CharactersBin { get; set; }
         public Deck<District> DistrictsDeck { get; set; }
-        public List<District> DistrictsBin { get; set; }
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
         public int TurnCount => this.turnCount;
@@ -42,7 +43,6 @@ namespace CitadellesDotIO.Controllers
 
             // Gestion de la pioche et de la défausse des districts
             this.DistrictsDeck = new Deck<District>(districts.OrderBy(_ => Dice.Roll(100)).ToList());
-            this.DistrictsBin = new List<District>();
             // Gestion des joueurs
             this.Players = players.ToList();
             this.Players.ForEach(p => p.DistrictThreshold = districtThreshold);
@@ -153,6 +153,7 @@ namespace CitadellesDotIO.Controllers
                 {
                     case GameState.CharacterPickPhase:
                         this.OrderPlayers();
+                        this.RecoverDestroyedDistricts();
                         this.ShuffleCharacters();
                         this.PrepareCharactersDistribution();
                         this.PickCharacters();
@@ -168,7 +169,15 @@ namespace CitadellesDotIO.Controllers
             this.ComputeScores();
             return true;
         }
-
+        private void RecoverDestroyedDistricts()
+        {
+            this.Players.Select(p => p.City.Where(d => !d.IsBuilt)).Flatten().ToList()
+                .ForEach(d =>
+                {
+                    d.Reset();
+                    this.DistrictsDeck.Enqueue(d);
+                });
+        }
         private void ComputeScores() =>
             this.Players.ForEach(p => p.ComputeScore());
         public IEnumerable<Player> GetRanking()
@@ -180,7 +189,6 @@ namespace CitadellesDotIO.Controllers
             // Après le tour de table, si personne n'as terminé, on repart sur la phase de séléction des personnages
             this.GameState = this.IsLastTableRound ? GameState.Finished : GameState.CharacterPickPhase;
         }
-
         private void PlayCharacterRound(Character character)
         {
             // On montre la carte du personnage courant s'il n'est pas assassiné
@@ -194,10 +202,6 @@ namespace CitadellesDotIO.Controllers
 
                 this.HandleMandatoryTurnChoice(character);
 
-                this.HandleCharacterSpellTargets(character);
-
-                HandleDistrictSpellTargets(character.Player.DistrictSpellSources);
-
                 this.HandleUnorderedTurnChoices(character);
 
                 this.CharactersBin.Add(character);
@@ -206,7 +210,6 @@ namespace CitadellesDotIO.Controllers
             // La couronne passe même si le roi a été assassiné
             this.HandleKingship(character);
         }
-
         private void PickDistrictInPool(Character character)
         {
             // Pioche des deux premières cartes
@@ -260,7 +263,7 @@ namespace CitadellesDotIO.Controllers
                         availableTargets.AddRange(this.Players);
                         break;
                     case nameof(District):
-                        availableTargets.AddRange(this.Players.Select(p => p.City).Flatten());
+                        availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
                         break;
                     case nameof(Character):
                         availableTargets.AddRange(this.CharactersRoaster.ToList());
@@ -277,17 +280,21 @@ namespace CitadellesDotIO.Controllers
         private void HandleDistrictSpellTargets(IEnumerable<District> spellSources)
         {
             // Liste contenant l'ensemble des cibles avant application des règles du Spell
-            List<ITarget> availableTargets = new();
             foreach (Spell spell in spellSources.Select(ss => ss.Spell))
-            {
-                switch (spell.TargetType.Name)
+            {                
+                if (spell.HasTargetType)
                 {
-                    case nameof(IDealable):
-                        availableTargets.Add(this.DistrictsDeck);
-                        availableTargets.AddRange(this.Players.Select(p => p.City).Flatten());
-                        break;
+                    List<ITarget> availableTargets = new();
+                    switch (spell.TargetType.Name)
+                    {
+                        case nameof(IDealable):
+                            availableTargets.Add(this.DistrictsDeck);
+                            availableTargets.AddRange(this.Players.Select(p => p.City).Flatten());
+                            break;
+                    }
+                    spell.GetAvailableTargets(availableTargets);
                 }
-                spell.GetAvailableTargets(availableTargets);
+                else spell.GetAvailableTargets();
             }
         }
 
@@ -367,6 +374,9 @@ namespace CitadellesDotIO.Controllers
             // Tant que le joueur n'a pas terminé son tour
             while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn.ToString()))
             {
+                // Raffraichissement des cibles potentielles
+                this.HandleCharacterSpellTargets(character);
+                HandleDistrictSpellTargets(character.Player.DistrictSpellSources);
 
                 UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
 

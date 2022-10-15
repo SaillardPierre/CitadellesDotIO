@@ -27,7 +27,8 @@ namespace CitadellesDotIO.Model.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
-            this.Targets.RemoveAll(t => t is Thief || t is Assassin || (t is Character c && c.IsMurdered));
+            targets.RemoveAll(t => t is Thief || t is Assassin || (t is Character c && c.IsMurdered));
+            this.Targets = targets; 
         }
     }
 }

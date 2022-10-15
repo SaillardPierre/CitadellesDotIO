@@ -1,4 +1,6 @@
 using CitadellesDotIO.Enums;
+using CitadellesDotIO.Model.Spells;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CitadellesDotIO.Model.Districts
@@ -12,17 +14,26 @@ namespace CitadellesDotIO.Model.Districts
         public virtual bool CanBeDestroyed => IsBuilt && Owner != null;
         public bool IsBuilt { get; set; }
         public Player Owner { get; set; }
-        public virtual DistrictType DistrictType { get; }
+        public virtual DistrictType DistrictType { get; set; }
         public virtual Spell Spell { get; set; }
         public bool HasSpell => this.Spell != null;
+
         public void Reset()
         {
-            this.IsBuilt = false;
-            this.Owner = null;
+            if (this.Owner != null)
+            {               
+                if(this.Owner.City.Contains(this))
+                {
+                    this.Owner.City.Remove(this);
+                }
+                this.Owner = null;
+            }
             if (this.HasSpell)
             {
                 this.Spell.Caster = null;
             }
+            this.IsBuilt = false;
+
         }
     }
 }

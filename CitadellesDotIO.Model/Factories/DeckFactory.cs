@@ -1,7 +1,7 @@
 ﻿using CitadellesDotIO.Model.Districts;
-using CitadellesDotIO.Model;
+using System.Collections.Generic;
 
-namespace CitadellesDotIO.Factories
+namespace CitadellesDotIO.Model.Factories
 {
     public static class DeckFactory
     {

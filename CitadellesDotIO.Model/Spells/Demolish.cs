@@ -37,12 +37,14 @@ namespace CitadellesDotIO.Model.Spells
             // qui ne peuvent être détruits ou
             // qui sont trop chers à détruire ou
             // qui appartiennent à une cité terminée
-            this.Targets.RemoveAll(t =>
-                t is District district &&
+            targets.RemoveAll(t =>
+                t is District district &&                
+                district.Owner != null &&
                 (district.Owner.Character.Name.Equals(nameof(Bishop)) ||
                 !district.CanBeDestroyed ||
                 district.DestructionCost > this.Caster.Gold ||
                 district.Owner.HasReachedDistrictThreshold));
+            this.Targets = targets;
         }
     }
 }

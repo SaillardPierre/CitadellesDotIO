@@ -9,23 +9,14 @@ using System.Diagnostics;
 namespace CitadellesDotIO.WebServer.Controllers
 {
     public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> logger;
-        private readonly IHubContext<LobbiesHub, ILobbiesHubClient> lobbiesHubContext;
-        private readonly ILobbiesService lobbiesService;
-
-        public HomeController(
-            ILogger<HomeController> logger,
-            IHubContext<LobbiesHub, ILobbiesHubClient> lobbiesHubContext,
-            ILobbiesService lobbiesService)
-        {
-            this.lobbiesHubContext = lobbiesHubContext;
-            this.logger = logger;
-            this.lobbiesService = lobbiesService;
+    {       
+        public HomeController()
+        { 
         }
 
         public IActionResult Index()
         {
+
             return View();
         }
 
