@@ -23,7 +23,6 @@ namespace CitadellesDotIO.Controllers
         private readonly bool ApplyKingShuffleRule;
         private readonly ImmutableList<Character> CharactersRoaster;
         private bool IsLastTableRound => this.Players.Any(p => p.HasReachedDistrictThreshold);
-        private static IEnumerable<DistrictType> DistrictTypes = Enum.GetValues(typeof(DistrictType)).Cast<DistrictType>().OrderBy(dt => dt);
         public IView View { get; set; }
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }

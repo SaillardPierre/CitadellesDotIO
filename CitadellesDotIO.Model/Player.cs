@@ -26,13 +26,16 @@ namespace CitadellesDotIO.Model
 
         public List<District> City { get; set; }
 
-        public List<District> BuiltDistricts => this.City.Where(d => d.IsBuilt).ToList();
-
+        public List<District> BuiltDistricts => GetBuiltDistricts();            
+        private List<District> GetBuiltDistricts() => this.City.Where(d => d.IsBuilt).ToList();
         public List<District> BuildableDistricts => this.GetBuildableDistricts();
         private List<District> GetBuildableDistricts()
             => this.DistrictsDeck.Where(
                     d => d.BuildingCost <= this.Gold &&
                     !this.BuiltDistricts.Any(bd => bd.Name == d.Name)).ToList();
+        public IEnumerable<District> DistrictSpellSources => GetDistrictSpellSources();
+        private IEnumerable<District> GetDistrictSpellSources() =>
+            this.BuiltDistricts.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name)).ToList();
         public List<District> DistrictsDeck { get; set; }
         public void PickCharacter(Character character)
         {
@@ -54,19 +57,6 @@ namespace CitadellesDotIO.Model
             this.DistrictsDeck = new();
             this.TakenChoices = new();
             this.Score = 0;
-        }
-
-        // La liste des districts construits, ayant un Spell et n'ayant pas été utilisés ce tour
-        public IEnumerable<District> DistrictSpellSources
-        {
-            get
-            {
-                if (this.BuiltDistricts.Where(d => d.HasSpell).Count() > 0)
-                {
-                    var bp = "bp";
-                }
-                return this.BuiltDistricts.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name)).ToList();
-            }
         }
 
         public List<string> TakenChoices { get; set; }
@@ -128,8 +118,6 @@ namespace CitadellesDotIO.Model
             {
                 this.Score += 2;
             }
-
-            // TODO Gérer les quartiers spéciaux
 
             // Si la cité contient des quartiers de 5 couleurs différentes
             if (this.HasAllDistrictTypesBonus)
