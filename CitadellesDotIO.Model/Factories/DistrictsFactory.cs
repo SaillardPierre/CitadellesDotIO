@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Model.Districts;
+using System.Collections.Generic;
 
 namespace CitadellesDotIO.Model.Factories
 {
@@ -17,5 +18,16 @@ namespace CitadellesDotIO.Model.Factories
                 Spell = null
             };
         }
+
+        public static List<District> TestDistrictList(int size)
+        {
+            List<District> districtList = new List<District>();
+            for(int i=0; i<size;i++)
+            {
+                districtList.Add(new TestDistrict());
+            }
+            return districtList;
+        }
+    
     }
 }

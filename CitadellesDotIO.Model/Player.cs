@@ -19,7 +19,7 @@ namespace CitadellesDotIO.Model
         public bool HasPlayed { get; set; }
         public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public bool IsFirstReachingDistrictThreshold { get; set; }
-        public bool HasReachedDistrictThreshold => this.BuiltDistricts.Count == this.DistrictThreshold;
+        public bool HasReachedDistrictThreshold => this.BuiltDistricts.Count >= this.DistrictThreshold;
         public bool HasAllDistrictTypesBonus => this.BuiltDistricts.Select(d => d.DistrictType).Distinct().Count() == Enum.GetNames(typeof(DistrictType)).Length;
         public int DistrictThreshold { get; set; }
         public int Score { get; set; }

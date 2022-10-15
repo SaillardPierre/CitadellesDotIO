@@ -79,6 +79,7 @@ namespace CitadellesDotIO.Model.Factories
         }
 
 
+
         public static Deck<District> TestDistrictDeck(int deckSize)
         {
             Deck<District> deck = new();
