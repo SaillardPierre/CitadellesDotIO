@@ -25,7 +25,7 @@ namespace CitadellesDotIO
                 int rank = 1;
                 gc.GetRanking().ToList().ForEach(p =>
                 {
-                    Console.WriteLine($"{rank} : {p.Name} with {p.Score} points and {p.City.Count()} districts");
+                    Console.WriteLine($"{rank} : {p.Name} with {p.Score} points and {p.City.Count} districts");
                     p.City.ToList().ForEach(d =>
                     {
                         Console.WriteLine($"\t {d.Name} {d.ScoreValue}");
