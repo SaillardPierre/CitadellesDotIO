@@ -4,22 +4,14 @@ using System.Linq;
 using PrivateObjectExtension;
 using CitadellesDotIO.Controllers.Factory;
 using CitadellesDotIO.Model.Factories;
+using CitadellesDotIO.Tests.Factories;
+using System;
 
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
     public class CharactersDistributionTests
     {
-        private Game GameUnderTest;
-        private PrivateObject PrivateGameUnderTest;
-
-        private void SetTestObjects(int playersCount)
-        {
-            // Arrange
-            this.GameUnderTest = GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(playersCount).ToList());
-            this.PrivateGameUnderTest = new PrivateObject(this.GameUnderTest);
-        }
-
         [TestMethod]
         [DataRow(1, 4)]
         [DataRow(1, 5)]
@@ -28,16 +20,15 @@ namespace CitadellesDotIO.Tests
         public void LeftoversCharactersCount_ShouldEqual_X_ForYPlayers(int xLeftoverCharacters, int yPlayers)
         {
             // Arrange
-            this.SetTestObjects(yPlayers);
+            (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(yPlayers);
 
             // Act
-            this.PrivateGameUnderTest.Invoke("ShuffleCharacters");
-            this.PrivateGameUnderTest.Invoke("PrepareCharactersDistribution");
-            this.PrivateGameUnderTest.Invoke("PickCharacters");
+            privateGame.Invoke("ShuffleCharacters");
+            privateGame.Invoke("PrepareCharactersDistribution");
+            privateGame.Invoke("PickCharacters");
 
             // Assert
-            Assert.IsTrue(
-                this.GameUnderTest.CharactersDeck.Count == xLeftoverCharacters);
+            Assert.AreEqual(game.CharactersDeck.Count, xLeftoverCharacters);
         }
 
         [TestMethod]
@@ -48,16 +39,15 @@ namespace CitadellesDotIO.Tests
         public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
             // Arrange
-            this.SetTestObjects(xPlayers);
+            (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(xPlayers);
 
             // Act
-            this.PrivateGameUnderTest.Invoke("ShuffleCharacters");
-            this.PrivateGameUnderTest.Invoke("PrepareCharactersDistribution");
-            this.PrivateGameUnderTest.Invoke("PickCharacters");
+            privateGame.Invoke("ShuffleCharacters");
+            privateGame.Invoke("PrepareCharactersDistribution");
+            privateGame.Invoke("PickCharacters");
 
             // Assert
-            Assert.IsTrue(
-                this.GameUnderTest.Players.Count(p => p.HasPickedCharacter) == this.GameUnderTest.Players.Count);
+            Assert.AreEqual(game.Players.Count(p => p.HasPickedCharacter), game.Players.Count);
         }
 
         [TestMethod]
@@ -68,16 +58,15 @@ namespace CitadellesDotIO.Tests
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
             // Arrange
-            this.SetTestObjects(zPlayers);
+            (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(zPlayers);
 
             // Act
-            this.PrivateGameUnderTest.Invoke("ShuffleCharacters");
-            this.PrivateGameUnderTest.Invoke("PrepareCharactersDistribution");
+            privateGame.Invoke("ShuffleCharacters");
+            privateGame.Invoke("PrepareCharactersDistribution");
 
             // Assert
-            Assert.IsTrue(
-                this.GameUnderTest.CharactersBin.Count(c => c.IsVisible) == xVisible &&
-                this.GameUnderTest.CharactersBin.Count(c => !c.IsVisible) == yHidden);
+            Assert.AreEqual(game.CharactersBin.Count(c => c.IsVisible), xVisible);
+            Assert.AreEqual(game.CharactersBin.Count(c => !c.IsVisible), yHidden);
         }
     }
 }

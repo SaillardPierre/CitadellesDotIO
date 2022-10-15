@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 
-namespace CitadellesDotIO.Tests.SpellTests
+namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTest
 {
     [TestClass]
     public class StealTest

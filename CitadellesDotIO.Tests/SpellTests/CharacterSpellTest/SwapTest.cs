@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CitadellesDotIO.Tests.SpellTests
+namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTest
 {
     [TestClass]
     public class SwapTest
@@ -56,6 +56,6 @@ namespace CitadellesDotIO.Tests.SpellTests
             // Assert
             Assert.IsTrue(caster.Player.DistrictsDeck.SequenceEqual(oldTargetDeck, new DistrictComparer()));
             Assert.IsTrue(target.Object.DistrictsDeck.SequenceEqual(oldCastersDeck, new DistrictComparer()));
-        }        
+        }
     }
 }

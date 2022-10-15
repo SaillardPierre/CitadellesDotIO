@@ -3,9 +3,8 @@ using CitadellesDotIO.Model.Characters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace CitadellesDotIO.Tests.SpellTests
+namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTest
 {
     [TestClass]
     public class MurderTest
