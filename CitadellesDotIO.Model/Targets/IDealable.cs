@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CitadellesDotIO.Model
+namespace CitadellesDotIO.Model.Targets
 {
     public interface IDealable : ITarget
     {

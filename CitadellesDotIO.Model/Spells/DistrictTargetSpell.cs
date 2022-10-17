@@ -1,5 +1,4 @@
 ﻿using CitadellesDotIO.Model.Districts;
-using CitadellesDotIO.Model.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +7,8 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Model.Spells
 {
-    public class Revive : Spell
+    public abstract class DistrictTargetSpell : Spell
     {
         public override Type TargetType => typeof(District);
-
-        public override void Cast(ITarget target)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

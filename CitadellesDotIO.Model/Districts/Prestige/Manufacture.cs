@@ -8,7 +8,7 @@ namespace CitadellesDotIO.Model.Districts
         {
             this.Name = "Manufacture";
             this.BuildingCost = 5;
-            //this.Spell = new Craft();
+            this.Spell = new Craft(this.Owner);
         }
     }
 }

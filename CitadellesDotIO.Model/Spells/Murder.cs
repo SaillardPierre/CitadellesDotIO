@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Exceptions;
 using CitadellesDotIO.Model.Characters;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,8 @@ using System.Text;
 
 namespace CitadellesDotIO.Model.Spells
 {
-
-    public class Murder: Spell
+    public class Murder: CharacterTargetSpell
     {
-        public override Type TargetType => typeof(Character);
-
         public Murder(Player player)
         {
             this.Caster = player;
@@ -19,6 +17,7 @@ namespace CitadellesDotIO.Model.Spells
 
         public override void Cast(ITarget target)
         {
+            base.Cast(target);
             if (target is Character character)
             {
                 character.IsMurdered = true;

@@ -1,5 +1,7 @@
 using CitadellesDotIO.Enums;
+using CitadellesDotIO.Model.Passives;
 using CitadellesDotIO.Model.Spells;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,6 +19,8 @@ namespace CitadellesDotIO.Model.Districts
         public virtual DistrictType DistrictType { get; set; }
         public virtual Spell Spell { get; set; }
         public bool HasSpell => this.Spell != null;
+        public virtual Passive Passive { get; set; }
+        public bool HasPassive => this.Passive != null;
 
         public void Reset()
         {
@@ -32,8 +36,12 @@ namespace CitadellesDotIO.Model.Districts
             {
                 this.Spell.Caster = null;
             }
-            this.IsBuilt = false;
+            if (this.HasPassive)
+            {
+                this.Passive.Player = null;
+            }
 
+            this.IsBuilt = false;
         }
     }
 }

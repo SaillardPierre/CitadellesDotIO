@@ -2,19 +2,20 @@
 using CitadellesDotIO.Model.Districts;
 using System.Collections.Generic;
 using CitadellesDotIO.Model.Factories;
+using CitadellesDotIO.Model.Targets;
 
 namespace CitadellesDotIO.Model.Spells
 {
-    public class ColorShift : Spell
+    public class ColorShift : DistrictTargetSpell
     {
         public District SpellSource { get; set; }
         public ColorShift(District district)
         {
             this.SpellSource = district;
         }
-
         public override void Cast(ITarget target)
         {
+            base.Cast(target);
             this.SpellSource = target as District;
         }
         public override void GetAvailableTargets()
@@ -23,10 +24,10 @@ namespace CitadellesDotIO.Model.Spells
             {
                 this.Targets = new List<ITarget>
                 {
-                    DistrictsFactory.ToHollow(this.SpellSource, DistrictType.Religious) as ITarget,
-                    DistrictsFactory.ToHollow(this.SpellSource,DistrictType.Noble) as ITarget,
-                    DistrictsFactory.ToHollow(this.SpellSource,DistrictType.Trading) as ITarget,
-                    DistrictsFactory.ToHollow(this.SpellSource,DistrictType.Warfare) as ITarget
+                    DistrictsFactory.ToHollow(this.SpellSource, DistrictType.Religious),
+                    DistrictsFactory.ToHollow(this.SpellSource, DistrictType.Noble),
+                    DistrictsFactory.ToHollow(this.SpellSource, DistrictType.Trading),
+                    DistrictsFactory.ToHollow(this.SpellSource, DistrictType.Warfare)
                 };
             }
         }

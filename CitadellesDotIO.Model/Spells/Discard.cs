@@ -1,21 +1,21 @@
 ﻿using CitadellesDotIO.Model.Districts;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CitadellesDotIO.Model.Spells
 {
-    public class Discard : Spell
+    public class Discard : TableDeckTargetSpell
     {
-        private Deck<District> TableDeck;
+        public override bool HasToPickTargets => true;
         public Discard(Player player)
         {
             this.Caster = player;
         }
-        public override Type TargetType => typeof(Deck<District>);
-
         public override void Cast(ITarget target)
         {
+            base.Cast(target);
             District toDiscard = target as District;
             toDiscard.Reset();
             this.Caster.DistrictsDeck.Remove(toDiscard);
@@ -26,8 +26,7 @@ namespace CitadellesDotIO.Model.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
-            this.TableDeck = targets.SingleOrDefault(t => t is Deck<District>) as Deck<District>;
-            this.Targets = new List<ITarget>(this.Caster.BuildableDistricts);
+            this.Targets = new List<ITarget>(this.Caster.DistrictsDeck);
         }
     }
 }

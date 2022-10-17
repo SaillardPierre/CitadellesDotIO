@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using CitadellesDotIO.Model.Targets;
 
 namespace CitadellesDotIO.Model
 {
-    public class Deck<T> : Queue, ISwappable, IDealable
+    public class Deck<T> : Queue, ISwappable, IDealable, IDeck
     {
         public Deck() : base() { }
         public Deck(ICollection values) : base (values) { }

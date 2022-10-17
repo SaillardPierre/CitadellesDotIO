@@ -8,18 +8,16 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Model.Spells
 {
-    public class Craft : TableDeckTargetSpell
+    public class Draw : TableDeckTargetSpell
     {
-        public Craft(Player player)
+        public Draw(Player player)
         {
             this.Caster = player;
         }
-        public override bool HasTargets => base.HasTargets && this.Caster.Gold >= 3;
         public override void Cast()
         {
             base.Cast();
-            this.Caster.PickDistricts(this.TableDeck.PickCards(3).ToList());
-            this.Caster.Gold -= 3;
+            this.Caster.PickDistricts(this.TableDeck.PickCards(2).ToList());
         }
     }
 }

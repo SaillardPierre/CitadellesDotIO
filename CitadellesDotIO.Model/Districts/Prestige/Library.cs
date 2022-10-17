@@ -1,4 +1,6 @@
-﻿namespace CitadellesDotIO.Model.Districts
+﻿using CitadellesDotIO.Model.Passives;
+
+namespace CitadellesDotIO.Model.Districts
 {
     public class Library : PrestigeDistrict
     {
@@ -6,7 +8,7 @@
         {
             this.Name = "Library";
             this.BuildingCost = 6;
-            // TODO Ajouter le passif
+            this.Passive = new IncreasePickSize(this.Owner, 1);
         }
     }
 }

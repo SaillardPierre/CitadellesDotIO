@@ -1,5 +1,8 @@
 ﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Enums.TurnChoices;
+using CitadellesDotIO.Model.Passives;
 using CitadellesDotIO.Model.Spells;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.Linq;
 
@@ -19,6 +22,8 @@ namespace CitadellesDotIO.Model.Characters
         public bool HasAssociatedDistrictType => AssociatedDistrictType.HasValue;
         public virtual Spell Spell { get; set; }
         public bool HasSpell => Spell != null;
+        public virtual Passive Passive { get; set; }
+        public bool HasPassive => Passive != null;
         public bool IsPicked => Player != null;
         public bool IsMurdered { get; set; }
         public bool IsStolen { get; set; }

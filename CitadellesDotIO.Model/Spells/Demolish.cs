@@ -1,6 +1,7 @@
 ﻿using CitadellesDotIO.Exceptions;
 using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +10,16 @@ using System.Text;
 namespace CitadellesDotIO.Model.Spells
 {
 
-    public class Demolish : Spell
+    public class Demolish : DistrictTargetSpell
     {
-        public override Type TargetType => typeof(District);
-
         public Demolish(Player caster)
         {
             this.Caster = caster;
-            this.Targets = new List<ITarget>();
         }
 
         public override void Cast(ITarget target)
         {
+            base.Cast(target);
             if (target is District district)
             {
                 district.IsBuilt = false;

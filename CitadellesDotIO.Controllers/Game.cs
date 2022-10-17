@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using CitadellesDotIO.Exceptions;
 using CitadellesDotIO.Model.Spells;
+using CitadellesDotIO.Model.Targets;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -195,6 +196,8 @@ namespace CitadellesDotIO.Controllers
             {
                 character.Flip();
 
+                this.HandlePassives(character.Player);
+
                 this.HandleThievery(character);
 
                 HandleTrading(character);
@@ -212,9 +215,9 @@ namespace CitadellesDotIO.Controllers
         private void PickDistrictInPool(Character character)
         {
             // Pioche des deux premières cartes
-            List<District> districtPool = this.GenerateDistrictPool(2);
+            List<District> districtPool = this.GenerateDistrictPool(character.Player.PoolSize);
             // Choix des districts à garder
-            List<District> pickedDistrics = this.View.PickDistrictsFromPool(1, districtPool);
+            List<District> pickedDistrics = this.View.PickDistrictsFromPool(character.Player.PickSize, districtPool);
             // Défausse des districts non choisis sous la pioche
             districtPool.Except(pickedDistrics).ToList().ForEach(d => this.DistrictsDeck.Enqueue(d));
             // Ajout des districts choisis à la main du joueur
@@ -241,8 +244,15 @@ namespace CitadellesDotIO.Controllers
         {
             if (spell.HasTargets)
             {
-                ITarget target = this.PickSpellTarget(spell.Targets);
-                spell.Cast(target);
+                if(spell.HasToPickTargets)
+                {
+                    ITarget target = this.PickSpellTarget(spell.Targets);
+                    spell.Cast(target);
+                }
+                else
+                {
+                    spell.Cast();
+                }
             }
         }
 
@@ -267,6 +277,9 @@ namespace CitadellesDotIO.Controllers
                     case nameof(Character):
                         availableTargets.AddRange(this.CharactersRoaster.ToList());
                         break;
+                    case nameof(IDeck):
+                        availableTargets.Add(this.DistrictsDeck);
+                        break;
                     case nameof(ITarget):
                         break;
                     default: break;
@@ -288,7 +301,10 @@ namespace CitadellesDotIO.Controllers
                     {
                         case nameof(IDealable):
                             availableTargets.Add(this.DistrictsDeck);
-                            availableTargets.AddRange(this.Players.Select(p => p.City).Flatten());
+                            availableTargets.AddRange(this.Players.Select(p => p.BuiltDistricts).Flatten());
+                            break;
+                        case nameof(IDeck):
+                            availableTargets.Add(this.DistrictsDeck);
                             break;
                     }
                     spell.GetAvailableTargets(availableTargets);
@@ -340,6 +356,21 @@ namespace CitadellesDotIO.Controllers
                 character.Player.Gold = 0;
                 // Ajout du butin au trésor du voleur
                 thief.Gold += stolenGold;
+            }
+        }
+
+        private void HandlePassives(Player player)
+        {
+            player.ResetPickSize();
+            player.ResetPoolSize();
+            player.ResetTurnBuildingCap();
+            if (player.Character.HasPassive)
+            {
+                player.Character.Passive.Apply();
+            }
+            foreach(District district in player.DistrictPassiveSources)
+            {
+                district.Passive.Apply();
             }
         }
 

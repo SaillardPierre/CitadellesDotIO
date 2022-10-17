@@ -1,4 +1,6 @@
-﻿namespace CitadellesDotIO.Model.Districts
+﻿using CitadellesDotIO.Model.Passives;
+
+namespace CitadellesDotIO.Model.Districts
 {
     public class Observatory : PrestigeDistrict
     {
@@ -6,7 +8,7 @@
         {
             this.Name = "Observatory";
             this.BuildingCost = 5;
-            // TODO ajouter le passif
+            this.Passive = new IncreasePoolSize(this.Owner, 1);
         }
     }
 }

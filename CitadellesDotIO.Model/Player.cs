@@ -2,6 +2,7 @@
 using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Model.Characters;
 using CitadellesDotIO.Model.Districts;
+using CitadellesDotIO.Model.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +17,23 @@ namespace CitadellesDotIO.Model
         public bool IsCurrentKing { get; set; }
         public Character Character { get; set; }
         public bool HasPickedCharacter => this.Character != null;
-        public bool HasPlayed { get; set; }
-        public bool CanPlay => this.HasPickedCharacter && !this.HasPlayed;
         public bool IsFirstReachingDistrictThreshold { get; set; }
         public bool HasReachedDistrictThreshold => this.BuiltDistricts.Count >= this.DistrictThreshold;
         public bool HasAllDistrictTypesBonus => this.BuiltDistricts.Select(d => d.DistrictType).Distinct().Count() == Enum.GetNames(typeof(DistrictType)).Length;
         public int DistrictThreshold { get; set; }
+        private const int BasePoolSize = 2;
+        private const int BasePickSize = 1;
+        private const int BaseTurnBuildingCap = 1;
+        public int PoolSize { get; set; }
+        public int PickSize { get; set; }
+        public int TurnBuildingCap { get; set; }
+        public void ResetPoolSize() => this.PoolSize = BasePoolSize;
+        public void ResetPickSize() => this.PickSize = BasePickSize;
+        public void ResetTurnBuildingCap() => this.TurnBuildingCap = BaseTurnBuildingCap;
+
         public int Score { get; set; }
 
         public List<District> City { get; set; }
-
         public List<District> BuiltDistricts => GetBuiltDistricts();            
         private List<District> GetBuiltDistricts() => this.City.Where(d => d.IsBuilt).ToList();
         public List<District> BuildableDistricts => this.GetBuildableDistricts();
@@ -36,6 +44,10 @@ namespace CitadellesDotIO.Model
         public IEnumerable<District> DistrictSpellSources => GetDistrictSpellSources();
         private IEnumerable<District> GetDistrictSpellSources() =>
             this.BuiltDistricts.Where(d => d.HasSpell && !TakenChoices.Contains(d.Name)).ToList();
+        public IEnumerable<District> DistrictPassiveSources => GetDistrictPassiveSources();
+        private IEnumerable<District> GetDistrictPassiveSources()
+            => this.BuiltDistricts.Where(d => d.HasPassive);
+
         public List<District> DistrictsDeck { get; set; }
         public void PickCharacter(Character character)
         {
@@ -44,6 +56,10 @@ namespace CitadellesDotIO.Model
             if (character.HasSpell)
             {
                 character.Spell.Caster = this;
+            }
+            if(character.HasPassive)
+            {
+                character.Passive.Player = this;
             }
             this.TakenChoices = new();
         }
@@ -57,6 +73,9 @@ namespace CitadellesDotIO.Model
             this.DistrictsDeck = new();
             this.TakenChoices = new();
             this.Score = 0;
+            this.PickSize = BasePickSize;
+            this.PoolSize = BasePoolSize;
+            this.TurnBuildingCap = BaseTurnBuildingCap;
         }
 
         public List<string> TakenChoices { get; set; }
@@ -69,6 +88,13 @@ namespace CitadellesDotIO.Model
                 List<UnorderedTurnChoice> choices = new() {
                     UnorderedTurnChoice.EndTurn
                 };
+
+                // Le joueur dispose d'un quartier disposant d'un pouvoir à utiliser
+                if (this.DistrictSpellSources.Any(d => d.Spell.HasTargets))
+                {
+                    choices.Add(UnorderedTurnChoice.CastDistrictSpell);
+                }
+
                 if (this.Character != null)
                 {
                     // Le personnage a un type de quartier associé et au moins un d'entre eux est construit
@@ -84,20 +110,16 @@ namespace CitadellesDotIO.Model
                         choices.Add(UnorderedTurnChoice.CastCharacterSpell);
                     }
 
-                    // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité
-                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !this.BuiltDistricts.Any(bd => bd.Name == d.Name)))
+                    choices.RemoveAll(c => TakenChoices.Contains(c.ToString()));
+
+                    // La joueur a assez d'or pour constuire un quartier qui n'existe pas dans sa cité et il n'a pas atteint le maximum de constructions pour ce tour
+                    if (this.DistrictsDeck.Any(d => d.BuildingCost <= this.Gold && !this.BuiltDistricts.Any(bd => bd.Name == d.Name)) &&
+                        this.TurnBuildingCap > TakenChoices.Count(c=>c.Equals(UnorderedTurnChoice.BuildDistrict.ToString())))
                     {
                         choices.Add(UnorderedTurnChoice.BuildDistrict);
                     }
                 }
 
-                // Le joueur dispose d'un quartier disposant d'un pouvoir à utiliser
-                if (this.DistrictSpellSources.Any(d => d.Spell.HasTargets))
-                {
-                    choices.Add(UnorderedTurnChoice.CastDistrictSpell);
-                }
-
-                choices.RemoveAll(c => TakenChoices.Contains(c.ToString()));
                 return choices;
             }
         }
@@ -125,13 +147,16 @@ namespace CitadellesDotIO.Model
                 this.Score += 3;
             }
         }
-
         public void BuildDistrict(District district)
         {
             district.IsBuilt = true;
             if (district.HasSpell)
             {
                 district.Spell.Caster = this;
+            }
+            if (district.HasPassive)
+            {
+                district.Passive.Player = this;
             }
             this.Gold -= district.BuildingCost;
             this.DistrictsDeck.Remove(district);
@@ -144,6 +169,10 @@ namespace CitadellesDotIO.Model
             if(district.HasSpell)
             {
                 district.Spell.Caster = this;
+            }
+            if(district.HasPassive)
+            {
+                district.Passive.Player = this;
             }
             this.DistrictsDeck.Add(district);
         }

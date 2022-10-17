@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CitadellesDotIO.Model
+namespace CitadellesDotIO.Model.Targets
 {
-    public interface ITarget
+    public interface ISwappable : ITarget
     {
     }
 }

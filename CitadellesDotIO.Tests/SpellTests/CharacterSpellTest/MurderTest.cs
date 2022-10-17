@@ -1,5 +1,5 @@
-﻿using CitadellesDotIO.Model;
-using CitadellesDotIO.Model.Characters;
+﻿using CitadellesDotIO.Model.Characters;
+using CitadellesDotIO.Model.Targets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
