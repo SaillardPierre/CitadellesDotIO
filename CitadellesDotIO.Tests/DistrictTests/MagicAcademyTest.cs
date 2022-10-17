@@ -26,8 +26,7 @@ namespace CitadellesDotIO.Tests.DistrictTests
             player.Object.Character.PercieveBonusIncome();
 
             // Assert
-            int expectedGold = PlayerMockFactory.InitialGold - player.Object.BuiltDistricts.First().BuildingCost + 1;
-            Assert.AreEqual(expectedGold, player.Object.Gold);
+            Assert.AreEqual(PlayerMockFactory.InitialGold + 1, player.Object.Gold);
         }
 
         [TestMethod]
@@ -44,8 +43,7 @@ namespace CitadellesDotIO.Tests.DistrictTests
             player.Object.Character.PercieveBonusIncome();
 
             // Assert
-            int expectedGold = PlayerMockFactory.InitialGold - player.Object.BuiltDistricts.First().BuildingCost;
-            Assert.AreEqual(expectedGold, player.Object.Gold);
+            Assert.AreEqual(PlayerMockFactory.InitialGold, player.Object.Gold);
         }
 
 
