@@ -196,7 +196,7 @@ namespace CitadellesDotIO.Controllers
             {
                 character.Flip();
 
-                this.HandlePassives(character.Player);
+                HandlePassives(character.Player);
 
                 this.HandleThievery(character);
 
@@ -244,7 +244,7 @@ namespace CitadellesDotIO.Controllers
         {
             if (spell.HasTargets)
             {
-                if(spell.HasToPickTargets)
+                if (spell.HasToPickTargets)
                 {
                     ITarget target = this.PickSpellTarget(spell.Targets);
                     spell.Cast(target);
@@ -293,7 +293,7 @@ namespace CitadellesDotIO.Controllers
         {
             // Liste contenant l'ensemble des cibles avant application des règles du Spell
             foreach (Spell spell in spellSources.Select(ss => ss.Spell))
-            {                
+            {
                 if (spell.HasTargetType)
                 {
                     List<ITarget> availableTargets = new();
@@ -368,7 +368,7 @@ namespace CitadellesDotIO.Controllers
             {
                 player.Character.Passive.Apply();
             }
-            foreach(District district in player.DistrictPassiveSources)
+            foreach (District district in player.DistrictPassiveSources)
             {
                 district.Passive.Apply();
             }
