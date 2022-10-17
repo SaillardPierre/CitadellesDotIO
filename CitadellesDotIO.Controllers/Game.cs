@@ -359,7 +359,7 @@ namespace CitadellesDotIO.Controllers
             }
         }
 
-        private void HandlePassives(Player player)
+        private static void HandlePassives(Player player)
         {
             player.ResetPickSize();
             player.ResetPoolSize();
