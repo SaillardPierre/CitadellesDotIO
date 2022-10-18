@@ -1,6 +1,6 @@
-﻿using CitadellesDotIO.Model;
-using CitadellesDotIO.Model.Characters;
-using CitadellesDotIO.Model.Districts;
+﻿using CitadellesDotIO.Engine;
+using CitadellesDotIO.Engine.Characters;
+using CitadellesDotIO.Engine.Districts;
 using CitadellesDotIO.Tests.Factories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;

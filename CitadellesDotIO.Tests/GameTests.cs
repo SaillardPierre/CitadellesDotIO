@@ -1,9 +1,9 @@
-﻿using CitadellesDotIO.Controllers;
-using CitadellesDotIO.Controllers.Factory;
-using CitadellesDotIO.Enums;
-using CitadellesDotIO.Model.Factories;
+﻿using CitadellesDotIO.Enums;
+using CitadellesDotIO.Engine.Factories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using CitadellesDotIO.Engine.Factory;
+using CitadellesDotIO.Engine;
 
 namespace CitadellesDotIO.Tests
 {

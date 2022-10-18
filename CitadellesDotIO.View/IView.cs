@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Enums.TurnChoices;
-using CitadellesDotIO.Model.Characters;
-using CitadellesDotIO.Model.Districts;
-using CitadellesDotIO.Model.Targets;
+using CitadellesDotIO.Engine.Characters;
+using CitadellesDotIO.Engine.Districts;
 
 namespace CitadellesDotIO.View
 {

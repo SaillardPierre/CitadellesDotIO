@@ -1,6 +1,5 @@
-﻿using CitadellesDotIO.Controllers;
-using CitadellesDotIO.Controllers.Factory;
-using CitadellesDotIO.Model.Factories;
+﻿using CitadellesDotIO.Engine;
+using CitadellesDotIO.Engine.Factories;
 using PrivateObjectExtension;
 using System;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace CitadellesDotIO.Tests.Factories
     {
         public static Tuple<Game, PrivateObject> GetPrivateGame(int playerCount) 
         {
-            Game game = GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(playerCount).ToList());
+            Game game = Engine.Factory.GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(playerCount).ToList());
             PrivateObject privateGame = new (game);
             return Tuple.Create(game, privateGame);
         }

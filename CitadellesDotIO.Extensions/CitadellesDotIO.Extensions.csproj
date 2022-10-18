@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>    
@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Enums\CitadellesDotIO.Enums.csproj" />
-    <ProjectReference Include="..\CitadellesDotIO.Model\CitadellesDotIO.Model.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.Engine\CitadellesDotIO.Engine.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CitadellesDotIO.Controllers\CitadellesDotIO.Controllers.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.Engine\CitadellesDotIO.Engine.csproj" />
   </ItemGroup>
 
 </Project>

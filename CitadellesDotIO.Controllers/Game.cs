@@ -1,9 +1,8 @@
 ﻿using CitadellesDotIO.Enums;
 using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Extensions;
-using CitadellesDotIO.Model.Characters;
-using CitadellesDotIO.Model.Districts;
-using CitadellesDotIO.Model;
+using CitadellesDotIO.Engine.Characters;
+using CitadellesDotIO.Engine.Districts;
 using CitadellesDotIO.View;
 using System;
 using System.Collections.Generic;
@@ -11,8 +10,9 @@ using System.Linq;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using CitadellesDotIO.Exceptions;
-using CitadellesDotIO.Model.Spells;
-using CitadellesDotIO.Model.Targets;
+using CitadellesDotIO.Engine;
+using CitadellesDotIO.Engine.Targets;
+using CitadellesDotIO.Engine.Spells;
 
 namespace CitadellesDotIO.Controllers
 {
@@ -194,9 +194,9 @@ namespace CitadellesDotIO.Controllers
             // On montre la carte du personnage courant s'il n'est pas assassiné
             if (!character.IsMurdered)
             {
-                character.Flip();
+                character.Player.ApplyPassives();
 
-                HandlePassives(character.Player);
+                character.Flip();
 
                 this.HandleThievery(character);
 
@@ -356,21 +356,6 @@ namespace CitadellesDotIO.Controllers
                 character.Player.Gold = 0;
                 // Ajout du butin au trésor du voleur
                 thief.Gold += stolenGold;
-            }
-        }
-
-        private static void HandlePassives(Player player)
-        {
-            player.ResetPickSize();
-            player.ResetPoolSize();
-            player.ResetTurnBuildingCap();
-            if (player.Character.HasPassive)
-            {
-                player.Character.Passive.Apply();
-            }
-            foreach (District district in player.DistrictPassiveSources)
-            {
-                district.Passive.Apply();
             }
         }
 

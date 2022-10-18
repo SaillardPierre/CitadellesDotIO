@@ -1,11 +1,9 @@
-﻿using CitadellesDotIO.Controllers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using PrivateObjectExtension;
-using CitadellesDotIO.Controllers.Factory;
-using CitadellesDotIO.Model.Factories;
 using CitadellesDotIO.Tests.Factories;
 using System;
+using CitadellesDotIO.Engine;
 
 namespace CitadellesDotIO.Tests
 {

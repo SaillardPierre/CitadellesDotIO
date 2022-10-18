@@ -5,19 +5,11 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Tests", "CitadellesDotIO.Tests\CitadellesDotIO.Tests.csproj", "{21190B94-F299-49D6-912A-2513D7E258CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Model", "CitadellesDotIO.Model\CitadellesDotIO.Model.csproj", "{3AC0D03F-AE02-4112-AB88-3C6E30F23E8E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Controllers", "CitadellesDotIO.Controllers\CitadellesDotIO.Controllers.csproj", "{A69B0F2B-306D-4392-B553-76CA46A7F4EB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Config", "CitadellesDotIO.Config\CitadellesDotIO.Config.csproj", "{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.View", "CitadellesDotIO.View\CitadellesDotIO.View.csproj", "{1C43A6D6-5482-4F7F-A4A0-414634226EFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Engine", "CitadellesDotIO.Engine\CitadellesDotIO.Engine.csproj", "{3AC0D03F-AE02-4112-AB88-3C6E30F23E8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Enums", "CitadellesDotIO.Enums\CitadellesDotIO.Enums.csproj", "{71BFF99E-B0C9-49EC-B7CB-1102042D6E5F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Exceptions", "CitadellesDotIO.Exceptions\CitadellesDotIO.Exceptions.csproj", "{312859BD-635B-4A23-A1B7-456B9BE696E1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Extensions", "CitadellesDotIO.Extensions\CitadellesDotIO.Extensions.csproj", "{E66BB1CE-5210-4D26-BBB3-1288E740FA4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Console", "CitadellesDotIO.Console\CitadellesDotIO.Console.csproj", "{3780EC8B-884E-4977-BE2A-1D8F90678D5B}"
 EndProject
@@ -37,18 +29,6 @@ Global
 		{3AC0D03F-AE02-4112-AB88-3C6E30F23E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AC0D03F-AE02-4112-AB88-3C6E30F23E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AC0D03F-AE02-4112-AB88-3C6E30F23E8E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A69B0F2B-306D-4392-B553-76CA46A7F4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A69B0F2B-306D-4392-B553-76CA46A7F4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A69B0F2B-306D-4392-B553-76CA46A7F4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A69B0F2B-306D-4392-B553-76CA46A7F4EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4D1588A-EB9B-45D5-BD5C-DC9D0A48B70D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1C43A6D6-5482-4F7F-A4A0-414634226EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C43A6D6-5482-4F7F-A4A0-414634226EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1C43A6D6-5482-4F7F-A4A0-414634226EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C43A6D6-5482-4F7F-A4A0-414634226EFC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{71BFF99E-B0C9-49EC-B7CB-1102042D6E5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71BFF99E-B0C9-49EC-B7CB-1102042D6E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71BFF99E-B0C9-49EC-B7CB-1102042D6E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -57,10 +37,6 @@ Global
 		{312859BD-635B-4A23-A1B7-456B9BE696E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{312859BD-635B-4A23-A1B7-456B9BE696E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{312859BD-635B-4A23-A1B7-456B9BE696E1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E66BB1CE-5210-4D26-BBB3-1288E740FA4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E66BB1CE-5210-4D26-BBB3-1288E740FA4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E66BB1CE-5210-4D26-BBB3-1288E740FA4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E66BB1CE-5210-4D26-BBB3-1288E740FA4F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
