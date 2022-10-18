@@ -6,14 +6,13 @@ namespace CitadellesDotIO.Engine.Factory
 {
     public static class GameFactory
     {
-        public static Game VanillaGame(List<Player> players, int districtDeckSize = 0)
+        public static Game VanillaGame(List<Player> players, IView view = null)
         {
             return new Game(
                 players,
                 CharactersFactory.VanillaCharactersList,
-                //DeckFactory.Laboratories().ToList(),
                 DeckFactory.VanillaDistrictsDeck(),
-                new RandomActionView());
+                view == null ? new RandomActionView() : view);
         }
     }
 }

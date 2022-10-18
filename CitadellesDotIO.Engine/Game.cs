@@ -11,6 +11,7 @@ using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Engine.Spells;
 using CitadellesDotIO.Extensions;
 using CitadellesDotIO.Engine.View;
+using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine
 {
@@ -132,17 +133,17 @@ namespace CitadellesDotIO.Engine
                 this.PrepareCharactersDistribution();
             }
         }
-        private void PickCharacters()
+        private async Task PickCharacters()
         {
-            Players.ForEach(p =>
+            foreach (Player p in Players)
             {
-                Character pickedCharacter = this.View.PickCharacter(this.CharactersDeck);
+                Character pickedCharacter = await this.View.PickCharacter(this.CharactersDeck);
                 p.PickCharacter(CharactersDeck.DrawElement(pickedCharacter));
-            });
+            }
             this.GameState = GameState.TableRoundPhase;
         }
 
-        public bool Run()
+        public async Task<bool> Run()
         {
             this.GameState = GameState.CharacterPickPhase;
             while (this.GameState != GameState.Finished)
@@ -154,10 +155,10 @@ namespace CitadellesDotIO.Engine
                         this.RecoverDestroyedDistricts();
                         this.ShuffleCharacters();
                         this.PrepareCharactersDistribution();
-                        this.PickCharacters();
+                        await this.PickCharacters();
                         break;
                     case GameState.TableRoundPhase:
-                        this.PlayTableRound();
+                        await this.PlayTableRound();
                         turnCount++;
                         break;
                 }
@@ -180,14 +181,17 @@ namespace CitadellesDotIO.Engine
             this.Players.ForEach(p => p.ComputeScore());
         public IEnumerable<Player> GetRanking()
             => this.Players.OrderByDescending(p => p.Score);
-        private void PlayTableRound()
+        private async Task PlayTableRound()
         {
             List<Character> characters = this.Players.Select(p => p.Character).OrderBy(c => c.Order).ToList();
-            characters.ForEach(c => this.PlayCharacterRound(c));
+            foreach (Character character in characters)
+            {
+                await this.PlayCharacterRound(character);
+            }
             // Après le tour de table, si personne n'as terminé, on repart sur la phase de séléction des personnages
             this.GameState = this.IsLastTableRound ? GameState.Finished : GameState.CharacterPickPhase;
         }
-        private void PlayCharacterRound(Character character)
+        private async Task PlayCharacterRound(Character character)
         {
             // On montre la carte du personnage courant s'il n'est pas assassiné
             if (!character.IsMurdered)
@@ -200,9 +204,9 @@ namespace CitadellesDotIO.Engine
 
                 HandleTrading(character);
 
-                this.HandleMandatoryTurnChoice(character);
+                await this.HandleMandatoryTurnChoice(character);
 
-                this.HandleUnorderedTurnChoices(character);
+                await this.HandleUnorderedTurnChoices(character);
 
                 this.CharactersBin.Add(character);
             }
@@ -210,21 +214,21 @@ namespace CitadellesDotIO.Engine
             // La couronne passe même si le roi a été assassiné
             this.HandleKingship(character);
         }
-        private void PickDistrictInPool(Character character)
+        private async Task PickDistrictInPool(Character character)
         {
             // Pioche des deux premières cartes
             List<District> districtPool = this.GenerateDistrictPool(character.Player.PoolSize);
             // Choix des districts à garder
-            List<District> pickedDistrics = this.View.PickDistrictsFromPool(character.Player.PickSize, districtPool);
+            List<District> pickedDistrics = await this.View.PickDistrictsFromPool(character.Player.PickSize, districtPool);
             // Défausse des districts non choisis sous la pioche
             districtPool.Except(pickedDistrics).ToList().ForEach(d => this.DistrictsDeck.Enqueue(d));
             // Ajout des districts choisis à la main du joueur
             character.Player.PickDistricts(pickedDistrics);
         }
 
-        private void BuildDistrict(Character character)
+        private async Task BuildDistrict(Character character)
         {
-            District toBuild = this.View.PickDistrictToBuild(character.Player.BuildableDistricts);
+            District toBuild = await this.View.PickDistrictToBuild(character.Player.BuildableDistricts);
             if (toBuild != null)
             {
                 character.Player.BuildDistrict(toBuild);
@@ -238,13 +242,13 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private void CastSpell(Spell spell)
+        private async Task CastSpell(Spell spell)
         {
             if (spell.HasTargets)
             {
                 if (spell.HasToPickTargets)
                 {
-                    ITarget target = this.PickSpellTarget(spell.Targets);
+                    ITarget target = await this.PickSpellTarget(spell.Targets);
                     spell.Cast(target);
                 }
                 else
@@ -254,7 +258,7 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private District PickDistrictSpellSource(List<District> districts) => this.View.PickDistrictSpellSource(districts);
+        private async Task<District> PickDistrictSpellSource(List<District> districts) => await this.View.PickDistrictSpellSource(districts);
 
         private void HandleCharacterSpellTargets(Character character)
         {
@@ -311,7 +315,7 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private ITarget PickSpellTarget(List<ITarget> availableTargets) => this.View.PickSpellTarget(availableTargets);
+        private async Task<ITarget> PickSpellTarget(List<ITarget> availableTargets) => await this.View.PickSpellTarget(availableTargets);
 
         private List<District> GenerateDistrictPool(int poolSize)
         {
@@ -366,9 +370,9 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private void HandleMandatoryTurnChoice(Character character)
+        private async Task HandleMandatoryTurnChoice(Character character)
         {
-            MandatoryTurnChoice turnChoice = this.View.PickMandatoryTurnChoice();
+            MandatoryTurnChoice turnChoice = await this.View.PickMandatoryTurnChoice();
 
             // Le joueur prend l'argent
             if (turnChoice == MandatoryTurnChoice.BaseIncome)
@@ -378,11 +382,11 @@ namespace CitadellesDotIO.Engine
             // Le joueur prend la pioche
             else
             {
-                this.PickDistrictInPool(character);
+                await this.PickDistrictInPool(character);
             }
         }
 
-        private void HandleUnorderedTurnChoices(Character character)
+        private async Task HandleUnorderedTurnChoices(Character character)
         {
             // Tant que le joueur n'a pas terminé son tour
             while (!character.Player.TakenChoices.Contains(UnorderedTurnChoice.EndTurn.ToString()))
@@ -391,7 +395,7 @@ namespace CitadellesDotIO.Engine
                 this.HandleCharacterSpellTargets(character);
                 HandleDistrictSpellTargets(character.Player.DistrictSpellSources);
 
-                UnorderedTurnChoice currentChoice = this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
+                UnorderedTurnChoice currentChoice = await this.View.PickUnorderedTurnChoice(character.Player.AvailableChoices);
 
                 // Ajout du choix courant à la liste des choix pris
                 switch (currentChoice)
@@ -401,16 +405,16 @@ namespace CitadellesDotIO.Engine
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                     case UnorderedTurnChoice.BuildDistrict:
-                        this.BuildDistrict(character);
+                        await this.BuildDistrict(character);
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                     case UnorderedTurnChoice.CastCharacterSpell:
-                        this.CastSpell(character.Spell);
+                        await this.CastSpell(character.Spell);
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                     case UnorderedTurnChoice.CastDistrictSpell:
-                        District casterDistrict = this.PickDistrictSpellSource(character.Player.DistrictSpellSources.ToList());
-                        this.CastSpell(casterDistrict.Spell);
+                        District casterDistrict = await this.PickDistrictSpellSource(character.Player.DistrictSpellSources.ToList());
+                        await this.CastSpell(casterDistrict.Spell);
                         character.Player.TakenChoices.Add(casterDistrict.Name);
                         break;
                     case UnorderedTurnChoice.EndTurn:

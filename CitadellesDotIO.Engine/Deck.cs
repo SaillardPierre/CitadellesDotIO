@@ -8,6 +8,9 @@ namespace CitadellesDotIO.Engine
     {
         public Deck() : base() { }
         public Deck(ICollection values) : base(values) { }
+
+        public string Name => "Table deck";
+
         public T PickCard() => (T)Dequeue();
 
         public IEnumerable<T> PickCards(int cardsCount)

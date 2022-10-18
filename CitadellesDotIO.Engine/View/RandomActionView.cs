@@ -7,6 +7,7 @@ using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Extensions;
 using CitadellesDotIO.Engine.Characters;
 using CitadellesDotIO.Engine.Districts;
+using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.View
 {
@@ -15,41 +16,25 @@ namespace CitadellesDotIO.Engine.View
     /// </summary>
     public class RandomActionView : IView
     {
-        public Character PickCharacter(List<Character> characters)
-            => characters[RandomNumberGenerator.GetInt32(0, characters.Count)];
+        public Task<Character> PickCharacter(List<Character> characters)
+            => Task.FromResult(characters[RandomNumberGenerator.GetInt32(0, characters.Count)]);
 
-        public MandatoryTurnChoice PickMandatoryTurnChoice()
-            => (MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length);
+        public Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
+            => Task.FromResult((MandatoryTurnChoice)RandomNumberGenerator.GetInt32(0, Enum.GetNames(typeof(MandatoryTurnChoice)).Length));
 
-        public UnorderedTurnChoice PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
-        {
-            if (availableChoices.Contains(UnorderedTurnChoice.CastDistrictSpell))
-            {
-                return UnorderedTurnChoice.CastDistrictSpell;
-            }
-            else return availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count)] : availableChoices.Single();
-        }
+        public Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
+            => Task.FromResult(availableChoices.Count != 1 ? availableChoices[Dice.Roll(availableChoices.Count)] : availableChoices.Single());
 
-        public List<District> PickDistrictsFromPool(int pickCount, List<District> pool)
-            => pool.OrderBy(d => Dice.Roll(pool.Count)).Take(pickCount).ToList();
+        public Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
+            => Task.FromResult(pool.OrderBy(d => Dice.Roll(pool.Count)).Take(pickCount).ToList());
 
-        public District PickDistrictToBuild(List<District> buildables)
-        {
-            if (buildables.Count == 0)
-            {
-                return null;
-            }
-            else if (buildables.Count == 1)
-            {
-                return buildables.Single();
-            }
-            return buildables[RandomNumberGenerator.GetInt32(0, buildables.Count)]; 
-        }
+        public Task<District> PickDistrictToBuild(List<District> buildables)
+            => Task.FromResult(buildables[RandomNumberGenerator.GetInt32(0, buildables.Count)]);
 
-        public ITarget PickSpellTarget(List<ITarget> targets)
-            => targets.Count != 1 ? targets[Dice.Roll(targets.Count)] : targets.Single();
+        public Task<ITarget> PickSpellTarget(List<ITarget> targets)
+            => Task.FromResult(targets.Count != 1 ? targets[Dice.Roll(targets.Count)] : targets.Single());
 
-        public District PickDistrictSpellSource(List<District> spellSources)
-            => spellSources.Count != 1 ? spellSources[Dice.Roll(spellSources.Count)] : spellSources.Single();
+        public Task<District> PickDistrictSpellSource(List<District> spellSources)
+            => Task.FromResult(spellSources.Count != 1 ? spellSources[Dice.Roll(spellSources.Count)] : spellSources.Single());
     }
 }

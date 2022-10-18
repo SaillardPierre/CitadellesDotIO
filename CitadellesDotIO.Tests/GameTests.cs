@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using CitadellesDotIO.Engine.Factory;
 using CitadellesDotIO.Engine;
+using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Tests
 {
@@ -15,11 +16,10 @@ namespace CitadellesDotIO.Tests
         [DataRow(6)]
         [DataRow(7)]
         [TestMethod]
-        public void Game_GameState_Finished_ForXPlayers(int xPlayers)
+        public async Task Game_GameState_Finished_ForXPlayers(int xPlayers)
         {
             Game game = GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(xPlayers).ToList());
-            Assert.IsTrue(
-                game.Run() && game.GameState.Equals(GameState.Finished));
+            Assert.IsTrue(await game.Run() && game.GameState.Equals(GameState.Finished));
         }
     }
 }

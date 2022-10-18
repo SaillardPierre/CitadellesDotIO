@@ -1,14 +1,16 @@
 ﻿using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.Factory;
+using CitadellesDotIO.Engine.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CitadellesDotIO
 {
     public static class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {            
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
             playerNames.GetRange(0, 0).ForEach(p => Console.WriteLine(p));            
@@ -17,8 +19,8 @@ namespace CitadellesDotIO
             {
                 players.Add(new Player(playerNames[i]));
             }
-            Game gc = GameFactory.VanillaGame(players);
-            if (gc.Run())
+            Game gc = GameFactory.VanillaGame(players, new ConsoleView());
+            if (await gc.Run())
             {
                 Console.WriteLine("La partie est terminée");
                 int rank = 1;

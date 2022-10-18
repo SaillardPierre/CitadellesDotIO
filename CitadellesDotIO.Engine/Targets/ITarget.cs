@@ -2,5 +2,6 @@
 {
     public interface ITarget
     {
+        public string Name { get; }
     }
 }
