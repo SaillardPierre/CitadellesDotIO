@@ -13,8 +13,8 @@ namespace CitadellesDotIO.Engine.View
         public Task<MandatoryTurnChoice> PickMandatoryTurnChoice();
         public Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices);
         public Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool);
-        public Task<District> PickDistrictToBuild(List<District> buildables);
         public Task<ITarget> PickSpellTarget(List<ITarget> targets);
-        public Task<District> PickDistrictSpellSource(List<District> spellSources);
+        public Task<District> PickDistrict(List<District> districts);
+
     }
 }

@@ -28,13 +28,10 @@ namespace CitadellesDotIO.Engine.View
         public Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
             => Task.FromResult(pool.OrderBy(d => Dice.Roll(pool.Count)).Take(pickCount).ToList());
 
-        public Task<District> PickDistrictToBuild(List<District> buildables)
-            => Task.FromResult(buildables[RandomNumberGenerator.GetInt32(0, buildables.Count)]);
-
         public Task<ITarget> PickSpellTarget(List<ITarget> targets)
             => Task.FromResult(targets.Count != 1 ? targets[Dice.Roll(targets.Count)] : targets.Single());
 
-        public Task<District> PickDistrictSpellSource(List<District> spellSources)
-            => Task.FromResult(spellSources.Count != 1 ? spellSources[Dice.Roll(spellSources.Count)] : spellSources.Single());
+        public Task<District> PickDistrict(List<District> districts)
+            => Task.FromResult(districts[RandomNumberGenerator.GetInt32(0, districts.Count)]);
     }
 }

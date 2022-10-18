@@ -12,48 +12,42 @@ namespace CitadellesDotIO.Engine.View
 {
     public class ConsoleView : IView
     {
-
-        private async Task<District> PickDistrict(List<District> districts)
+        private async Task<int> GetIndexAsync(List<dynamic> items)
         {
             int i = 0;
-            Console.WriteLine("Pick District to by index :");
-            foreach (District district in districts)
+            foreach (object item in items)
             {
-                Console.WriteLine($"[{i}] {district.Name}");
+                string name = (item is string) ? item as string : item.GetType().GetProperties().Single(p => p.Name == "Name").GetValue(item).ToString();
+                Console.WriteLine($"[{i}] {name}");
                 i++;
             }
             string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < districts.Count && index > -1)
+            if (int.TryParse(input, out int index) && index < items.Count && index > -1)
             {
-                return districts[index];
+                return index;
             }
             else
             {
-                Console.WriteLine("Please enter a valid choice index");
-                return await this.PickDistrictToBuild(districts);
+                Console.WriteLine($"Please enter a valid choice index (between 0 and {items.Count})");
+                return await this.GetIndexAsync(items);
             }
+        }
+
+        public async Task<District> PickDistrict(List<District> districts)
+        {
+            Console.WriteLine("Pick District by index :");
+            return districts[await this.GetIndexAsync(new(districts))];
         }
 
         public async Task<Character> PickCharacter(List<Character> characters)
         {
-            int i = 0;
-            Console.WriteLine("Pick character by index :");
-            characters.ForEach(c =>
-            {
-                Console.WriteLine($"[{i}] {c.Name}");
-                i++;
-            });
-            string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < characters.Count && index > -1)
-            {
-                return characters[index];                
-            }
-            Console.WriteLine("Please enter a valid character index");
-            return await this.PickCharacter(characters);
+            Console.WriteLine("Pick Character by index :");
+            return characters[await this.GetIndexAsync(new(characters))];
         }
 
         public async Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
         {
+            Console.WriteLine($"Pick {pickCount} Districts from Pool");
             List<District> pickeds = new List<District>();
             while (pickeds.Count < pickCount)
             {
@@ -64,93 +58,22 @@ namespace CitadellesDotIO.Engine.View
             return pickeds;
         }
 
-        public async Task<District> PickDistrictSpellSource(List<District> spellSources)
-        {
-            int i = 0;
-            Console.WriteLine("Pick DistrictSpellSource by index :");
-            foreach (District district in spellSources)
-            {
-                Console.WriteLine($"[{i}] {district.Name}");
-                i++;
-            }
-            string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < spellSources.Count && index > -1)
-            {
-                return spellSources[index];
-            }
-            else
-            {
-                Console.WriteLine("Please enter a valid choice index");
-                return await this.PickDistrictToBuild(spellSources);
-            }
-        }
-
-        public async Task<District> PickDistrictToBuild(List<District> buildables)
-        {
-            return await this.PickDistrict(buildables);
-        }
-
         public async Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
         {
-            int i = 0;
             Console.WriteLine("Pick Mandatory turn choice by index :");
-            foreach (string choice in Enum.GetNames(typeof(MandatoryTurnChoice)))
-            {
-                Console.WriteLine($"[{i}] {choice}");
-                i++;
-            }
-            string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < 2 && index > -1)
-            {
-                return (MandatoryTurnChoice)index;
-            }
-            else
-            {
-                Console.WriteLine("Please enter a valid choice index");
-                return await this.PickMandatoryTurnChoice();
-            }
+            return (MandatoryTurnChoice)await this.GetIndexAsync(new(Enum.GetNames(typeof(MandatoryTurnChoice))));
         }
 
         public async Task<ITarget> PickSpellTarget(List<ITarget> targets)
         {
-            int i = 0;
             Console.WriteLine("Pick Spell Target by index :");
-            foreach (ITarget target in targets)
-            {
-                Console.WriteLine($"[{i}] {target.Name}");
-                i++;
-            }
-            string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < targets.Count && index > -1)
-            {
-                return targets[index];
-            }
-            else
-            {
-                Console.WriteLine("Please enter a valid choice index");
-                return await this.PickSpellTarget(targets);
-            }
+            return targets[await this.GetIndexAsync(new(targets))];
         }
 
         public async Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
         {
-            int i = 0;
-            Console.WriteLine("Pick Unordered turn choice by index :");
-            foreach (string choice in availableChoices.Select(ac=>ac.ToString()))
-            {
-                Console.WriteLine($"[{i}] {choice}");
-                i++;
-            }
-            string input = await Task.Run(() => Console.ReadKey(true).KeyChar.ToString());
-            if (int.TryParse(input, out int index) && index < availableChoices.Count && index > -1)
-            {
-                return availableChoices[index];
-            }
-            else
-            {
-                Console.WriteLine("Please enter a valid choice index");
-                return await this.PickUnorderedTurnChoice(availableChoices);
-            }
+            Console.WriteLine("Pick Unordered turn choice by index :");            
+            return availableChoices[await this.GetIndexAsync(new(availableChoices.Select(ac=>ac.ToString())))];
         }
     }
 }

@@ -228,7 +228,7 @@ namespace CitadellesDotIO.Engine
 
         private async Task BuildDistrict(Character character)
         {
-            District toBuild = await this.View.PickDistrictToBuild(character.Player.BuildableDistricts);
+            District toBuild = await this.View.PickDistrict(character.Player.BuildableDistricts);
             if (toBuild != null)
             {
                 character.Player.BuildDistrict(toBuild);
@@ -258,7 +258,7 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private async Task<District> PickDistrictSpellSource(List<District> districts) => await this.View.PickDistrictSpellSource(districts);
+        private async Task<District> PickDistrictSpellSource(List<District> districts) => await this.View.PickDistrict(districts);
 
         private void HandleCharacterSpellTargets(Character character)
         {
