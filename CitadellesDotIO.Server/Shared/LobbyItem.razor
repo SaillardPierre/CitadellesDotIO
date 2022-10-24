@@ -1,23 +1,42 @@
 ﻿@using CitadellesDotIO.Engine
+@using CitadellesDotIO.Server.Client.CustomEventArgs
 @using CitadellesDotIO.Server.Models
 
 <div class="container border border-primary rounded">
     <div class="row">
-        <p class="text-start col-6">@lobby.Name</p>
+        <div class="text-start col-6">
+            <p>@Lobby.Name</p>
+            <button type=button @onclick="@JoinButtonClicked">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                Join
+            </button>
+        </div>
         <div class="col-6 text-end">
             <i class="fa-solid fa-users d-inline"></i>
-            <p class="d-inline">@lobby.Players.Count</p>
+            <p class="d-inline">@Lobby.Players.Count</p>
         </div>
-    </div>    
-    <ul>
-        @foreach (Player player in lobby.Players)
-        {
-            <li>@player.Name</li>
-        }
-    </ul>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <p>Characters : @Lobby.Parameters.CharactersListName</p>
+            <p>Districts : @Lobby.Parameters.DistrictsDeckName</p>
+            <p>District Threshold : @Lobby.Parameters.DistrictThreshold</p>
+        </div>
+        <ul class="col-6">
+            @foreach (Player player in Lobby.Players)
+            {
+                <li>@player.Name</li>
+            }
+        </ul>
+    </div>
 </div>
 
 @code {
     [Parameter]
-    public Lobby lobby { get; set; }
+    public Lobby Lobby { get; set; }
+    [Parameter]
+    public EventCallback OnJoinButtonClicked { get; set; }
+
+    private async Task JoinButtonClicked()
+    => await OnJoinButtonClicked.InvokeAsync();
 }

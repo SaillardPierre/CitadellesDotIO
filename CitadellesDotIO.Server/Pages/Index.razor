@@ -1,10 +1,11 @@
 ﻿@page "/"
+@using CitadellesDotIO.Server.Client.CustomEventArgs
 @using CitadellesDotIO.Engine
 @using CitadellesDotIO.Server.Client
 @using CitadellesDotIO.Server.Data
 @using CitadellesDotIO.Server.Models
-@using Microsoft.AspNetCore.SignalR.Client
-@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager NavManager;
 
 
 <PageTitle>Index</PageTitle>
@@ -13,7 +14,7 @@
 {
     <div id="lobbiesContainer" style="display: @(IsConnected ? "block" : "none");">
         <EditForm Model="@LobbiesClient.Player" OnSubmit="@RegisterPlayer">
-            <InputText id="lobbyName" placeholder="Lobby name" @bind-Value="@LobbiesClient.newLobby.Name"></InputText>
+            <InputText id="lobbyName" placeholder="Lobby name" @bind-Value="@LobbiesClient.NewLobby.Name"></InputText>
             <button type="submit" @onclick="@LobbiesClient.CreateLobbyAsync">
                 <i class="fa-solid fa-square-plus"></i>
                 Create Lobby
@@ -23,9 +24,14 @@
         <button @onclick="@LobbiesClient.GetLobbiesAsync">Refresh</button>
         @foreach (Lobby lobby in this.LobbiesClient.Lobbies)
         {
-            <LobbyItem lobby="@lobby"></LobbyItem>
+            //<LobbyItem lobby="@lobby" OnJoinButtonClicked="@((args)=>OnJoinedLobby(lobby.Id))"></LobbyItem>
+            <LobbyItem lobby="@lobby" OnJoinButtonClicked="@((args)=>OnJoinedLobby(lobby.Id))"></LobbyItem>
         }
 
+        @foreach (Player player in this.LobbiesClient.Players)
+        {
+            <p>@player.Name</p>
+        }
 
     </div>
 }
@@ -42,34 +48,35 @@
 
 @code {
     LobbiesClient LobbiesClient;
-    Player player = new();
+    Player player = new(string.Empty);
     public bool IsConnected { get => this.LobbiesClient != null && this.LobbiesClient.IsConnected; }
     public HubConnectionState State { get; set; } = HubConnectionState.Disconnected;
     public string StateMessage { get; set; }
 
 
+    private async void OnJoinedLobby(string lobbyId)
+    {
+        await this.LobbiesClient.JoinLobbyAsync(lobbyId);
+        // Gérer l'affichage du lobby rejoint et cacher les autres
+    }
+
 
     async Task RegisterPlayer()
     {
         await this.Start();
-        await this.PullLobbies();
-    }
-
-    async Task PullLobbies()
-    {
         await this.LobbiesClient.GetLobbiesAsync();
-        this.StateHasChanged();
+        await this.LobbiesClient.GetPlayersAsync();
     }
 
     async Task Start()
     {
         if (this.LobbiesClient == null || !this.LobbiesClient.IsConnected)
         {
-            this.LobbiesClient = new LobbiesClient(this.player, NavManager.BaseUri);
-            this.LobbiesClient.StateChanged += StateChanged;        
+            this.LobbiesClient = new LobbiesClient(this.player, NavManager.BaseUri, DataChanged, StateChanged);
+            this.LobbiesClient.StateChanged += StateChanged;
             await this.LobbiesClient.StartAsync();
             this.State = HubConnectionState.Connected;
-            StateMessage = "Lobbies client connected";
+            StateMessage = "Lobbies client connected";         
         }
     }
 
@@ -81,10 +88,16 @@
         }
     }
 
-    void StateChanged(object sender, StateChangedEventArgs e)
-    {
+    async void StateChanged(object sender, StateChangedEventArgs e)
+    {        
         this.State = e.State;
         this.StateMessage = e.Message;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
+
+    async void DataChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
 }

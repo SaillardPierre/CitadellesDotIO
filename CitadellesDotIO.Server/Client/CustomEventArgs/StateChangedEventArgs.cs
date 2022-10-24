@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 
-namespace CitadellesDotIO.Server.Client
+namespace CitadellesDotIO.Server.Client.CustomEventArgs
 {
     public class StateChangedEventArgs : EventArgs
     {
@@ -8,8 +8,8 @@ namespace CitadellesDotIO.Server.Client
         public string Message { get; set; }
         public StateChangedEventArgs(HubConnectionState state, string message)
         {
-            this.State = state;
-            this.Message = message;
+            State = state;
+            Message = message;
         }
     }
 }

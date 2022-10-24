@@ -10,7 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR(hubOptions =>
 {
     hubOptions.EnableDetailedErrors = true;
-    hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(1);
+    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(1);
 })
  .AddNewtonsoftJsonProtocol(opts =>
         opts.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.Auto);

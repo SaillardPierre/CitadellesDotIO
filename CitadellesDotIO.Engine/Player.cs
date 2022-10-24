@@ -65,7 +65,6 @@ namespace CitadellesDotIO.Engine
             }
             TakenChoices = new();
         }
-
         public Player() : this(string.Empty) { }
         public Player(string name)
         {

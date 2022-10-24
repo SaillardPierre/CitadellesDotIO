@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Server.Data;
+﻿using CitadellesDotIO.Engine;
+using CitadellesDotIO.Server.Data;
 using CitadellesDotIO.Server.Models;
 using Microsoft.AspNetCore.SignalR;
 
@@ -11,11 +12,8 @@ namespace CitadellesDotIO.Server.HubsClients
     /// </summary>
     public interface ILobbiesHubClient
     {
-        [HubMethodName("PullLobbies")]
         Task PullLobbies(IList<Lobby> lobbies);
 
-        //Task PullLobbies(LobbiesList lobbies);
-
-        Task Prout(string message);
+        Task PullPlayers(IList<Player> players);
     }
 }

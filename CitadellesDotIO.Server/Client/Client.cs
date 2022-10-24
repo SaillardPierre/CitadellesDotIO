@@ -1,5 +1,4 @@
-﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Data;
+﻿using CitadellesDotIO.Server.Client.CustomEventArgs;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace CitadellesDotIO.Server.Client
