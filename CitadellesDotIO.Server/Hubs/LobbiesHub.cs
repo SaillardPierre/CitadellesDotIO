@@ -1,5 +1,4 @@
 ﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Data;
 using CitadellesDotIO.Server.HubsClients;
 using CitadellesDotIO.Server.Models;
 using CitadellesDotIO.Server.Services;

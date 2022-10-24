@@ -1,5 +1,4 @@
-﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Engine.Districts;
+﻿using CitadellesDotIO.Engine.Districts;
 using System.Collections.Generic;
 
 namespace CitadellesDotIO.Engine.Factories
@@ -71,24 +70,6 @@ namespace CitadellesDotIO.Engine.Factories
 
             return deck;
         }
-
-        public static IEnumerable<District> Laboratories()
-        {
-            for (int i = 0; i < 500; i++)
-            {
-                yield return new Laboratory();
-            }
-        }
-
-        public static IEnumerable<District> CourtOfMiracles()
-        {
-            for (int i = 0; i < 500; i++)
-            {
-                yield return new CourtOfMiracles();
-            }
-        }
-
-
 
         public static Deck<District> TestDistrictDeck(int deckSize)
         {
