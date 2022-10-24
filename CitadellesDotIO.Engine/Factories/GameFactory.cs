@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Engine.Factories;
 using CitadellesDotIO.Engine.View;
+using System;
 using System.Collections.Generic;
 
 namespace CitadellesDotIO.Engine.Factory
@@ -12,7 +13,8 @@ namespace CitadellesDotIO.Engine.Factory
                 players,
                 CharactersFactory.VanillaCharactersList,
                 DeckFactory.VanillaDistrictsDeck(),
-                view == null ? new RandomActionView() : view);
+                view ?? new RandomActionView(),
+                Guid.NewGuid().ToString("n"));
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿@using CitadellesDotIO.Engine
+@using CitadellesDotIO.Server.Models
+
+<div class="container border border-primary rounded">
+    <div class="row">
+        <p class="text-start col-6">@lobby.Name</p>
+        <div class="col-6 text-end">
+            <i class="fa-solid fa-users d-inline"></i>
+            <p class="d-inline">@lobby.Players.Count</p>
+        </div>
+    </div>    
+    <ul>
+        @foreach (Player player in lobby.Players)
+        {
+            <li>@player.Name</li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public Lobby lobby { get; set; }
+}

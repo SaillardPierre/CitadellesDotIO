@@ -5,6 +5,7 @@ using System.Linq;
 using CitadellesDotIO.Engine.Factory;
 using CitadellesDotIO.Engine;
 using System.Threading.Tasks;
+using CitadellesDotIO.Engine.View;
 
 namespace CitadellesDotIO.Tests
 {
@@ -20,6 +21,6 @@ namespace CitadellesDotIO.Tests
         {
             Game game = GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(xPlayers).ToList());
             Assert.IsTrue(await game.Run() && game.GameState.Equals(GameState.Finished));
-        }
+        }        
     }
 }

@@ -1,10 +1,7 @@
-﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Engine.Spells;
+﻿using CitadellesDotIO.Engine.Spells;
 using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Enums;
-using CitadellesDotIO.Enums.TurnChoices;
 using CitadellesDotIO.Engine.Passives;
-using System;
 using System.Linq;
 
 namespace CitadellesDotIO.Engine.Characters

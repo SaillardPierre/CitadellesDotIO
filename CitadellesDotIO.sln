@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Exceptions"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Console", "CitadellesDotIO.Console\CitadellesDotIO.Console.csproj", "{3780EC8B-884E-4977-BE2A-1D8F90678D5B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.WebServer", "CitadellesDotIO.WebServer\CitadellesDotIO.WebServer.csproj", "{DDFA24D6-9CA5-44C3-A93F-B6C9B715CF71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Server", "CitadellesDotIO.Server\CitadellesDotIO.Server.csproj", "{E6DAA273-D9F3-4D42-823F-EB5B98150022}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3780EC8B-884E-4977-BE2A-1D8F90678D5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDFA24D6-9CA5-44C3-A93F-B6C9B715CF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDFA24D6-9CA5-44C3-A93F-B6C9B715CF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDFA24D6-9CA5-44C3-A93F-B6C9B715CF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDFA24D6-9CA5-44C3-A93F-B6C9B715CF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6DAA273-D9F3-4D42-823F-EB5B98150022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6DAA273-D9F3-4D42-823F-EB5B98150022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6DAA273-D9F3-4D42-823F-EB5B98150022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6DAA273-D9F3-4D42-823F-EB5B98150022}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

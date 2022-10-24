@@ -1,0 +1,90 @@
+﻿@page "/"
+@using CitadellesDotIO.Engine
+@using CitadellesDotIO.Server.Client
+@using CitadellesDotIO.Server.Data
+@using CitadellesDotIO.Server.Models
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavManager
+
+
+<PageTitle>Index</PageTitle>
+
+@if (this.LobbiesClient != null)
+{
+    <div id="lobbiesContainer" style="display: @(IsConnected ? "block" : "none");">
+        <EditForm Model="@LobbiesClient.Player" OnSubmit="@RegisterPlayer">
+            <InputText id="lobbyName" placeholder="Lobby name" @bind-Value="@LobbiesClient.newLobby.Name"></InputText>
+            <button type="submit" @onclick="@LobbiesClient.CreateLobbyAsync">
+                <i class="fa-solid fa-square-plus"></i>
+                Create Lobby
+            </button>
+        </EditForm>
+
+        <button @onclick="@LobbiesClient.GetLobbiesAsync">Refresh</button>
+        @foreach (Lobby lobby in this.LobbiesClient.Lobbies)
+        {
+            <LobbyItem lobby="@lobby"></LobbyItem>
+        }
+
+
+    </div>
+}
+
+<div id="connectionContainer" style="display: @(IsConnected ? "none" : "block");">
+    <EditForm Model="@this.player" OnSubmit="@RegisterPlayer">
+        <InputText id="playerName" placeholder="What is your G@M3R74G ?" @bind-Value="@this.player.Name"></InputText>
+        <button type="submit"> Go G@@M!NG</button>
+    </EditForm>
+</div>
+
+
+
+
+@code {
+    LobbiesClient LobbiesClient;
+    Player player = new();
+    public bool IsConnected { get => this.LobbiesClient != null && this.LobbiesClient.IsConnected; }
+    public HubConnectionState State { get; set; } = HubConnectionState.Disconnected;
+    public string StateMessage { get; set; }
+
+
+
+    async Task RegisterPlayer()
+    {
+        await this.Start();
+        await this.PullLobbies();
+    }
+
+    async Task PullLobbies()
+    {
+        await this.LobbiesClient.GetLobbiesAsync();
+        this.StateHasChanged();
+    }
+
+    async Task Start()
+    {
+        if (this.LobbiesClient == null || !this.LobbiesClient.IsConnected)
+        {
+            this.LobbiesClient = new LobbiesClient(this.player, NavManager.BaseUri);
+            this.LobbiesClient.StateChanged += StateChanged;        
+            await this.LobbiesClient.StartAsync();
+            this.State = HubConnectionState.Connected;
+            StateMessage = "Lobbies client connected";
+        }
+    }
+
+    async Task Stop()
+    {
+        if (this.LobbiesClient != null && this.LobbiesClient.IsConnected)
+        {
+            await this.LobbiesClient.StopAsync();
+        }
+    }
+
+    void StateChanged(object sender, StateChangedEventArgs e)
+    {
+        this.State = e.State;
+        this.StateMessage = e.Message;
+        StateHasChanged();
+    }
+}

@@ -15,6 +15,5 @@ namespace CitadellesDotIO.Engine.View
         public Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool);
         public Task<ITarget> PickSpellTarget(List<ITarget> targets);
         public Task<District> PickDistrict(List<District> districts);
-
     }
 }

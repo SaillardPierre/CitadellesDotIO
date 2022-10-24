@@ -6,6 +6,15 @@ namespace CitadellesDotIO.Engine.Factories
 {
     public static class DeckFactory
     {
+        public static List<District> MatchNames(string deckName)
+        {
+            switch (deckName)
+            {
+                case nameof(VanillaDistrictsDeck):
+                    return VanillaDistrictsDeck();                    
+            }
+            return VanillaDistrictsDeck();
+        }
         public static List<District> VanillaDistrictsDeck()
         {
             List<District> deck = new()

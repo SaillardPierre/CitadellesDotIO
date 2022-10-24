@@ -31,10 +31,11 @@ namespace CitadellesDotIO.Engine
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
         public int TurnCount => this.turnCount;
+        public string Id { get; set; }
         public Game()
         {
         }
-        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, bool applyKingShuffleRule = true, int districtThreshold = 7)
+        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, IView view, string gameId, bool applyKingShuffleRule = true, int districtThreshold = 7)
         {
             this.GameState = GameState.Starting;
             this.View = view;
@@ -51,6 +52,9 @@ namespace CitadellesDotIO.Engine
             this.CharactersRoaster = characters.ToImmutableList();
             this.CharactersBin = new List<Character>();
         }
+
+        public void JoinPlayer(Player joining)
+            => this.Players.Add(joining);
         private void SetNewKing(Player newKing)
         {
             // Destitution de l'ancien Roi s'il existe

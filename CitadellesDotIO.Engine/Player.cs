@@ -14,6 +14,7 @@ namespace CitadellesDotIO.Engine
     public class Player : ISwappable
     {
         public string Name { get; set; }
+        public string Id { get; set; }
         public int Gold { get; set; }
         public bool IsCurrentKing { get; set; }
         public Character Character { get; set; }
@@ -65,7 +66,7 @@ namespace CitadellesDotIO.Engine
             TakenChoices = new();
         }
 
-        public Player() : this("AnonymousPlayer") { }
+        public Player() : this(string.Empty) { }
         public Player(string name)
         {
             Name = name;
