@@ -28,13 +28,13 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Thief caster = new(0);
-            Mock<Thief> unstealable = new();
+            Thief unstealable = new();
 
             // Act
-            caster.Spell.Cast(unstealable.Object);
+            caster.Spell.Cast(unstealable);
 
             // Assert
-            Assert.IsFalse(unstealable.Object.IsStolen);
+            Assert.IsFalse(unstealable.IsStolen);
         }
 
         [TestMethod]
@@ -42,12 +42,12 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Thief caster = new(0);
-            Mock<Thief> unstealable = new();
+            Thief unstealable = new();
 
             // Act
             caster.Spell.GetAvailableTargets(new List<ITarget>()
             {
-                unstealable.Object
+                unstealable
             });
 
             // Assert

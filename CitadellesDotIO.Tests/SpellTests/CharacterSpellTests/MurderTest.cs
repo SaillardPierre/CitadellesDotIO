@@ -14,13 +14,13 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Assassin caster = new(0);
-            Mock<Assassin> unmurderable = new();
+            Assassin unmurderable = new();
 
             // Act
-            caster.Spell.Cast(unmurderable.Object);
+            caster.Spell.Cast(unmurderable);
 
             // Assert
-            Assert.IsFalse(unmurderable.Object.IsMurdered);
+            Assert.IsFalse(unmurderable.IsMurdered);
         }
 
         [TestMethod]
@@ -42,12 +42,12 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Assassin caster = new(0);
-            Mock<Assassin> unmurderable = new();
+            Assassin unmurderable = new();
 
             // Act
             caster.Spell.GetAvailableTargets(new List<ITarget>()
             {
-                unmurderable.Object
+                unmurderable
             });
 
             // Assert
