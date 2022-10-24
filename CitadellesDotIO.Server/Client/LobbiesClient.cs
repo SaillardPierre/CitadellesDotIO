@@ -19,7 +19,7 @@ namespace CitadellesDotIO.Server.Client
         public event DataChangedEventHandler DataChanged;
 
         public bool IsConnected => HubConnection?.State == HubConnectionState.Connected;
-        public string? ConnectionId => HubConnection != null ? HubConnection.ConnectionId : null;
+        public string? ConnectionId => HubConnection?.ConnectionId;
 
         public Player Player { get; set; }
         public List<Lobby> Lobbies { get; set; }
@@ -101,18 +101,21 @@ namespace CitadellesDotIO.Server.Client
         }
 
         protected async Task HubConnection_Reconnecting(Exception? arg)
-        {
+        {            
             StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
+            await Task.CompletedTask;
         }
 
         protected async Task HubConnection_Reconnected(string? arg)
         {
             StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Connected, arg!));
+            await Task.CompletedTask;
         }
 
         protected async Task HubConnection_Closed(Exception? arg)
         {
             StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
+            await Task.CompletedTask;
         }
         public async ValueTask DisposeAsync()
         {

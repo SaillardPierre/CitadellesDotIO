@@ -26,7 +26,6 @@ builder.Services.AddResponseCompression(opts =>
 {
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 });
-builder.Services.AddSingleton<GamesService>();
 builder.Services.AddSingleton<ILobbiesService, LobbiesService>();
 
 var app = builder.Build();
@@ -49,7 +48,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapHub<GamesHub>("/gameshub");
 app.MapHub<LobbiesHub>("/lobbieshub");
 app.MapControllers();
 app.MapBlazorHub();
