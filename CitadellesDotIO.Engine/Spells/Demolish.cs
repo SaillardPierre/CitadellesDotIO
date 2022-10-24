@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace CitadellesDotIO.Engine.Spells
 {
 
-    public class Demolish : DistrictTargetSpell
+    public sealed class Demolish : DistrictTargetSpell
     {
         public Demolish(Player caster)
         {

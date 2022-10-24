@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Passives
 {
-    public class IncreasePoolSize : Passive
+    public sealed class IncreasePoolSize : Passive
     {
         private readonly int PoolSizeBonus;
         public IncreasePoolSize(Player player, int poolSizeBonus)

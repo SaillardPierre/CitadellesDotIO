@@ -2,7 +2,7 @@
 
 namespace CitadellesDotIO.Engine.Districts
 {
-    public class Manufacture : PrestigeDistrict
+    public sealed class Manufacture : PrestigeDistrict
     {
         public Manufacture()
         {

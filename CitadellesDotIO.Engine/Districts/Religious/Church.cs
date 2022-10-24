@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Church : ReligiousDistrict
+    public sealed class Church : ReligiousDistrict
     {
         public Church()
         {

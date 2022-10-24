@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Wizard : Character
+    public sealed class Wizard : Character
     {
         public Wizard() : base()
         {

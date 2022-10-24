@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Graveyard : PrestigeDistrict
+    public sealed class Graveyard : PrestigeDistrict
     {
         public Graveyard()
         {

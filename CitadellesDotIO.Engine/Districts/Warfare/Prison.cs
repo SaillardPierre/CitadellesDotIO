@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Prison : WarfareDistrict
+    public sealed class Prison : WarfareDistrict
     {
         public Prison()
         {

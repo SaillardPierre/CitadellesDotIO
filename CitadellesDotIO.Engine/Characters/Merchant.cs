@@ -6,7 +6,7 @@ using CitadellesDotIO.Engine.Spells;
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Merchant : Character
+    public sealed class Merchant : Character
     {
         public Merchant() : base() { }
         public Merchant(int order) : base(order)

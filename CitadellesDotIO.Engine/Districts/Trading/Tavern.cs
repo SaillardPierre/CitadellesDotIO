@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Tavern : TradingDistrict
+    public sealed class Tavern : TradingDistrict
     {
         public Tavern()
         {

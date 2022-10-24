@@ -4,7 +4,7 @@ using System;
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class Revive : Spell
+    public sealed class Revive : Spell
     {
         public override Type TargetType => typeof(District);
 

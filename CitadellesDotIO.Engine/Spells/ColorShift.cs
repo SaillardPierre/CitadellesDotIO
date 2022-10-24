@@ -6,7 +6,7 @@ using CitadellesDotIO.Engine.Targets;
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class ColorShift : DistrictTargetSpell
+    public sealed class ColorShift : DistrictTargetSpell
     {
         public District SpellSource { get; set; }
         public ColorShift(District district)

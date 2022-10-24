@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class University : PrestigeDistrict
+    public sealed class University : PrestigeDistrict
     {
         public University()
         {

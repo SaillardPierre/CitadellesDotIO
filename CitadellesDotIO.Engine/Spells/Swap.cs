@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class Swap : Spell
+    public sealed class Swap : Spell
     {
         public Swap(Player caster)
         {

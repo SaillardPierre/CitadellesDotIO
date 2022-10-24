@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Palace : NobleDistrict
+    public sealed class Palace : NobleDistrict
     {
         public Palace()
         {

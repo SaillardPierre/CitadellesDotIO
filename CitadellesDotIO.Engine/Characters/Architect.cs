@@ -4,7 +4,7 @@ using CitadellesDotIO.Engine.Spells;
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Architect : Character
+    public sealed class Architect : Character
     {
         public Architect() : base()
         {

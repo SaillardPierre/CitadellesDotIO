@@ -3,7 +3,7 @@ using CitadellesDotIO.Enums;
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Condottiere : Character
+    public sealed class Condottiere : Character
     {
         public Condottiere() : base() {
             this.Spell = new Demolish(this.Player);

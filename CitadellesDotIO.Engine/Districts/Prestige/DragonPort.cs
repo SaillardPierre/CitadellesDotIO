@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class DragonPort : PrestigeDistrict
+    public sealed class DragonPort : PrestigeDistrict
     {
         public DragonPort()
         {

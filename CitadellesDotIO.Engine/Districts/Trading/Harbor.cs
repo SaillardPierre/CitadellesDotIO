@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Harbor : TradingDistrict
+    public sealed class Harbor : TradingDistrict
     {
         public Harbor()
         {

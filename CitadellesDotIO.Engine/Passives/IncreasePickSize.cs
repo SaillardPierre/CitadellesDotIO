@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Passives
 {
-    public class IncreasePickSize : Passive
+    public sealed class IncreasePickSize : Passive
     {
         private readonly int PickSizeBonus;
         public IncreasePickSize(Player player, int pickSizeBonus)

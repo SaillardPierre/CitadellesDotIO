@@ -2,7 +2,7 @@
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class Craft : TableDeckTargetSpell
+    public sealed class Craft : TableDeckTargetSpell
     {
         public Craft(Player player)
         {

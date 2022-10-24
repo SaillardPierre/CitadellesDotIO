@@ -11,7 +11,7 @@ using System.Text;
 
 namespace CitadellesDotIO.Engine
 {
-    public class Player : ISwappable
+    public sealed class Player : ISwappable
     {
         public string Name { get; set; }
         public string Id { get; set; }

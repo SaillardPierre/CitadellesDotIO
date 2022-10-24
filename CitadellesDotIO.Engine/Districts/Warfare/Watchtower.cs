@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Watchtower : WarfareDistrict
+    public sealed class Watchtower : WarfareDistrict
     {
         public Watchtower()
         {

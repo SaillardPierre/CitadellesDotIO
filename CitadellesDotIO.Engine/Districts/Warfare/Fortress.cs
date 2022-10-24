@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Fortress : WarfareDistrict
+    public sealed class Fortress : WarfareDistrict
     {
         public Fortress()
         {

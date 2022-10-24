@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Counter : TradingDistrict
+    public sealed class Counter : TradingDistrict
     {
         public Counter()
         {

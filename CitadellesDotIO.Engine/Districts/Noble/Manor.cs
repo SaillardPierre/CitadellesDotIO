@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Manor : NobleDistrict
+    public sealed class Manor : NobleDistrict
     {
         public Manor()
         {

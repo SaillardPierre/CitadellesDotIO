@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class Discard : TableDeckTargetSpell
+    public sealed class Discard : TableDeckTargetSpell
     {
         public override bool HasToPickTargets => true;
         public Discard(Player player)

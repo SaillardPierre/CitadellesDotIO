@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace CitadellesDotIO.Engine.Spells
 {
-    public class Murder : CharacterTargetSpell
+    public sealed class Murder : CharacterTargetSpell
     {
         public Murder(Player player)
         {

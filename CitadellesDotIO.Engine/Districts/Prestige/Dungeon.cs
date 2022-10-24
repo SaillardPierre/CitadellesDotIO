@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.Engine.Districts
 {
-    public class Dungeon : PrestigeDistrict
+    public sealed class Dungeon : PrestigeDistrict
     {
         public Dungeon()
         {

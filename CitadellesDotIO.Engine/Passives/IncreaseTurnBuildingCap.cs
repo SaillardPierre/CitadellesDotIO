@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Passives
 {
-    public class IncreaseTurnBuildingCap : Passive
+    public sealed class IncreaseTurnBuildingCap : Passive
     {
         private readonly int TurnBuildingCapBonus;
         public IncreaseTurnBuildingCap(Player player, int turnBuildingCapBonus)

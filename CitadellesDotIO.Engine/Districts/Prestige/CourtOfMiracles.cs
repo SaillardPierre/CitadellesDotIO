@@ -2,7 +2,7 @@
 
 namespace CitadellesDotIO.Engine.Districts
 {
-    public class CourtOfMiracles : PrestigeDistrict
+    public sealed class CourtOfMiracles : PrestigeDistrict
     {
         public CourtOfMiracles()
         {

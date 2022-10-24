@@ -2,7 +2,7 @@
 
 namespace CitadellesDotIO.Engine.Districts
 {
-    public class Laboratory : PrestigeDistrict
+    public sealed class Laboratory : PrestigeDistrict
     {
         public Laboratory()
         {

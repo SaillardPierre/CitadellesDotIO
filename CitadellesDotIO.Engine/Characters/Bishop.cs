@@ -2,7 +2,7 @@
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Bishop : Character
+    public sealed class Bishop : Character
     {
         public Bishop() : base() { }
         public Bishop(int order) : base(order)

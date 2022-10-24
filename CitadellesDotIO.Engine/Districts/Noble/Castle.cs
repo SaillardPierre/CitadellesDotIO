@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Districts
 {
-    public class Castle : NobleDistrict
+    public sealed class Castle : NobleDistrict
     {
         public Castle()
         {

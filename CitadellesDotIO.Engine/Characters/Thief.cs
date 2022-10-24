@@ -3,7 +3,7 @@ using CitadellesDotIO.Enums;
 
 namespace CitadellesDotIO.Engine.Characters
 {
-    public class Thief : Character
+    public sealed class Thief : Character
     {        
         public Thief() : base()
         {
