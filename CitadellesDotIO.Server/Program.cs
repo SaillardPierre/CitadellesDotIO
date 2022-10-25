@@ -18,7 +18,7 @@ builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;
     options.DisconnectedCircuitMaxRetained = 100;
-    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromSeconds(2);
     options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
     options.MaxBufferedUnacknowledgedRenderBatches = 10;
 });

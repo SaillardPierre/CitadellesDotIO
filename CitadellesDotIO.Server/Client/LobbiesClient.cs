@@ -20,12 +20,13 @@ namespace CitadellesDotIO.Server.Client
 
         public bool IsConnected => HubConnection?.State == HubConnectionState.Connected;
         public string? ConnectionId => HubConnection?.ConnectionId;
+        public string? LobbyId { get; set; }
 
         public Player Player { get; set; }
         public List<Lobby> Lobbies { get; set; }
         public List<Player> Players { get; set; }
         public Lobby NewLobby { get; set; }
-        public LobbiesClient(Player player, string siteUrl, DataChangedEventHandler dataChangedEventHandler, StateChangedEventHandler stateChangedEventHandler )
+        public LobbiesClient(Player player, string siteUrl, DataChangedEventHandler dataChangedEventHandler, StateChangedEventHandler stateChangedEventHandler)
         {
             this.Lobbies = new();
             this.Players = new();
@@ -56,10 +57,27 @@ namespace CitadellesDotIO.Server.Client
             });
             HubConnection.On<IList<Player>>("PullPlayers", (players) =>
             {
+                Player? self = players.SingleOrDefault(p => p.Id == this.ConnectionId);
+                if (self != null)
+                {
+                    this.Player = self;
+                    players.Remove(this.Player);
+                }
                 this.Players = players.ToList();
                 this.DataChanged.Invoke();
             });
+            HubConnection.On<string>("PullLobbyId", (lobbyId) =>
+            {
+                this.LobbyId = lobbyId;
+                this.DataChanged.Invoke();
+            });
         }
+
+        public bool IsPlayerInLobby(string lobbyId)
+        => this.LobbyId == lobbyId;
+
+        public bool CanPlayerJoinLobby
+        => string.IsNullOrWhiteSpace(this.LobbyId);
 
         public async Task StartAsync()
         {
@@ -79,20 +97,26 @@ namespace CitadellesDotIO.Server.Client
         }
 
         public async Task CreateLobbyAsync()
-        {            
+        {
             await this.HubConnection.InvokeAsync("CreateLobbyAsync", NewLobby);
             await this.JoinLobbyAsync(NewLobby.Id);
         }
 
         public async Task JoinLobbyAsync(string lobbyId)
-        {
-            await this.HubConnection.InvokeAsync("JoinLobbyAsync", lobbyId, this.ConnectionId);
-        }
+        => await this.HubConnection.InvokeAsync("JoinLobbyAsync", lobbyId, this.ConnectionId);
+
+        public async Task LeaveLobbyAsync()
+        => await this.HubConnection.InvokeAsync("LeaveLobbyAsync", this.LobbyId, this.ConnectionId);
 
         public async Task StopAsync()
         {
             if (this.HubConnection != null && this.HubConnection.State != HubConnectionState.Disconnected)
             {
+                if (!string.IsNullOrWhiteSpace(this.LobbyId))
+                {
+                    await this.HubConnection.InvokeAsync("LeaveLobbyAsync", this.LobbyId, this.ConnectionId);
+                }
+                await this.HubConnection.InvokeAsync("UnregisterPlayerAsync", this.ConnectionId);
                 // Gérer l'evenement de déconnexion
                 await this.HubConnection.StopAsync();
                 await this.HubConnection.DisposeAsync();
@@ -101,7 +125,7 @@ namespace CitadellesDotIO.Server.Client
         }
 
         protected async Task HubConnection_Reconnecting(Exception? arg)
-        {            
+        {
             StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
             await Task.CompletedTask;
         }

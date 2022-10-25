@@ -27,21 +27,39 @@ namespace CitadellesDotIO.Server.Services
 
         public async Task<bool> RegisterPlayerAsync(Player player)
         => await Task.FromResult(this.Players.TryAdd(player.Id, player));
-        
 
         public async Task<bool> AddPlayerToLobby(string lobbyId, string playerId)
         {
-            // Retester avec la modif sur le constructeur des dummy
-            // Voir si on a besoin de chercher l'id du player mais je crois pas
-            // Voir pour ajouter le player a la liste des joueurs sans lobby a la connexion
-
             if (this.Players.TryGetValue(playerId, out Player? joiner) &&
                this.Lobbies.TryGetValue(lobbyId, out Lobby? toJoin))
             {
                 toJoin.Players.Add(joiner);
-                return await Task.FromResult(this.Players.TryRemove(new(playerId, joiner)));
+                return await this.RemovePlayerFromPlayers(playerId);
             }
             else return await Task.FromResult(false);
+        }
+
+        public async Task<bool> RemovePlayerFromLobby(string lobbyId, string playerId)
+        {
+            if (this.Lobbies.TryGetValue(lobbyId, out Lobby? toLeave))
+            {
+                Player? leaver = toLeave.Players.SingleOrDefault(p => p.Id == playerId);
+                if (leaver != null)
+                {
+                    toLeave.Players.Remove(leaver);
+                    return await this.RegisterPlayerAsync(leaver);
+                }
+            }
+            return await Task.FromResult(false);
+        }
+
+        public async Task<bool> RemovePlayerFromPlayers(string playerId)
+        {
+            if (this.Players.TryGetValue(playerId, out Player? leaver))
+            {
+                return await Task.FromResult(this.Players.TryRemove(new(playerId, leaver)));
+            }
+            return await Task.FromResult(false);
         }
 
         public async Task<List<Lobby>> GetLobbiesAsync()

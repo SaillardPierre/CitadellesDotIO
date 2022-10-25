@@ -8,11 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace CitadellesDotIO.Engine
 {
     public class Player : ISwappable
     {
+        [Required]
+        [StringLength(50, ErrorMessage = "La longueur de votre G@M3R74G doit être comprise en 5 et 50 caractères", MinimumLength = 5)]
         public string Name { get; set; }
         public string Id { get; set; }
         public int Gold { get; set; }

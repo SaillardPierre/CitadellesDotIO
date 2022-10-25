@@ -5,26 +5,34 @@
 @using CitadellesDotIO.Server.Models
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavManager;
+@implements IAsyncDisposable;
+@implements IDisposable;
 
 
 <PageTitle>Index</PageTitle>
 
 @if (this.LobbiesClient != null)
 {
-    <div id="lobbiesContainer" style="display: @(IsConnected ? "block" : "none");">
-        <EditForm Model="@LobbiesClient.Player" OnSubmit="@RegisterPlayer">
-            <InputText id="lobbyName" placeholder="Lobby name" @bind-Value="@LobbiesClient.NewLobby.Name"></InputText>
-            <button type="submit" @onclick="@LobbiesClient.CreateLobbyAsync">
-                <i class="fa-solid fa-square-plus"></i>
-                Create Lobby
-            </button>
-        </EditForm>
+    <div id="lobbiesContainer container-flex" style="display: @(IsConnected ? "block" : "none");">
+        @if(this.LobbiesClient.CanPlayerJoinLobby)
+        {
+            <EditForm Model="@LobbiesClient.Player" OnSubmit="@RegisterPlayer">
+                <InputText id="lobbyName" placeholder="Lobby name" @bind-Value="@LobbiesClient.NewLobby.Name"></InputText>
+                <button type="submit" @onclick="@LobbiesClient.CreateLobbyAsync">
+                    <i class="fa-solid fa-square-plus"></i>
+                    Create Lobby
+                </button>
+            </EditForm>
+        }        
 
-        <button @onclick="@LobbiesClient.GetLobbiesAsync">Refresh</button>
         @foreach (Lobby lobby in this.LobbiesClient.Lobbies)
         {
-            //<LobbyItem lobby="@lobby" OnJoinButtonClicked="@((args)=>OnJoinedLobby(lobby.Id))"></LobbyItem>
-            <LobbyItem lobby="@lobby" OnJoinButtonClicked="@((args)=>OnJoinedLobby(lobby.Id))"></LobbyItem>
+            <LobbyListItem lobby="@lobby"
+                   OnJoinButtonClicked="@((args)=>this.LobbiesClient.JoinLobbyAsync(@lobby.Id))"
+                   OnLeaveButtonClicked="@((args)=>this.LobbiesClient.LeaveLobbyAsync())"
+                   IsPlayerInLobby="@this.LobbiesClient.IsPlayerInLobby(@lobby.Id)"
+                   CanPlayerJoinLobby="@this.LobbiesClient.CanPlayerJoinLobby">
+            </LobbyListItem>
         }
 
         @foreach (Player player in this.LobbiesClient.Players)
@@ -32,15 +40,19 @@
             <p>@player.Name</p>
         }
 
+        <div class="container border border-primary rounded">
+            <p>@this.player.Name</p>
+            <p>@this.LobbiesClient.ConnectionId</p>
+            <p>@this.LobbiesClient.LobbyId</p>
+        </div>
     </div>
 }
 
 <div id="connectionContainer" style="display: @(IsConnected ? "none" : "block");">
-    <EditForm Model="@this.player" OnSubmit="@RegisterPlayer">
-        <InputText id="playerName" placeholder="What is your G@M3R74G ?" @bind-Value="@this.player.Name"></InputText>
-        <button type="submit"> Go G@@M!NG</button>
-    </EditForm>
+    <PlayerRegister Player="this.player" OnRegisterPlayerClicked="@((args)=>RegisterPlayer())"></PlayerRegister>
 </div>
+
+
 
 
 
@@ -53,12 +65,12 @@
     public string StateMessage { get; set; }
 
 
-    private async void OnJoinedLobby(string lobbyId)
+
+    private async void JoinLobby(string lobbyId)
     {
         await this.LobbiesClient.JoinLobbyAsync(lobbyId);
         // Gérer l'affichage du lobby rejoint et cacher les autres
     }
-
 
     async Task RegisterPlayer()
     {
@@ -72,12 +84,18 @@
         if (this.LobbiesClient == null || !this.LobbiesClient.IsConnected)
         {
             this.LobbiesClient = new LobbiesClient(this.player, NavManager.BaseUri, DataChanged, StateChanged);
-            this.LobbiesClient.StateChanged += StateChanged;
             await this.LobbiesClient.StartAsync();
             this.State = HubConnectionState.Connected;
-            StateMessage = "Lobbies client connected";         
+            StateMessage = "Lobbies client connected";
         }
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await this.Stop();
+    }
+
+    public void Dispose()=> this.Stop().RunSynchronously();
 
     async Task Stop()
     {
@@ -88,7 +106,7 @@
     }
 
     async void StateChanged(object sender, StateChangedEventArgs e)
-    {        
+    {
         this.State = e.State;
         this.StateMessage = e.Message;
         await InvokeAsync(StateHasChanged);

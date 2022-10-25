@@ -1,0 +1,41 @@
+﻿@using CitadellesDotIO.Engine
+<EditForm Model="@this.Player" OnSubmit="@RegisterButtonClicked">
+        <DataAnnotationsValidator />
+        <div class="input-group m-3">
+            <div class="input-group-text">
+                <i class="fa-solid fa-id-card-clip"></i>
+            </div>
+            <InputText id="playerName"
+                class="form-control" 
+                placeholder="What is your G@M3R74G ?" 
+                @bind-Value="@this.Player.Name"
+                @oninput="@ValidateGamerTag"
+            ></InputText>
+            <button type="submit" disabled="@(!this.IsGamerTagValid)" class="btn btn-outline-primary"> Go G@@M!NG</button>
+        </div>
+        <ValidationMessage For="()=>Player.Name" class="m-3"/>
+    </EditForm>
+
+
+
+@code{
+    [Parameter]
+    public EventCallback OnRegisterPlayerClicked { get; set; }
+
+    [Parameter]
+    public Player Player { get; set; }
+
+    public bool IsGamerTagValid = false;
+    public void ValidateGamerTag() => this.IsGamerTagValid = EC.Validate();
+    private EditContext EC { get; set; }
+
+
+    private async Task RegisterButtonClicked()
+    => await OnRegisterPlayerClicked.InvokeAsync();
+
+    protected override async Task OnInitializedAsync()
+    {
+        EC = new EditContext(this.Player);
+        await base.OnInitializedAsync();
+    }
+}

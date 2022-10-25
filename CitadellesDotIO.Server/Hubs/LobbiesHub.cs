@@ -20,7 +20,7 @@ namespace CitadellesDotIO.Server.Hubs
 
         public async Task RegisterPlayerAsync(Player player)
         {
-            if(await this.lobbiesService.RegisterPlayerAsync(player))
+            if (await this.lobbiesService.RegisterPlayerAsync(player))
             {
                 await this.BroadcastPlayersAsync();
             }
@@ -30,7 +30,7 @@ namespace CitadellesDotIO.Server.Hubs
         public async Task CreateLobbyAsync(Lobby newLobby)
         {
             if (await this.lobbiesService.CreateLobbyAsync(newLobby))
-            {                
+            {
                 await this.Groups.AddToGroupAsync(this.Context.ConnectionId, newLobby.Name);
                 await this.BroadcastLobbiesAsync();
             }
@@ -39,14 +39,36 @@ namespace CitadellesDotIO.Server.Hubs
 
         public async Task JoinLobbyAsync(string lobbyId, string playerId)
         {
-            if(await this.lobbiesService.AddPlayerToLobby(lobbyId, playerId))
+            if (await this.lobbiesService.AddPlayerToLobby(lobbyId, playerId))
             {
+                
                 await this.Groups.AddToGroupAsync(this.Context.ConnectionId, lobbyId);
-
                 // Temporaire
-                await this.Clients.Groups(lobbyId).PullLobbies(await this.lobbiesService.GetLobbiesAsync());
+                //await this.Clients.Groups(lobbyId).PullLobbies(await this.lobbiesService.GetLobbiesAsync());
                 // Dans la réalité aprés avoir mis à jour l'interface du joueur pour montrer son lobby,
                 // Broadcast le lobby a tous les membres du groupe
+                await this.Clients.Caller.PullLobbyId(lobbyId);
+                await this.BroadcastLobbiesAsync();
+                await this.BroadcastPlayersAsync();
+            }
+        }
+
+        public async Task LeaveLobbyAsync(string lobbyId, string playerId)
+        {
+            if (await this.lobbiesService.RemovePlayerFromLobby(lobbyId, playerId))
+            {
+                await this.Groups.RemoveFromGroupAsync(this.Context.ConnectionId, lobbyId);
+                await this.Clients.Caller.PullLobbyId(string.Empty);
+                await this.BroadcastLobbiesAsync();
+                await this.BroadcastPlayersAsync();
+            }
+        }
+
+        public async Task UnregisterPlayerAsync(string playerId)
+        {
+            if (await this.lobbiesService.RemovePlayerFromPlayers(playerId))
+            {
+                await this.BroadcastPlayersAsync();
             }
         }
 
@@ -61,6 +83,6 @@ namespace CitadellesDotIO.Server.Hubs
 
         public async Task BroadcastPlayersAsync()
         => await this.Clients.All.PullPlayers(await this.lobbiesService.GetPlayersAsync());
-        
+
     }
 }
