@@ -1,24 +1,25 @@
 ﻿@using CitadellesDotIO.Engine
-<EditForm Model="@this.Player" OnSubmit="@RegisterButtonClicked">
-        <DataAnnotationsValidator />
-        <div class="input-group m-3">
+<EditForm Model="@this.Player" OnSubmit="@RegisterButtonClicked" class="">
+    <DataAnnotationsValidator />
+    <div class="">
+        <div class="input-group">
             <div class="input-group-text">
                 <i class="fa-solid fa-id-card-clip"></i>
             </div>
             <InputText id="playerName"
-                class="form-control" 
-                placeholder="What is your G@M3R74G ?" 
-                @bind-Value="@this.Player.Name"
-                @oninput="@ValidateGamerTag"
-            ></InputText>
-            <button type="submit" disabled="@(!this.IsGamerTagValid)" class="btn btn-outline-primary"> Go G@@M!NG</button>
+                       class="form-control"
+                       placeholder="What is your G@M3R74G ?"
+                       @bind-Value="@this.Player.Name"
+                       @oninput="@ValidateGamerTag"></InputText>
+            <button type="submit" disabled="@(!this.IsGamerTagValid)" class="btn btn-primary"> Go G@@M!NG</button>
         </div>
-        <ValidationMessage For="()=>Player.Name" class="m-3"/>
-    </EditForm>
+    </div>
+    <div class="input-group error-messages-container">
+        <ValidationMessage  For="()=>Player.Name" />
+    </div>
+</EditForm>
 
-
-
-@code{
+@code {
     [Parameter]
     public EventCallback OnRegisterPlayerClicked { get; set; }
 

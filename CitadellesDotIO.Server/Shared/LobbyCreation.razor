@@ -1,0 +1,53 @@
+﻿@using CitadellesDotIO.Engine
+@using CitadellesDotIO.Server.Models
+<EditForm class="col input-group justify-content-end" Model="@NewLobby">
+    @if (this.InputVisible)
+    {
+        <InputText id="lobbyName" class="col-auto" placeholder="Your Lobby Name" @bind-Value="@NewLobby.Name"></InputText>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" @onclick="@CreateButtonClicked">
+                <i class="fa-solid fa-check"></i>
+            </button>
+            <button type="button" class="btn btn-secondary" @onclick="@CancelButtonClicked">
+                <i class="fa-solid fa-arrow-turn-up fa-rotate-90"></i>
+            </button>
+        </div>       
+    }
+    else
+    {
+        <button type="button" class="btn btn-primary" @onclick="@NewButtonClicked">
+            <i class="fa-solid fa-square-plus"></i>
+            Create Lobby
+        </button>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public Lobby NewLobby { get; set; }
+    [Parameter]
+    public EventCallback OnCreateButtonClicked { get; set; }
+
+    private bool InputVisible = false;
+
+    private void NewButtonClicked()
+    {
+        this.InputVisible = true;
+        this.StateHasChanged();
+    }
+
+    private void CancelButtonClicked()
+    {
+        this.NewLobby.Name = string.Empty;
+        this.InputVisible = false;
+        this.StateHasChanged();
+    }
+
+
+    private async Task CreateButtonClicked()
+    {
+        await OnCreateButtonClicked.InvokeAsync();
+        this.InputVisible = false;
+    }
+
+}

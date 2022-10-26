@@ -2,7 +2,6 @@
 using CitadellesDotIO.Engine.Factories;
 using CitadellesDotIO.Server.Models;
 using System.Collections.Concurrent;
-using System.Reflection;
 
 namespace CitadellesDotIO.Server.Services
 {
@@ -12,14 +11,23 @@ namespace CitadellesDotIO.Server.Services
         private readonly ConcurrentDictionary<string, Player> Players = new();
         public LobbiesService()
         {
-            // population à la con pour l'instant
-            Lobby dummy = new Lobby("Dummy 3 players lobby")
+            for (int i = 0; i < 8; i++)
             {
-                Players = new List<Player>() { new("Sam"), new("Clover"), new("Alex") }
-            };
-            this.Lobbies.AddOrUpdate(dummy.Id, dummy, (key, value) => value);
+                // population à la con pour l'instant
+                Lobby dummy = new Lobby("Dummy 3 players lobby")
+                {
+                    Players = new List<Player>() { new("Sam"), new("Clover"), new("Alex") }
+                };
+                this.Lobbies.AddOrUpdate(dummy.Id, dummy, (key, value) => value);
+            }
 
-            PlayersFactory.BuddiesPlayerList(4).ToList().ForEach(p =>
+            List<Player> buddies = new List<Player>();
+            buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));
+            buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));
+            buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));
+            buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));
+            buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));
+            buddies.ForEach(p =>
             {
                 this.Players.AddOrUpdate(Guid.NewGuid().ToString(), p, (key, value) => value);
             });
@@ -47,6 +55,10 @@ namespace CitadellesDotIO.Server.Services
                 if (leaver != null)
                 {
                     toLeave.Players.Remove(leaver);
+                    if(!toLeave.Players.Any())
+                    {
+                        this.Lobbies.TryRemove(lobbyId, out _);
+                    }
                     return await this.RegisterPlayerAsync(leaver);
                 }
             }

@@ -8,14 +8,14 @@
             <p>@Lobby.Name</p>
             @if (this.IsPlayerInLobby)
             {
-                <button type=button @onclick="@LeaveButtonClicked">
+                <button class="btn btn-secondary" type=button @onclick="@LeaveButtonClicked">
                     <i class="fa-solid fa-arrow-right-from-bracket fa-flip-horizontal"></i>
                     Leave
                 </button>
             }
             else if(this.CanPlayerJoinLobby)
             {
-                <button type=button @onclick="@JoinButtonClicked">
+                <button class="btn btn-primary" type=button @onclick="@JoinButtonClicked">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     Join
                 </button>

@@ -14,8 +14,8 @@ namespace CitadellesDotIO.Engine
 {
     public class Player : ISwappable
     {
-        [Required]
-        [StringLength(50, ErrorMessage = "La longueur de votre G@M3R74G doit être comprise en 5 et 50 caractères", MinimumLength = 5)]
+        [Required(ErrorMessage ="Your G@M3R74G is required !")]
+        [StringLength(50, ErrorMessage = "The length of your nickname must be between 5 and 50 characters !", MinimumLength = 5)]
         public string Name { get; set; }
         public string Id { get; set; }
         public int Gold { get; set; }
