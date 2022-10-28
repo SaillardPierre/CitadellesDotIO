@@ -5,13 +5,22 @@ using CitadellesDotIO.Enums.TurnChoices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.View
 {
+    [DataContract(IsReference = true)]
     public class ConsoleView : IView
     {
+        public void SetPlayer(Player player)
+        {
+            this.Player = player;
+        }
+        [JsonIgnore]
+        public Player Player{ get; set; }
         private async Task<int> GetIndexAsync(List<dynamic> items)
         {
             int i = 0;
@@ -41,6 +50,7 @@ namespace CitadellesDotIO.Engine.View
 
         public async Task<Character> PickCharacter(List<Character> characters)
         {
+            Console.WriteLine($"Start of {this.Player.Name}'s Turn to pick his character !");
             Console.WriteLine("Pick Character by index :");
             return characters[await this.GetIndexAsync(new(characters))];
         }
@@ -60,6 +70,7 @@ namespace CitadellesDotIO.Engine.View
 
         public async Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
         {
+            Console.WriteLine($"Start of {this.Player.Name}'s Turn, playing {this.Player.Character.Name} !"); 
             Console.WriteLine("Pick Mandatory turn choice by index :");
             return (MandatoryTurnChoice)await this.GetIndexAsync(new(Enum.GetNames(typeof(MandatoryTurnChoice))));
         }

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using CitadellesDotIO.Engine.View;
+using System.Text.Json.Serialization;
 
 namespace CitadellesDotIO.Engine
 {
@@ -18,6 +20,8 @@ namespace CitadellesDotIO.Engine
         [StringLength(50, ErrorMessage = "The length of your nickname must be between 5 and 50 characters !", MinimumLength = 5)]
         public string Name { get; set; }
         public string Id { get; set; }
+        [JsonIgnore]
+        public IView View { get; set; }
         public int Gold { get; set; }
         public bool IsCurrentKing { get; set; }
         public Character Character { get; set; }
@@ -80,6 +84,12 @@ namespace CitadellesDotIO.Engine
             PickSize = BasePickSize;
             PoolSize = BasePoolSize;
             TurnBuildingCap = BaseTurnBuildingCap;
+        }
+
+        public Player(string name, IView view) : this(name)
+        {
+            this.View = view;
+            this.View.SetPlayer(this);
         }
 
         public List<string> TakenChoices { get; set; }

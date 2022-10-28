@@ -33,5 +33,11 @@ namespace CitadellesDotIO.Engine.View
 
         public Task<District> PickDistrict(List<District> districts)
             => Task.FromResult(districts[RandomNumberGenerator.GetInt32(0, districts.Count)]);
+
+        public void SetPlayer(Player player)
+        {
+            this.Player = player;
+        }
+        public Player Player { get; set; }
     }
 }

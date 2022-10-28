@@ -11,7 +11,12 @@ namespace CitadellesDotIO.Server.Services
         private readonly ConcurrentDictionary<string, Player> Players = new();
         public LobbiesService()
         {
-            for (int i = 0; i < 8; i++)
+            Lobby lobby = new Lobby("Empty lobby")
+            {
+                Players = new List<Player>() { }
+            };
+            this.Lobbies.AddOrUpdate(lobby.Id, lobby, (key, value) => value);
+            for (int i = 0; i < 2; i++)
             {
                 // population à la con pour l'instant
                 Lobby dummy = new Lobby("Dummy 3 players lobby")
@@ -19,7 +24,7 @@ namespace CitadellesDotIO.Server.Services
                     Players = new List<Player>() { new("Sam"), new("Clover"), new("Alex") }
                 };
                 this.Lobbies.AddOrUpdate(dummy.Id, dummy, (key, value) => value);
-            }
+            }           
 
             List<Player> buddies = new List<Player>();
             buddies.AddRange(PlayersFactory.BuddiesPlayerList(8));

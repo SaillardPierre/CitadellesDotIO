@@ -9,6 +9,7 @@ namespace CitadellesDotIO.Engine.View
 {
     public interface IView
     {
+        public void SetPlayer(Player player);
         public Task<Character> PickCharacter(List<Character> characters);
         public Task<MandatoryTurnChoice> PickMandatoryTurnChoice();
         public Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices);

@@ -13,7 +13,6 @@ namespace CitadellesDotIO.Engine.Factory
                 players,
                 CharactersFactory.VanillaCharactersList,
                 DeckFactory.VanillaDistrictsDeck(),
-                view ?? new RandomActionView(),
                 Guid.NewGuid().ToString("n"));
         }
     }
