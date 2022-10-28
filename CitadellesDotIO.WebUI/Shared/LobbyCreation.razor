@@ -1,9 +1,9 @@
 ﻿@using CitadellesDotIO.Engine
 @using CitadellesDotIO.Server.Models
-<EditForm class="col input-group justify-content-end" Model="@NewLobby">
+<EditForm class="col input-group justify-content-end">
     @if (this.InputVisible)
     {
-        <InputText id="lobbyName" class="col-auto" placeholder="Your Lobby Name" @bind-Value="@NewLobby.Name"></InputText>
+        <InputText id="lobbyName" class="col-auto" placeholder="Your Lobby Name" @bind-Value="@newLobbyName"></InputText>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-primary" @onclick="@CreateButtonClicked">
                 <i class="fa-solid fa-check"></i>
@@ -24,7 +24,7 @@
 
 @code {
     [Parameter]
-    public Lobby NewLobby { get; set; }
+    public string newLobbyName { get; set; }
     [Parameter]
     public EventCallback OnCreateButtonClicked { get; set; }
 
@@ -38,7 +38,7 @@
 
     private void CancelButtonClicked()
     {
-        this.NewLobby.Name = string.Empty;
+        this.newLobbyName = string.Empty;
         this.InputVisible = false;
         this.StateHasChanged();
     }

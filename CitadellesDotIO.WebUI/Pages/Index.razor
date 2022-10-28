@@ -1,0 +1,133 @@
+﻿@page "/"
+@using CitadellesDotIO.Client.CustomEventArgs
+@using CitadellesDotIO.Engine
+@using CitadellesDotIO.Client
+@using CitadellesDotIO.Engine.Characters
+@using CitadellesDotIO.Engine.Districts
+@using CitadellesDotIO.Engine.Targets
+@using CitadellesDotIO.Engine.View
+@using CitadellesDotIO.Enums.TurnChoices
+@using CitadellesDotIO.Server.Models
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager NavManager;
+@implements IAsyncDisposable;
+@implements IDisposable;
+@implements IView;
+
+
+<PageTitle>Index</PageTitle>
+@if (this.playerClient != null && this.playerClient.LobbiesConnection.IsConnected)
+{
+    <div id="playersContainer" class="container-flex col h-100">
+        <h3>Connected Players</h3>
+        <div class="scrollableDiv">
+            @foreach (Player player in this.playerClient.LobbiesConnection.Players)
+            {
+                <p>@player.Name</p>
+            }
+        </div>
+    </div>
+    <div id="lobbiesContainer" class="container-flex col h-100">
+        <div class="row">
+            <h3 class="col-auto">Available Lobbies</h3>
+            @if (this.playerClient.LobbiesConnection.CanPlayerJoinLobby)
+            {
+                <LobbyCreation newLobbyName="newLobbyName"
+                       OnCreateButtonClicked="()=>this.playerClient.LobbiesConnection.CreateLobbyAsync(newLobbyName)">
+                </LobbyCreation>
+            }
+        </div>
+        <div class="scrollableDiv">
+            @foreach (Lobby lobby in this.playerClient.LobbiesConnection.Lobbies)
+            {
+                <LobbyListItem lobby="@lobby"
+                       OnJoinButtonClicked="@((args)=>this.playerClient.LobbiesConnection.JoinLobbyAsync(@lobby.Id))"
+                       OnLeaveButtonClicked="@((args)=>this.playerClient.LobbiesConnection.LeaveLobbyAsync())"
+                       IsPlayerInLobby="@this.playerClient.LobbiesConnection.IsPlayerInLobby(@lobby.Id)"
+                       CanPlayerJoinLobby="@this.playerClient.LobbiesConnection.CanPlayerJoinLobby">
+                </LobbyListItem>
+            }
+        </div>
+
+    </div>
+    <div class="container-flex border border-primary rounded col h-auto">
+        <h3>Your connectivity informations</h3>
+        <p>@this.player.Name</p>
+        <p>@this.playerClient.LobbiesConnection.ConnectionId</p>
+        <p>@this.playerClient.LobbiesConnection.LobbyId</p>
+    </div>
+}
+else
+{
+    <div id="connectionContainer" style="width: 33%;margin: auto">
+        <PlayerRegister PlayerName="@this.playerName" OnRegisterPlayerClicked="@((args)=>RegisterPlayer())"></PlayerRegister>
+    </div>
+}
+
+
+
+
+@code {
+    string playerName = string.Empty;
+    Player player;
+    PlayerClient playerClient;
+    string newLobbyName = string.Empty;
+
+    async Task RegisterPlayer()
+    {
+        await this.Start();
+        await this.playerClient.LobbiesConnection.GetLobbiesAsync();
+        await this.playerClient.LobbiesConnection.GetPlayersAsync();
+    }
+
+    async Task Start()
+    {
+        this.playerClient = await PlayerClient.BuildPlayerClientAsync(playerName, this);
+        this.SetPlayer(this.playerClient.Player);
+    }
+
+    public void SetPlayer(Player player)
+    {
+        this.player = player;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await this.Stop();
+    }
+
+    public void Dispose() => this.Stop().RunSynchronously();
+
+    async Task Stop()
+    {
+        if (this.playerClient != null)
+        {
+            await this.playerClient.DisposeAsync();
+        }
+    }
+
+   
+
+    public async Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+    public async Task<Character> PickCharacter(List<Character> characters)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    
+    public async Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+    public async Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+    public async Task<ITarget> PickSpellTarget(List<ITarget> targets)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+    public async Task<District> PickDistrict(List<District> districts)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+    public async Task DisplayRanking(Player player, int rank)
+    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+
+
+}

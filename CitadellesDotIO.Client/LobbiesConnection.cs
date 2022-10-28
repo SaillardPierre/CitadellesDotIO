@@ -1,22 +1,19 @@
-﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Client.CustomEventArgs;
+﻿using CitadellesDotIO.Client.CustomEventArgs;
+using CitadellesDotIO.Engine;
 using CitadellesDotIO.Server.Models;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
-namespace CitadellesDotIO.Server.Client
+namespace CitadellesDotIO.Client
 {
-    public class LobbiesClient
+    public class LobbiesConnection
     {
         private HubConnection HubConnection;
 
-        public delegate void StateChangedEventHandler(object sender, StateChangedEventArgs e);
+        public delegate void StateChangedEventHandler(object sender, HubConnectionStateChangedEventArgs e);
         public event StateChangedEventHandler StateChanged;
-
-        public delegate void DataChangedEventHandler();
-        public event DataChangedEventHandler DataChanged;
 
         public bool IsConnected => HubConnection?.State == HubConnectionState.Connected;
         public string? ConnectionId => HubConnection?.ConnectionId;
@@ -26,13 +23,12 @@ namespace CitadellesDotIO.Server.Client
         public List<Lobby> Lobbies { get; set; }
         public List<Player> Players { get; set; }
         public Lobby NewLobby { get; set; }
-        public LobbiesClient(Player player, string siteUrl, DataChangedEventHandler dataChangedEventHandler, StateChangedEventHandler stateChangedEventHandler)
+        public LobbiesConnection(Player player, string siteUrl, StateChangedEventHandler stateChangedEventHandler)
         {
             this.Lobbies = new();
             this.Players = new();
             this.Player = player;
             this.NewLobby = new(string.Empty);
-            this.DataChanged = dataChangedEventHandler;
             this.StateChanged = stateChangedEventHandler;
 
             string hubUrl = siteUrl.TrimEnd('/') + "/lobbieshub";
@@ -53,7 +49,7 @@ namespace CitadellesDotIO.Server.Client
             HubConnection.On<IList<Lobby>>("PullLobbies", (lobbies) =>
             {
                 this.Lobbies = lobbies.ToList();
-                this.DataChanged.Invoke();
+                this.StateChanged.Invoke(this, new(HubConnectionState.Connected, "Pulled lobbies"));
             });
             HubConnection.On<IList<Player>>("PullPlayers", (players) =>
             {
@@ -64,12 +60,12 @@ namespace CitadellesDotIO.Server.Client
                     players.Remove(this.Player);
                 }
                 this.Players = players.ToList();
-                this.DataChanged.Invoke();
+                this.StateChanged.Invoke(this, new(HubConnectionState.Connected, "Pulled players"));
             });
             HubConnection.On<string>("PullLobbyId", (lobbyId) =>
             {
                 this.LobbyId = lobbyId;
-                this.DataChanged.Invoke();
+                this.StateChanged.Invoke(this, new(HubConnectionState.Connected, "Pulled LobbyId"));
             });
             HubConnection.On<Game>("PullGame", (game) =>
             {
@@ -109,11 +105,9 @@ namespace CitadellesDotIO.Server.Client
             await this.HubConnection.InvokeAsync("SendPlayersAsync");
         }
 
-        public async Task CreateLobbyAsync()
-        {
-            await this.HubConnection.InvokeAsync("CreateLobbyAsync", NewLobby);
-            await this.JoinLobbyAsync(NewLobby.Id);
-        }
+        public async Task CreateLobbyAsync(string newLobbyName)
+        => await this.HubConnection.InvokeAsync("CreateLobbyAsync", newLobbyName);
+
 
         public async Task JoinLobbyAsync(string lobbyId)
         => await this.HubConnection.InvokeAsync("JoinLobbyAsync", lobbyId, this.ConnectionId);
@@ -139,19 +133,19 @@ namespace CitadellesDotIO.Server.Client
 
         protected async Task HubConnection_Reconnecting(Exception? arg)
         {
-            StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
+            StateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
             await Task.CompletedTask;
         }
 
         protected async Task HubConnection_Reconnected(string? arg)
         {
-            StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Connected, arg!));
+            StateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Connected, arg!));
             await Task.CompletedTask;
         }
 
         protected async Task HubConnection_Closed(Exception? arg)
         {
-            StateChanged?.Invoke(this, new StateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
+            StateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
             await Task.CompletedTask;
         }
         public async ValueTask DisposeAsync()

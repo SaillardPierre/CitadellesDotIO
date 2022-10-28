@@ -37,12 +37,12 @@ namespace CitadellesDotIO.Server.Hubs
         //    await this.Clients.Group(lobbyId);
         //}
 
-        public async Task CreateLobbyAsync(Lobby newLobby)
+        public async Task CreateLobbyAsync(string newLobbyName)
         {
+            Lobby newLobby = new(newLobbyName);
             if (await this.lobbiesService.CreateLobbyAsync(newLobby))
             {
-                await this.Groups.AddToGroupAsync(this.Context.ConnectionId, newLobby.Name);
-                await this.BroadcastLobbiesAsync();
+                await this.JoinLobbyAsync(newLobby.Id, this.Context.ConnectionId);
             }
             else await Task.FromException(new Exception("Failure in Create lobby"));
         }
@@ -51,12 +51,7 @@ namespace CitadellesDotIO.Server.Hubs
         {
             if (await this.lobbiesService.AddPlayerToLobby(lobbyId, playerId))
             {
-                
-                await this.Groups.AddToGroupAsync(this.Context.ConnectionId, lobbyId);
-                // Temporaire
-                //await this.Clients.Groups(lobbyId).PullLobbies(await this.lobbiesService.GetLobbiesAsync());
-                // Dans la réalité aprés avoir mis à jour l'interface du joueur pour montrer son lobby,
-                // Broadcast le lobby a tous les membres du groupe
+                await this.Groups.AddToGroupAsync(this.Context.ConnectionId, lobbyId);                
                 await this.Clients.Caller.PullLobbyId(lobbyId);
                 await this.BroadcastLobbiesAsync();
                 await this.BroadcastPlayersAsync();

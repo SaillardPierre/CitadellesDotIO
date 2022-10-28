@@ -13,4 +13,8 @@
     <ProjectReference Include="..\CitadellesDotIO.Exceptions\CitadellesDotIO.Exceptions.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.Enums\CitadellesDotIO.Enums.csproj" />
   </ItemGroup>
+
+ <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+   <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\CitadellesDotIO.Unity\Assets\Plugins\$(ProjectName).dll&quot;&#xD;&#xA;" />
+ </Target>
 </Project>

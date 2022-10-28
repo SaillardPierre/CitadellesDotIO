@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Server", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "CitadellesDotIO.Unity\Assembly-CSharp.csproj", "{47A34B79-EA3A-7AE2-DDCF-CCB4DE3AD642}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Client", "CitadellesDotIO.Client\CitadellesDotIO.Client.csproj", "{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.WebUI", "CitadellesDotIO.WebUI\CitadellesDotIO.WebUI.csproj", "{EFAEF4D0-89AE-45C0-AEDC-EAD1F051AA18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{47A34B79-EA3A-7AE2-DDCF-CCB4DE3AD642}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A34B79-EA3A-7AE2-DDCF-CCB4DE3AD642}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A34B79-EA3A-7AE2-DDCF-CCB4DE3AD642}.Release|Any CPU.Build.0 = Release|Any CPU
+		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFAEF4D0-89AE-45C0-AEDC-EAD1F051AA18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFAEF4D0-89AE-45C0-AEDC-EAD1F051AA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFAEF4D0-89AE-45C0-AEDC-EAD1F051AA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFAEF4D0-89AE-45C0-AEDC-EAD1F051AA18}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

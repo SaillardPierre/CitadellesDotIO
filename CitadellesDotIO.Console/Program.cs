@@ -1,16 +1,9 @@
-﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Engine.Factory;
+﻿using CitadellesDotIO.Client;
+using CitadellesDotIO.Client.CustomEventArgs;
+using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.View;
-using CitadellesDotIO.Server.Client;
-using CitadellesDotIO.Server.Client.CustomEventArgs;
-using CitadellesDotIO.Server.Models;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO
@@ -23,40 +16,27 @@ namespace CitadellesDotIO
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
             playerNames.GetRange(0, 0).ForEach(p => Console.WriteLine(p));            
             List<Player> players = new List<Player>();
-            List<LobbiesClient> clients = new();
+            List<LobbiesConnection> clients = new();
 
             // Joueur courant 
-            Player playingPlayer = new Player(playerNames[0], new ConsoleView());
-            LobbiesClient playingLobbiesClient = new LobbiesClient(playingPlayer, "https://localhost:7257", () => { }, StateChanged);
-            clients.Add(playingLobbiesClient);
-            await playingLobbiesClient.StartAsync();
-            await playingLobbiesClient.GetLobbiesAsync();
-            await playingLobbiesClient.CreateLobbyAsync();
+            PlayerClient realPlayerClient = await PlayerClient.BuildPlayerClientAsync("Pierre", new ConsoleView());
+            await realPlayerClient.LobbiesConnection.CreateLobbyAsync("Console Test Lobby");
 
-            string lobbyId = playingLobbiesClient.LobbyId;
+            string lobbyId = realPlayerClient.LobbiesConnection.LobbyId;
 
             for (int i = 1; i < 5; i++)
             {
-                Player player = new Player(playerNames[i], new RandomActionView());
-                LobbiesClient lobbiesClient = new LobbiesClient(player, "https://localhost:7257", () => { }, StateChanged);
-                clients.Add(lobbiesClient);
-                await lobbiesClient.StartAsync();
-                await lobbiesClient.GetLobbiesAsync();
+                PlayerClient otherPlayerClient = await PlayerClient.BuildPlayerClientAsync(playerNames[i], new RandomActionView());
+                await otherPlayerClient.LobbiesConnection.JoinLobbyAsync(lobbyId);
             }
 
-            foreach(LobbiesClient client in clients)
-            {
-                await client.JoinLobbyAsync(lobbyId);
-            }
-
-            await playingLobbiesClient.StartGameAsync();
+            await realPlayerClient.LobbiesConnection.StartGameAsync();
 
             Console.ReadKey();
         }
-
-        public static void StateChanged(object sender, StateChangedEventArgs e)
+        static void StateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
-            Console.WriteLine("State changed");
+            Console.Write(e.State);
         }
     }
 }

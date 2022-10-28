@@ -85,7 +85,7 @@ namespace CitadellesDotIO.Engine
             Score = 0;
             PickSize = BasePickSize;
             PoolSize = BasePoolSize;
-            TurnBuildingCap = BaseTurnBuildingCap;
+            TurnBuildingCap = BaseTurnBuildingCap;            
         }
 
         public Player(string name, IView view) : this(name)
