@@ -8,9 +8,8 @@ namespace CitadellesDotIO.Server.Models
         public string Id { get; set; }
         public string Name { get; set; }
         public List<Player> Players { get; set; }
-
         public GameParameters Parameters { get; set; }
-        
+        public Game? Game { get; set; }        
         public Lobby(string name, GameParameters? parameters = null)
         {
             this.Id = Guid.NewGuid().ToString();

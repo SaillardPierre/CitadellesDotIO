@@ -2,6 +2,7 @@
 using CitadellesDotIO.Engine.Districts;
 using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Enums.TurnChoices;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,13 @@ using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.View
 {
-    [DataContract(IsReference = true)]
+    [JsonObject(IsReference = true)]
     public class ConsoleView : IView
     {
         public void SetPlayer(Player player)
         {
             this.Player = player;
         }
-        [JsonIgnore]
         public Player Player{ get; set; }
         private async Task<int> GetIndexAsync(List<dynamic> items)
         {
@@ -85,6 +85,16 @@ namespace CitadellesDotIO.Engine.View
         {
             Console.WriteLine("Pick Unordered turn choice by index :");            
             return availableChoices[await this.GetIndexAsync(new(availableChoices.Select(ac=>ac.ToString())))];
+        }
+
+        public async Task DisplayRanking(Player player, int rank)
+        {
+            Console.WriteLine($"{rank} : {player.Name} with {player.Score} points and {player.City.Count} districts");
+            player.City.ToList().ForEach(d =>
+            {
+                Console.WriteLine($"\t {d.Name} {d.ScoreValue}");
+            });
+            await Task.CompletedTask;
         }
     }
 }

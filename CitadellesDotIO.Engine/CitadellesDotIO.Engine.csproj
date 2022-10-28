@@ -4,6 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
  <ItemGroup>
     <ProjectReference Include="..\CitadellesDotIO.Exceptions\CitadellesDotIO.Exceptions.csproj" />
     <ProjectReference Include="..\CitadellesDotIO.Enums\CitadellesDotIO.Enums.csproj" />

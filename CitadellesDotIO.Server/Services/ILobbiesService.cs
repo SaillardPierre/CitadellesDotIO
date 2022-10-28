@@ -12,5 +12,6 @@ namespace CitadellesDotIO.Server.Services
         public Task<bool> RemovePlayerFromLobby(string lobbyId, string playerId);
         public Task<bool> RemovePlayerFromPlayers(string playerId);
         public Task<bool> RegisterPlayerAsync(Player player);
+        public Task CreateGameAsync(string lobbyId);
     }
 }

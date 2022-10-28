@@ -13,7 +13,10 @@ builder.Services.AddSignalR(hubOptions =>
     hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(1);
 })
  .AddNewtonsoftJsonProtocol(opts =>
-        opts.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.Auto);
+        {
+            opts.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+            opts.PayloadSerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+        });
 builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;

@@ -27,6 +27,11 @@ namespace CitadellesDotIO.Server.Hubs
             else await Task.FromException(new Exception("Failure in Register Player"));
         }
 
+        public async Task StartGameAsync(string lobbyId)
+        {
+            await this.lobbiesService.CreateGameAsync(lobbyId);
+        }
+
         public async Task CreateLobbyAsync(Lobby newLobby)
         {
             if (await this.lobbiesService.CreateLobbyAsync(newLobby))

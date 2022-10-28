@@ -11,16 +11,18 @@ using System.Text;
 using System.ComponentModel.DataAnnotations;
 using CitadellesDotIO.Engine.View;
 using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace CitadellesDotIO.Engine
 {
+    [JsonObject(IsReference = true)]
     public class Player : ISwappable
     {
         [Required(ErrorMessage ="Your G@M3R74G is required !")]
         [StringLength(50, ErrorMessage = "The length of your nickname must be between 5 and 50 characters !", MinimumLength = 5)]
         public string Name { get; set; }
         public string Id { get; set; }
-        [JsonIgnore]
         public IView View { get; set; }
         public int Gold { get; set; }
         public bool IsCurrentKing { get; set; }

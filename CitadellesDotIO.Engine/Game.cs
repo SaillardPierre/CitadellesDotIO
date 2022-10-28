@@ -38,6 +38,7 @@ namespace CitadellesDotIO.Engine
         {
             this.GameState = GameState.Starting;
             this.ApplyKingShuffleRule = applyKingShuffleRule;
+            this.Id = gameId;
 
             // Gestion de la pioche des districts
             this.DistrictsDeck = new Deck<District>(districts.OrderBy(_ => Dice.Roll(100)).ToList());
@@ -170,6 +171,12 @@ namespace CitadellesDotIO.Engine
             // Récupération des personnages pour que les joueurs n'y soit plus associés
             this.ShuffleCharacters();
             this.ComputeScores();
+            int rank = 1;
+            this.GetRanking().ToList().ForEach(r =>
+            {
+                 this.Players.ForEach(p => p.View.DisplayRanking(r, rank));
+                 rank++;
+            });
             return true;
         }
         private void RecoverDestroyedDistricts()

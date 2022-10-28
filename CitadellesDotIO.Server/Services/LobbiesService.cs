@@ -1,5 +1,6 @@
 ﻿using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.Factories;
+using CitadellesDotIO.Engine.Factory;
 using CitadellesDotIO.Server.Models;
 using System.Collections.Concurrent;
 
@@ -36,6 +37,16 @@ namespace CitadellesDotIO.Server.Services
             {
                 this.Players.AddOrUpdate(Guid.NewGuid().ToString(), p, (key, value) => value);
             });
+        }
+
+        public async Task CreateGameAsync(string lobbyId)
+        {
+            if (this.Lobbies.TryGetValue(lobbyId, out Lobby? toStart))
+            {
+                toStart.Game = GameFactory.VanillaGame(toStart.Players);
+                toStart.Game.Id = lobbyId;
+                await toStart.Game.Run();                
+            }
         }
 
         public async Task<bool> RegisterPlayerAsync(Player player)

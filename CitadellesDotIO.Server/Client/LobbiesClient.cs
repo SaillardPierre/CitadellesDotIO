@@ -86,6 +86,15 @@ namespace CitadellesDotIO.Server.Client
             await this.HubConnection.InvokeAsync("RegisterPlayerAsync", this.Player);
         }
 
+        public async Task StartGameAsync()
+        {
+            if (string.IsNullOrWhiteSpace(this.LobbyId))
+            {
+                return;
+            }
+            await this.HubConnection.InvokeAsync("StartGameAsync", this.LobbyId);
+        }
+
         public async Task GetLobbiesAsync()
         {
             await this.HubConnection.InvokeAsync("SendLobbiesAsync");

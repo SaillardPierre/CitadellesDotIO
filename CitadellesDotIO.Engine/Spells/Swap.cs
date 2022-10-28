@@ -52,6 +52,7 @@ namespace CitadellesDotIO.Engine.Spells
         public override void GetAvailableTargets(List<ITarget> targets)
         {
             base.GetAvailableTargets(targets);
+            targets.Remove(this.Caster);
             Targets = targets;
         }
     }

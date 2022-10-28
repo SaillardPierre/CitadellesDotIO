@@ -5,9 +5,11 @@ using CitadellesDotIO.Engine.Passives;
 using CitadellesDotIO.Engine.Targets;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace CitadellesDotIO.Engine.Districts
 {
+    [DataContract(IsReference = true)]
     public abstract class District : IDealable
     {
         public virtual string Name { get; set; }
