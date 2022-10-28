@@ -45,7 +45,12 @@ namespace CitadellesDotIO.Server.Services
             {
                 toStart.Game = GameFactory.VanillaGame(toStart.Players);
                 toStart.Game.Id = lobbyId;
-                await toStart.Game.Run();                
+                // Peut etre passer un EventCallBack a Run() et faire un clients.groups(lobbyId).PullGame à l'invocation de ce callback
+                await toStart.Game.Run((game) =>
+                {
+                    // Trouver un moyen d'appeler le hub d'ici ou bien retourner la fonction jsp
+                    var bp = "bp";
+                });                
             }
         }
 

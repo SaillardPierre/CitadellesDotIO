@@ -71,6 +71,10 @@ namespace CitadellesDotIO.Server.Client
                 this.LobbyId = lobbyId;
                 this.DataChanged.Invoke();
             });
+            HubConnection.On<Game>("PullGame", (game) =>
+            {
+                var bp = "bp";
+            });
         }
 
         public bool IsPlayerInLobby(string lobbyId)

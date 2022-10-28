@@ -15,5 +15,7 @@ namespace CitadellesDotIO.Server.HubsClients
         Task PullLobbyId(string lobbyId);
 
         Task PullPlayers(IList<Player> players);
+
+        Task PullGame(Game game);
     }
 }

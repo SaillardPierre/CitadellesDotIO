@@ -12,6 +12,7 @@ using CitadellesDotIO.Engine.Spells;
 using CitadellesDotIO.Extensions;
 using CitadellesDotIO.Engine.View;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace CitadellesDotIO.Engine
 {
@@ -144,12 +145,16 @@ namespace CitadellesDotIO.Engine
             {
                 Character pickedCharacter = await p.View.PickCharacter(this.CharactersDeck);
                 p.PickCharacter(CharactersDeck.DrawElement(pickedCharacter));
+                this.GameDataChanged.Invoke(this);
             }
             this.GameState = GameState.TableRoundPhase;
         }
 
-        public async Task<bool> Run()
+        private Action<Game> GameDataChanged;
+
+        public async Task<bool> Run(Action<Game> gameDataChanged)
         {
+            this.GameDataChanged = gameDataChanged;
             this.GameState = GameState.CharacterPickPhase;
             while (this.GameState != GameState.Finished)
             {
@@ -208,14 +213,20 @@ namespace CitadellesDotIO.Engine
             if (!character.IsMurdered)
             {
                 character.Player.ApplyPassives();
+                this.Notify();
 
                 character.Flip();
+                this.Notify();
 
                 this.HandleThievery(character);
+                this.Notify();
+
 
                 HandleTrading(character);
+                this.Notify();
 
                 await this.HandleMandatoryTurnChoice(character);
+                this.Notify();
 
                 await this.HandleUnorderedTurnChoices(character);
 
@@ -224,6 +235,7 @@ namespace CitadellesDotIO.Engine
 
             // La couronne passe même si le roi a été assassiné
             this.HandleKingship(character);
+            this.Notify();
         }
         private async Task PickDistrictInPool(Character character)
         {
@@ -365,7 +377,13 @@ namespace CitadellesDotIO.Engine
                 character.Player.Gold = 0;
                 // Ajout du butin au trésor du voleur
                 thief.Gold += stolenGold;
+                this.Notify();
             }
+        }
+
+        private void Notify()
+        {
+            this.GameDataChanged.Invoke(this);
         }
 
         private static void HandleTrading(Character character)
@@ -428,6 +446,7 @@ namespace CitadellesDotIO.Engine
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                 }
+                this.Notify();
             }
         }
     }

@@ -32,6 +32,11 @@ namespace CitadellesDotIO.Server.Hubs
             await this.lobbiesService.CreateGameAsync(lobbyId);
         }
 
+        //private async Task BroadcastGameAsync(string lobbyId)
+        //{
+        //    await this.Clients.Group(lobbyId);
+        //}
+
         public async Task CreateLobbyAsync(Lobby newLobby)
         {
             if (await this.lobbiesService.CreateLobbyAsync(newLobby))
