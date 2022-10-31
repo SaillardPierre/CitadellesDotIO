@@ -1,6 +1,5 @@
 ﻿using CitadellesDotIO.Engine;
 using CitadellesDotIO.Server.HubsClients;
-using CitadellesDotIO.Server.Models;
 using CitadellesDotIO.Server.Services;
 using Microsoft.AspNetCore.SignalR;
 namespace CitadellesDotIO.Server.Hubs

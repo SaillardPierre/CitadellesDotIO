@@ -6,12 +6,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <!--
+	  <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\CitadellesDotIO.Unity\Assets\Plugins\$(ProjectName).dll&quot;&#xD;&#xA;" />-->
+  </Target>
+
   <ItemGroup>
-    <ProjectReference Include="..\CitadellesDotIO.Server\CitadellesDotIO.Server.csproj" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="6.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\CitadellesDotIO.Unity\Assets\Plugins\$(ProjectName).dll&quot;&#xD;&#xA;" />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\CitadellesDotIO.Engine\CitadellesDotIO.Engine.csproj" />
+  </ItemGroup>
 
 </Project>

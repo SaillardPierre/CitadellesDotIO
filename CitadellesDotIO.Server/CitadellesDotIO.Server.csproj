@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\CitadellesDotIO.Unity\Assets\Plugins\$(ProjectName).dll&quot;&#xD;&#xA;" />
+    <!--<Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(SolutionDir)\CitadellesDotIO.Unity\Assets\Plugins\$(ProjectName).dll&quot;&#xD;&#xA;" />-->
   </Target>
 
 </Project>

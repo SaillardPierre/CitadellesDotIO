@@ -1,6 +1,5 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
 using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Models;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +37,10 @@ namespace CitadellesDotIO.Client
                        cfg.Transports = HttpTransportType.WebSockets;
                    })
                    .AddNewtonsoftJsonProtocol(opts =>
-                        opts.PayloadSerializerSettings.TypeNameHandling = TypeNameHandling.Auto)
+                   {
+                       opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+                       opts.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+                   })
                    .WithAutomaticReconnect()
                    .Build();
 

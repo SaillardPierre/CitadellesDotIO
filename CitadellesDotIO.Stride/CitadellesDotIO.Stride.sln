@@ -1,0 +1,11 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 16
+VisualStudioVersion = 16.0.0.0
+MinimumVisualStudioVersion = 16.0.0.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.Stride.Windows", "CitadellesDotIO.Stride.Windows\CitadellesDotIO.Stride.Windows.csproj", "{1A088302-7AE8-4C8A-AE6A-E2D02F9F95A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitadellesDotIO.Stride", "CitadellesDotIO.Stride\CitadellesDotIO.Stride.csproj", "{9C3CA5C9-951D-41C7-BBED-B1E5EB0B392E}"
+EndProject
+Global
+EndGlobal

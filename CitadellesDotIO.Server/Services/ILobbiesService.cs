@@ -1,5 +1,4 @@
 ﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Models;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CitadellesDotIO.Server.Services

@@ -1,7 +1,6 @@
 ﻿using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.Factories;
 using CitadellesDotIO.Engine.Factory;
-using CitadellesDotIO.Server.Models;
 using System.Collections.Concurrent;
 
 namespace CitadellesDotIO.Server.Services

@@ -1,5 +1,4 @@
 ﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.Models;
 
 namespace CitadellesDotIO.Server.HubsClients
 {

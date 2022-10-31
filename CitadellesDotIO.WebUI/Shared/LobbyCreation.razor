@@ -1,5 +1,4 @@
 ﻿@using CitadellesDotIO.Engine
-@using CitadellesDotIO.Server.Models
 <EditForm class="col input-group justify-content-end">
     @if (this.InputVisible)
     {
@@ -31,7 +30,7 @@
     private bool InputVisible = false;
 
     private void NewButtonClicked()
-    {
+    { 
         this.InputVisible = true;
         this.StateHasChanged();
     }
