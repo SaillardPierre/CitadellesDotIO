@@ -51,7 +51,7 @@
     </div>
     <div class="container-flex border border-primary rounded col h-auto">
         <h3>Your connectivity informations</h3>
-        <p>@this.player.Name</p>
+        <p>@this.playerClient.Player.Name</p>
         <p>@this.playerClient.LobbiesConnection.ConnectionId</p>
         <p>@this.playerClient.LobbiesConnection.LobbyId</p>
     </div>
@@ -67,9 +67,9 @@ else
 
 
 @code {
-    string playerName = string.Empty;
-    Player player;
+    string playerName = "enculé";
     PlayerClient playerClient;
+    WebBrowserView view;
     string newLobbyName = string.Empty;
 
     async Task RegisterPlayer()
@@ -81,13 +81,14 @@ else
 
     async Task Start()
     {
-        this.playerClient = await PlayerClient.BuildPlayerClientAsync(playerName, this);
-        this.SetPlayer(this.playerClient.Player);
+        this.view = new WebBrowserView();
+        // Pq ca marche ca et pas avant enculé ????
+        this.playerClient = await PlayerClient.BuildPlayerClientAsync(playerName,  view);        
     }
 
     public void SetPlayer(Player player)
     {
-        this.player = player;
+        
     }
 
     public async ValueTask DisposeAsync()

@@ -1,27 +1,32 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.ResponseCompression;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddSignalR(hubOptions =>
-{
-    hubOptions.EnableDetailedErrors = true;
-    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(1);
-})
- .AddNewtonsoftJsonProtocol(opts =>
- {
-     opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
-     opts.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
- });
 
-builder.Services.AddResponseCompression(opts =>
+builder.Services.AddRazorPages().AddJsonOptions(opts =>
 {
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
+    opts.JsonSerializerOptions.PropertyNamingPolicy = null;
+    opts.JsonSerializerOptions.PropertyNameCaseInsensitive = false;//.PropertyNamingPolicy = 
 });
+builder.Services.AddServerSideBlazor();
+
+//builder.Services.AddSignalR(hubOptions =>
+//{
+//    hubOptions.EnableDetailedErrors = true;
+//    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(1);
+//})
+// .AddNewtonsoftJsonProtocol(opts =>
+// {
+//     opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+//     opts.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+// });
+
+//builder.Services.AddResponseCompression(opts =>
+//{
+//    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
+//});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

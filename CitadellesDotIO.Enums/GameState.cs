@@ -6,6 +6,7 @@ namespace CitadellesDotIO.Enums
 {
     public enum GameState
     {
+        Created,
         Starting,
         CharacterPickPhase,
         TableRoundPhase,        

@@ -15,5 +15,13 @@ namespace CitadellesDotIO.Engine.Factory
                 DeckFactory.VanillaDistrictsDeck(),
                 Guid.NewGuid().ToString("n"));
         }
+        public static Game VanillaGame(string gameName)
+        {
+            return new Game(
+                    gameName, 
+                    CharactersFactory.VanillaCharactersList,
+                    DeckFactory.VanillaDistrictsDeck()
+                );
+        }
     }
 }

@@ -10,20 +10,24 @@ using CitadellesDotIO.Exceptions;
 using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Engine.Spells;
 using CitadellesDotIO.Extensions;
-using CitadellesDotIO.Engine.View;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using CitadellesDotIO.Engine.DTOs;
+using CitadellesDotIO.Engine.Hubs;
 
 namespace CitadellesDotIO.Engine
 {
     public class Game
     {
+        private GameHub GameHub;
         private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
         private readonly bool ApplyKingShuffleRule;
-        private readonly ImmutableList<Character> CharactersRoaster;
+        private ImmutableList<Character> CharactersRoaster;
         private bool IsLastTableRound => this.Players.Any(p => p.HasReachedDistrictThreshold);
+        public string Name { get; set; }
+        public string Id { get; set; }
+
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
         public List<Character> CharactersBin { get; set; }
@@ -31,32 +35,83 @@ namespace CitadellesDotIO.Engine
         public List<Player> Players { get; set; }
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
         public int TurnCount => this.turnCount;
-        public string Id { get; set; }
-        public Game()
-        {
+        public int DistrictThreshold { get; set; }
+        public Game(string name,                   
+                    ICollection<Character> characters,
+                    ICollection<District> districts,
+                    bool applyKingShuffleRule = true,
+                    int districtThreshold = 7
+            )
+        {            
+            this.Name = name;
+            this.Id = Guid.NewGuid().ToString("n");
+            this.GameState = GameState.Created;
+
+            this.ApplyKingShuffleRule = applyKingShuffleRule;
+            this.DistrictThreshold = districtThreshold;
+
+            this.Players= new List<Player>();
+            this.InitTable(characters, districts);
+            this.OpenConnection();
         }
-        public Game(IEnumerable<Player> players, ICollection<Character> characters, ICollection<District> districts, string gameId, bool applyKingShuffleRule = true, int districtThreshold = 7)
+        public Game(
+            IEnumerable<Player> players,
+            ICollection<Character> characters,
+            ICollection<District> districts,
+            string gameId,
+            bool applyKingShuffleRule = true,
+            int districtThreshold = 7)
         {
+
+            this.Id = Guid.NewGuid().ToString("n");
+            this.Name = "Programmatically created game";
+            this.GameState = GameState.Created;
+
             this.GameState = GameState.Starting;
             this.ApplyKingShuffleRule = applyKingShuffleRule;
-            this.Id = gameId;
+            this.DistrictThreshold = districtThreshold;            
 
+            this.InitTable(characters, districts);
+            this.InitPlayers(players);
+        }
+
+        public void OpenConnection()
+        {
+            this.GameHub = new GameHub();            
+        }
+
+
+        public void InitTable(
+            ICollection<Character> characters,
+            ICollection<District> districts)
+        {
             // Gestion de la pioche des districts
             this.DistrictsDeck = new Deck<District>(districts.OrderBy(_ => Dice.Roll(100)).ToList());
-
-            // Gestion des joueurs
-            this.Players = players.ToList();
-            this.Players.ForEach(p => p.DistrictThreshold = districtThreshold);
-            this.ShufflePlayers();
-            this.PickInitialHandAndGold();
 
             // Gestion de la pioche et de la défausse des personnages
             this.CharactersRoaster = characters.ToImmutableList();
             this.CharactersBin = new List<Character>();
         }
 
-        public void JoinPlayer(Player joining)
-            => this.Players.Add(joining);
+        public void InitPlayers(IEnumerable<Player> players)
+        {
+            // Gestion des joueurs
+            this.Players = players.ToList();
+            this.Players.ForEach(p => p.DistrictThreshold = this.DistrictThreshold);
+            this.ShufflePlayers();
+            this.PickInitialHandAndGold();
+        }
+
+        // Voir pour gérer le nombre de joueur max
+        public bool AddPlayer(Player newPlayer)
+        {
+            if (this.Players.Count < 8)
+            {
+                this.Players.Add(newPlayer);                
+                return true;
+            }
+            return false;
+        }
         private void SetNewKing(Player newKing)
         {
             // Destitution de l'ancien Roi s'il existe
@@ -449,5 +504,13 @@ namespace CitadellesDotIO.Engine
                 this.Notify();
             }
         }
+
+        public GameDto ToGameDto()
+        => new GameDto()
+        {
+            Id = this.Id,
+            Name = this.Name,
+            Players = this.Players.Select(p => p.Name).ToList()
+        };
     }
 }

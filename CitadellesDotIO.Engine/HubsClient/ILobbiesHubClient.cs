@@ -1,6 +1,8 @@
 ﻿using CitadellesDotIO.Engine;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace CitadellesDotIO.Server.HubsClients
+namespace CitadellesDotIO.Engine.HubsClients
 {
     /// <summary>
     /// Interface utilisée pour définir les signatures des méthodes du client SignalR associé

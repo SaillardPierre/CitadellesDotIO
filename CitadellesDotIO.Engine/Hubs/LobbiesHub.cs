@@ -1,11 +1,14 @@
 ﻿using CitadellesDotIO.Engine;
-using CitadellesDotIO.Server.HubsClients;
-using CitadellesDotIO.Server.Services;
+using CitadellesDotIO.Engine.HubsClients;
+using CitadellesDotIO.Engine.Services;
 using Microsoft.AspNetCore.SignalR;
-namespace CitadellesDotIO.Server.Hubs
+using System;
+using System.Threading.Tasks;
+
+namespace CitadellesDotIO.Engine.Hubs
 {
     /// <summary>
-    /// Classe utilisée pour définir les méthodse appellables par le client SignalR associé
+    /// Classe utilisée pour définir les méthodes appellables par le client SignalR associé
     /// Ces méthodes sont appellables par connection.invoke("NomDeMethode", monParametre = {})
     /// Les méthodes du client (ILobbiesHubClient) sont appelées sur l'objet client concerné
     /// </summary>

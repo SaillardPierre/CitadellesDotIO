@@ -9,10 +9,10 @@ namespace CitadellesDotIO.Client
         private static string HostAdress = "https://localhost:7257";
         public Player Player;
         public LobbiesConnection LobbiesConnection;
-        private PlayerClient(Player player, LobbiesConnection lobbiesClient)
+        private PlayerClient(Player player, LobbiesConnection lobbiesConnection)
         {
             this.Player = player;
-            this.LobbiesConnection = lobbiesClient;
+            this.LobbiesConnection = lobbiesConnection;
         }
 
         public static async Task<PlayerClient> BuildPlayerClientAsync(string playerName)
@@ -29,9 +29,9 @@ namespace CitadellesDotIO.Client
 
         private static async Task<LobbiesConnection> BuildLobbiesConnectionAsync(Player player)
         {
-            LobbiesConnection lobbiesClient = new(player, HostAdress, StateChanged);
-            await lobbiesClient.StartAsync();
-            return lobbiesClient;
+            LobbiesConnection lobbiesConnection = new(player, HostAdress, StateChanged);
+            await lobbiesConnection.StartAsync();
+            return lobbiesConnection;
         }
 
         async static void StateChanged(object sender, HubConnectionStateChangedEventArgs e)

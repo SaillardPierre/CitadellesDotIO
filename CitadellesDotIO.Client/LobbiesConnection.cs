@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Web.Helpers;
 
 namespace CitadellesDotIO.Client
 {
@@ -17,6 +18,7 @@ namespace CitadellesDotIO.Client
         public bool IsConnected => HubConnection?.State == HubConnectionState.Connected;
         public string? ConnectionId => HubConnection?.ConnectionId;
         public string? LobbyId { get; set; }
+
 
         public Player Player { get; set; }
         public List<Lobby> Lobbies { get; set; }
@@ -33,7 +35,7 @@ namespace CitadellesDotIO.Client
             string hubUrl = siteUrl.TrimEnd('/') + "/lobbieshub";
             HubConnection = new HubConnectionBuilder()
                    .WithUrl(hubUrl, cfg =>
-                   {
+                   {                       
                        cfg.Transports = HttpTransportType.WebSockets;
                    })
                    .AddNewtonsoftJsonProtocol(opts =>
@@ -84,8 +86,8 @@ namespace CitadellesDotIO.Client
         public async Task StartAsync()
         {
             await this.HubConnection.StartAsync();
-            this.Player.Id = this.ConnectionId;
-            await this.HubConnection.InvokeAsync("RegisterPlayerAsync", this.Player);
+            this.Player.Id = this.ConnectionId;         
+            await this.HubConnection.InvokeAsync("RegisterPlayerAsync",this.Player);
         }
 
         public async Task StartGameAsync()
