@@ -46,7 +46,7 @@ namespace CitadellesDotIO.Client
             Console.WriteLine("[" + this.PlayerName + "] "+e.State + " | " + e.Message);
         }
 
-        void LobbyStateChanged(object sender, LobbyStateChangedEventArgs e)
+        async void LobbyStateChanged(object sender, LobbyStateChangedEventArgs e)
         {
             Console.WriteLine("["+this.PlayerName+"] "+ e.State + " | " + e.Message);
             switch (e)
@@ -62,7 +62,7 @@ namespace CitadellesDotIO.Client
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
                     // Peut etre stocker la game ?
-                    GameConnection.StartAsync(gameJoinedEvent.GameId);
+                    await GameConnection.StartAsync(gameJoinedEvent.GameId, this.PlayerName);
                     break;
                 default:
                     break;
@@ -71,6 +71,10 @@ namespace CitadellesDotIO.Client
 
         void GameStateChanged(object sender, GameStateChangedEventArgs e)
         {
+            if(e.State == GameState.Pending)
+            {
+                var bp = "bp";
+            }
             Console.WriteLine("[" + this.PlayerName + "] " + e.State + " | " + e.Message);
         }
     }

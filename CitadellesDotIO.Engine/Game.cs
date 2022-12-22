@@ -19,7 +19,7 @@ namespace CitadellesDotIO.Engine
 {
     public class Game
     {
-        private IHubContext<GameHub> GameHubContext;
+        private GameHubContextAdapter GameHubContextAdapter;
         private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
@@ -54,7 +54,7 @@ namespace CitadellesDotIO.Engine
 
             this.Players= new List<Player>();
             this.InitTable(characters, districts);
-            this.GameHubContext = gameHubContext;
+            this.GameHubContextAdapter = new(gameHubContext, this.Id);
         }
         public Game(
             IEnumerable<Player> players,
@@ -76,8 +76,6 @@ namespace CitadellesDotIO.Engine
             this.InitTable(characters, districts);
             this.InitPlayers(players);
         }
-
-
 
         public void InitTable(
             ICollection<Character> characters,
@@ -101,12 +99,11 @@ namespace CitadellesDotIO.Engine
         }
 
         // Voir pour gérer le nombre de joueur max
-        public bool AddPlayer(Player newPlayer)
+        public async Task<bool> AddPlayer(Player newPlayer)
         {
             if (this.Players.Count < 8)
             {
                 this.Players.Add(newPlayer);
-                this.GameHubContext.Clients.Group(this.Id).SendAsync("SendTest", this.Id);
                 return true;
             }
             return false;
@@ -504,12 +501,15 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        public GameDto ToGameDto()
-        => new GameDto()
+        public async Task<GameDto> ToGameDto()
         {
-            Id = this.Id,
-            Name = this.Name,
-            Players = this.Players.Select(p => p.Name).ToList()
-        };
+            await this.GameHubContextAdapter.SendTest();
+            return new GameDto()
+                {
+                    Id = this.Id,
+                    Name = this.Name,
+                    Players = this.Players.Select(p => p.Name).ToList()
+                };
+        }
     }
 }

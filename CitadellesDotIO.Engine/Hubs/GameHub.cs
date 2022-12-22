@@ -1,30 +1,32 @@
 ﻿using CitadellesDotIO.Engine.HubsClient;
 using CitadellesDotIO.Engine.Services;
 using Microsoft.AspNetCore.SignalR;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Hubs
 {
     public class GameHub : Hub<IGameHubClient>
-    {       
-        public GameHub() {
-            
+    {
+        private readonly IGamesService gamesService;
+        public GameHub(IGamesService gamesService)
+        {
+            this.gamesService = gamesService;
         }
+
         public async override Task OnConnectedAsync()
         {
             await this.Clients.Caller.RegisterPlayer();
         }
-
-        public async Task RegisterPlayer(string gameId)
+        public string LastCallerId { get; set; }
+        public async Task RegisterPlayer(string gameId, string playerName)
         {
             await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
-            await this.Clients.Group(gameId).SendTest("Prout");
-        }
-
-        public async Task SendTest(string gameId)
-        {
-            await this.Clients.Group(gameId).SendTest("SendTestContent");
+            if (!this.gamesService.SetPlayerConnection(gameId, playerName, this.Context.ConnectionId))
+            {
+                return;
+            }
+            await this.Clients.Group(gameId).SendTest("Player " + playerName + " joined " + gameId + "with connection "+ this.Context.ConnectionId);
         }
     }
 }
+

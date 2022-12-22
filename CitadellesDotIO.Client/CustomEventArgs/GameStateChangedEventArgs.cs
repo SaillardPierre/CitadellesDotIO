@@ -13,7 +13,7 @@ namespace CitadellesDotIO.Client.CustomEventArgs
         public string Message { get; set; }
         public GameStateChangedEventArgs(GameState state, string message)
         {
-            this.State = State;
+            this.State = state;
             this.Message = message;
         }
     }

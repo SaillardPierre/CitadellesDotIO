@@ -1,6 +1,7 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
 using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.HubsClient;
+using CitadellesDotIO.Enums;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ namespace CitadellesDotIO.Client
     internal class GameConnection : IGameHubClient
     {
         private string GameId { get; set; }
+        private string PlayerName { get; set; }
 
         private HubConnection GameHubConnection;
         public delegate void HubConnectionStateChangedEventHandler(object sender, HubConnectionStateChangedEventArgs e);
@@ -44,32 +46,31 @@ namespace CitadellesDotIO.Client
             this.GameStateChanged += gameStateChangedEventHandler;
 
             GameHubConnection.On(nameof(RegisterPlayer), async () => await this.RegisterPlayer());
-            GameHubConnection.On<string>("SendTest", async (msg) => await this.SendTest(msg));
+            GameHubConnection.On<string>(nameof(SendTest), async (msg) => await this.SendTest(msg));
 
 
         }
         #region Appelées par le serveur vers les client du hub
         public async Task RegisterPlayer()
         {
-            await GameHubConnection.InvokeAsync(nameof(RegisterPlayer), this.GameId);
+            await GameHubConnection.InvokeAsync(nameof(RegisterPlayer), this.GameId, this.PlayerName);
         }
 
         public Task SendTest(string message)
         {
-            this.GameStateChanged.Invoke(this, new(Enums.GameState.Created, message));
-            
-            
-            Turquoise17cc?!
-                return Task.CompletedTask;
+            GameStateChangedEventArgs args = new(GameState.Pending, message);
+            this.GameStateChanged.Invoke(this, args);            
+            return Task.CompletedTask;
         }
         #endregion
         #region Appelées par le client du hub vers le serveur
 
         #endregion
         #region Lifecyle
-        public async Task StartAsync(string gameId)
+        public async Task StartAsync(string gameId, string playerName)
         {
             this.GameId = gameId;
+            this.PlayerName = playerName;
             await this.GameHubConnection.StartAsync();
         }
         public async Task StopAsync()

@@ -24,7 +24,10 @@ namespace CitadellesDotIO.Engine.Hubs
         }
 
         public async Task GetGamesAsync()
-        => await this.Clients.Caller.PullGamesAsync(this.gamesService.GetGames());
+        {
+            IEnumerable<GameDto> games = await this.gamesService.GetGames();
+            await this.Clients.Caller.PullGamesAsync(games);
+        }
         
 
         public async Task CreateGameAsync(string gameName, string playerName)
@@ -38,7 +41,8 @@ namespace CitadellesDotIO.Engine.Hubs
             if (await this.gamesService.AddPlayerToGameAsync(gameId, playerName))
             {
                 await this.Clients.Caller.PullGameId(gameId);
-                await this.Clients.All.PullGamesAsync(this.gamesService.GetGames());
+                IEnumerable<GameDto> games = await this.gamesService.GetGames();
+                await this.Clients.All.PullGamesAsync(games);                
             }
             else await this.Clients.Caller.GameNotFound();
         }

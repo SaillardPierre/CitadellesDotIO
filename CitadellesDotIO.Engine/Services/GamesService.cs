@@ -40,14 +40,24 @@ namespace CitadellesDotIO.Engine.Services
             return newGame.Id;
         }
 
-        public IEnumerable<GameDto> GetGames()
+        public async Task<IEnumerable<GameDto>> GetGames()
         {
             List<GameDto> games = new();
             foreach (Game game in this.Games.Values)
             {
-                games.Add(game.ToGameDto());
+                games.Add(await game.ToGameDto());
             }
             return games;
+        }
+
+        public bool SetPlayerConnection(string gameId, string playerName, string connectionId)
+        {
+            if (this.Games.TryGetValue(gameId, out Game game))
+            {
+                game.Players.Single(p=>p.Name == playerName).Id = connectionId;
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> AddPlayerToGameAsync(string gameId, string playerName)
@@ -65,8 +75,8 @@ namespace CitadellesDotIO.Engine.Services
                 return false;
             }
 
-            Player player = new Player(playerName);
-            return game.AddPlayer(player);
+            Player player = new(playerName);
+            return await game.AddPlayer(player);
         }
     }
 
