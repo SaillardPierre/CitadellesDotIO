@@ -9,12 +9,12 @@
 @using CitadellesDotIO.Enums.TurnChoices
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject NavigationManager NavManager;
-@implements IAsyncDisposable;
+@*@implements IAsyncDisposable;
 @implements IDisposable;
-@implements IView;
+@implements IView;*@
 
 
-<PageTitle>Index</PageTitle>
+@*<PageTitle>Index</PageTitle>
 @if (this.playerClient != null && this.playerClient.LobbiesConnection.IsConnected)
 {
     <div id="playersContainer" class="container-flex col h-100">
@@ -63,71 +63,71 @@ else
     </div>
 }
 
-
+*@
 
 
 @code {
-    string playerName = "enculé";
-    PlayerClient playerClient;
-    WebBrowserView view;
-    string newLobbyName = string.Empty;
+    //string playerName = "enculé";
+    //PlayerClient playerClient;
+    //WebBrowserView view;
+    //string newLobbyName = string.Empty;
 
-    async Task RegisterPlayer()
-    {
-        await this.Start();
-        await this.playerClient.LobbiesConnection.GetLobbiesAsync();
-        await this.playerClient.LobbiesConnection.GetPlayersAsync();
-    }
+    //async Task RegisterPlayer()
+    //{
+    //    await this.Start();
+    //    await this.playerClient.LobbiesConnection.GetLobbiesAsync();
+    //    await this.playerClient.LobbiesConnection.GetPlayersAsync();
+    //}
 
-    async Task Start()
-    {
-        this.view = new WebBrowserView();
-        // Pq ca marche ca et pas avant enculé ????
-        this.playerClient = await PlayerClient.BuildPlayerClientAsync(playerName,  view);        
-    }
+    //async Task Start()
+    //{
+    //    this.view = new WebBrowserView();
+    //    // Pq ca marche ca et pas avant enculé ????
+    //    this.playerClient = await PlayerClient.BuildPlayerClientAsync(playerName,  view);        
+    //}
 
-    public void SetPlayer(Player player)
-    {
+    //public void SetPlayer(Player player)
+    //{
         
-    }
+    //}
 
-    public async ValueTask DisposeAsync()
-    {
-        await this.Stop();
-    }
+    //public async ValueTask DisposeAsync()
+    //{
+    //    await this.Stop();
+    //}
 
-    public void Dispose() => this.Stop().RunSynchronously();
+    //public void Dispose() => this.Stop().RunSynchronously();
 
-    async Task Stop()
-    {
-        if (this.playerClient != null)
-        {
-            await this.playerClient.DisposeAsync();
-        }
-    }
+    //async Task Stop()
+    //{
+    //    if (this.playerClient != null)
+    //    {
+    //        await this.playerClient.DisposeAsync();
+    //    }
+    //}
 
    
 
-    public async Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<MandatoryTurnChoice> PickMandatoryTurnChoice()
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
-    public async Task<Character> PickCharacter(List<Character> characters)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<Character> PickCharacter(List<Character> characters)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
     
-    public async Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<UnorderedTurnChoice> PickUnorderedTurnChoice(List<UnorderedTurnChoice> availableChoices)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
-    public async Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<List<District>> PickDistrictsFromPool(int pickCount, List<District> pool)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
-    public async Task<ITarget> PickSpellTarget(List<ITarget> targets)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<ITarget> PickSpellTarget(List<ITarget> targets)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
-    public async Task<District> PickDistrict(List<District> districts)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task<District> PickDistrict(List<District> districts)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
-    public async Task DisplayRanking(Player player, int rank)
-    => throw new NotImplementedException("Not implemented, please wait a bit for the web client");
+    //public async Task DisplayRanking(Player player, int rank)
+    //=> throw new NotImplementedException("Not implemented, please wait a bit for the web client");
 
 
 }

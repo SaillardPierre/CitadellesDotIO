@@ -30,7 +30,7 @@ builder.Services.AddResponseCompression(opts =>
 });
 builder.Services.AddCors();
 builder.Services.AddSingleton<ILobbiesService, LobbiesService>();
-builder.Services.AddTransient<IGamesService, GamesService>();
+builder.Services.AddSingleton<IGamesService, GamesService>();
 var app = builder.Build();
 
 
@@ -49,7 +49,6 @@ app.UseCors(policy => policy
             .WithOrigins("http://localhost:7243")
             .AllowAnyHeader()
             .AllowAnyMethod());
-app.MapHub<LobbiesHub>("/lobbieshub");
 app.MapHub<LobbyHub>("/lobbyhub");
 app.MapHub<GameHub>("/gamehub");
 app.MapControllers();

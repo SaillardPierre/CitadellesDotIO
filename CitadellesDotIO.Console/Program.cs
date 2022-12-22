@@ -2,45 +2,33 @@
 using CitadellesDotIO.Client.CustomEventArgs;
 using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.View;
+using CitadellesDotIO.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO
 {
     public static class Program
     {
-        private static string siteUrl = "https://localhost:7257";
+        
         static async Task Main(string[] args)
         {
-            await Task.Delay(2000);
             List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie" };
-            playerNames.GetRange(0, 0).ForEach(p => Console.WriteLine(p));
 
-            //Joueur courant
-            //PlayerClient realPlayerClient = await PlayerClient.BuildPlayerClientAsync("Pierre", new ConsoleView());
-            //await realPlayerClient.LobbiesConnection.CreateLobbyAsync("Console Test Lobby");
-
-            //string lobbyId = realPlayerClient.LobbiesConnection.LobbyId;
-
-            //for (int i = 1; i < 5; i++)
-            //{
-            //    PlayerClient otherPlayerClient = await PlayerClient.BuildPlayerClientAsync(playerNames[i], new RandomActionView());
-            //    await otherPlayerClient.LobbiesConnection.JoinLobbyAsync(lobbyId);
-            //}
-
-            //await realPlayerClient.LobbiesConnection.StartGameAsync();
-
-
-            LobbyConnection lobbyConnection = new(siteUrl, StateChanged);            
+            PlayerClient playerClient = new(playerNames.First());
+            await playerClient.StartLobbyConnection();
+            await playerClient.CreateGameAsync("PartieAJoindre");
             Console.ReadKey();
-            await lobbyConnection.StartAsync();
-            Console.WriteLine("Ca devrait essayer de se co");
+            PlayerClient player3Client = new("UnAutre");
+            await player3Client.StartLobbyConnection();
+            PlayerClient player2Client = new("Danaé");
+            await player2Client.StartLobbyConnection();
+            string gameId = Console.ReadLine();
+            await player2Client.JoinGameAsync(gameId);
+            
             Console.ReadKey();
-        }
-        static void StateChanged(object sender, HubConnectionStateChangedEventArgs e)
-        {
-            Console.Write(e.State +" "+e.Message);
-        }
+        }        
     }
 }

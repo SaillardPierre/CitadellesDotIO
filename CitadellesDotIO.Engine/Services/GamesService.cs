@@ -36,8 +36,15 @@ namespace CitadellesDotIO.Engine.Services
             return newGame.Id;
         }
 
-        public Task<IEnumerable<GameDto>> GetGamesAsync()
-        => Task.FromResult(this.Games.Values.Select(g => g.ToGameDto()));
+        public IEnumerable<GameDto> GetGames()
+        {
+            List<GameDto> games = new();
+            foreach (Game game in this.Games.Values)
+            {
+                games.Add(game.ToGameDto());
+            }
+            return games;
+        }
 
         public async Task<bool> AddPlayerToGameAsync(string gameId, string playerName)
         {

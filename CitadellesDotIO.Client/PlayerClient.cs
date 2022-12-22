@@ -1,50 +1,77 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
 using CitadellesDotIO.Engine;
+using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.View;
+using CitadellesDotIO.Enums;
+using Microsoft.AspNet.SignalR.Client;
+using System.Text;
 
 namespace CitadellesDotIO.Client
 {
-    public class PlayerClient : IAsyncDisposable
+    public class PlayerClient
     {
-        private static string HostAdress = "https://localhost:7257";
-        public Player Player;
-        public LobbiesConnection LobbiesConnection;
-        private PlayerClient(Player player, LobbiesConnection lobbiesConnection)
+        public LobbyState LobbyState { get; set; }
+
+        private static string siteUrl = "https://localhost:7257";
+        
+        private string PlayerName { get; set; }
+        private List<GameDto> Games { get; set; }
+        private LobbyConnection LobbyConnection { get; set; }
+        private GameConnection GameConnection { get; set; }
+        public PlayerClient(string playerName)
         {
-            this.Player = player;
-            this.LobbiesConnection = lobbiesConnection;
+            this.PlayerName = playerName;
+            this.Games = new();
+            LobbyConnection = new(playerName, siteUrl, HubStateChanged, LobbyStateChanged);
+            GameConnection = new(siteUrl, HubStateChanged, GameStateChanged);
         }
 
-        public static async Task<PlayerClient> BuildPlayerClientAsync(string playerName)
+        public async Task StartLobbyConnection()
         {
-            Player player = new(playerName, new RandomActionView());
-            return new PlayerClient(player, await BuildLobbiesConnectionAsync(player));
+            await this.LobbyConnection.StartAsync();
         }
 
-        public static async Task<PlayerClient> BuildPlayerClientAsync(string playerName, IView view)
+        public async Task CreateGameAsync(string gameName)
         {
-            Player player = new(playerName, view);
-            return new PlayerClient(player, await BuildLobbiesConnectionAsync(player));
+            await this.LobbyConnection.CreateGameAsync(gameName, this.PlayerName);
         }
 
-        private static async Task<LobbiesConnection> BuildLobbiesConnectionAsync(Player player)
+        public async Task JoinGameAsync(string gameId)
         {
-            LobbiesConnection lobbiesConnection = new(player, HostAdress, StateChanged);
-            await lobbiesConnection.StartAsync();
-            return lobbiesConnection;
+            await this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
         }
 
-        async static void StateChanged(object sender, HubConnectionStateChangedEventArgs e)
+        void HubStateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
-            
+            Console.WriteLine("[" + this.PlayerName + "] "+e.State + " | " + e.Message);
         }
 
-        public async ValueTask DisposeAsync()
+        void LobbyStateChanged(object sender, LobbyStateChangedEventArgs e)
         {
-            if (this.LobbiesConnection != null && this.LobbiesConnection.IsConnected)
+            Console.WriteLine("["+this.PlayerName+"] "+ e.State + " | " + e.Message);
+            switch (e)
             {
-                await this.LobbiesConnection.StopAsync();
+                case GamesPulledEventArgs gamesPulledEvent:
+                    this.Games = gamesPulledEvent.Games.ToList();
+                    StringBuilder message = new();
+                    foreach (GameDto g in this.Games)
+                    {
+                        message.AppendLine("Id : " + g.Id + " - Name : " + g.Name + " - Players : " + g.Players.Count);
+                    }
+                    Console.WriteLine(message.ToString());
+                    break;
+                case GameJoinedEventArgs gameJoinedEvent:
+                    // Peut etre stocker la game ?
+                    GameConnection.StartAsync(gameJoinedEvent.GameId);
+                    break;
+                default:
+                    break;
             }
+        }
+
+        void GameStateChanged(object sender, GameStateChangedEventArgs e)
+        {
+            Console.WriteLine("[" + this.PlayerName + "] " + e.State + " | " + e.Message);
         }
     }
 }

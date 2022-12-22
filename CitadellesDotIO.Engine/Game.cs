@@ -77,7 +77,7 @@ namespace CitadellesDotIO.Engine
 
         public void OpenConnection()
         {
-            this.GameHub = new GameHub();            
+            //this.GameHub = new GameHub();            
         }
 
 
