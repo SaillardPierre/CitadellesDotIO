@@ -21,8 +21,9 @@ namespace CitadellesDotIO.Client
         public delegate void GameStateChangedEventHandler(object sender, GameStateChangedEventArgs e);
         public event GameStateChangedEventHandler GameStateChanged;
 
-        public GameConnection(string siteUrl,
+        public GameConnection(
             string playerName,
+            string siteUrl,
             HubConnectionStateChangedEventHandler hubConnectionStateChangedEventHandler,
             GameStateChangedEventHandler gameStateChangedEventHandler)
         {

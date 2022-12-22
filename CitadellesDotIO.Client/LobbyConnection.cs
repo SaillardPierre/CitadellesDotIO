@@ -19,7 +19,8 @@ namespace CitadellesDotIO.Client
         public delegate void LobbyStateChangedEventHandler(object sender, LobbyStateChangedEventArgs e);
         public event LobbyStateChangedEventHandler LobbyStateChanged;
 
-        public LobbyConnection(string playerName,
+        public LobbyConnection(
+            string playerName,
             string siteUrl,
             HubConnectionStateChangedEventHandler hubConnectionStateChangedEventHandler,
             LobbyStateChangedEventHandler lobbyStateChangedEventHandler)

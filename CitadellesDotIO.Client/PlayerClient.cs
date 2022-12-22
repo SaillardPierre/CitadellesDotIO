@@ -20,7 +20,7 @@ namespace CitadellesDotIO.Client
             this.PlayerName = playerName;
             this.Games = new();
             LobbyConnection = new(playerName, siteUrl, HubStateChanged, LobbyStateChanged);
-            GameConnection = new(siteUrl, HubStateChanged, GameStateChanged);
+            GameConnection = new(playerName, siteUrl, HubStateChanged, GameStateChanged);
         }
 
         public async Task StartLobbyConnection()
@@ -59,7 +59,7 @@ namespace CitadellesDotIO.Client
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
                     // Peut etre stocker la game ?
-                    await GameConnection.StartAsync(gameJoinedEvent.GameId, this.PlayerName);
+                    await GameConnection.StartAsync(gameJoinedEvent.GameId);
                     break;
                 default:
                     break;
