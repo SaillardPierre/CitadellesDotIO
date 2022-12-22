@@ -71,10 +71,6 @@ namespace CitadellesDotIO.Client
 
         void GameStateChanged(object sender, GameStateChangedEventArgs e)
         {
-            if(e.State == GameState.Pending)
-            {
-                var bp = "bp";
-            }
             Console.WriteLine("[" + this.PlayerName + "] " + e.State + " | " + e.Message);
         }
     }

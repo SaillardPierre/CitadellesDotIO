@@ -19,7 +19,7 @@ namespace CitadellesDotIO.Engine
 {
     public class Game
     {
-        private GameHubContextAdapter GameHubContextAdapter;
+        private readonly GameHubContextAdapter GameHubContextAdapter;
         private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
@@ -99,7 +99,7 @@ namespace CitadellesDotIO.Engine
         }
 
         // Voir pour gérer le nombre de joueur max
-        public async Task<bool> AddPlayer(Player newPlayer)
+        public bool AddPlayer(Player newPlayer)
         {
             if (this.Players.Count < 8)
             {
@@ -316,7 +316,7 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        private async Task CastSpell(Spell spell)
+        private static async Task CastSpell(Spell spell)
         {
             if (spell.HasTargets)
             {
@@ -485,12 +485,12 @@ namespace CitadellesDotIO.Engine
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                     case UnorderedTurnChoice.CastCharacterSpell:
-                        await this.CastSpell(character.Spell);
+                        await CastSpell(character.Spell);
                         character.Player.TakenChoices.Add(currentChoice.ToString());
                         break;
                     case UnorderedTurnChoice.CastDistrictSpell:
                         District casterDistrict = await character.Player.View.PickDistrict(character.Player.DistrictSpellSources.ToList());
-                        await this.CastSpell(casterDistrict.Spell);
+                        await CastSpell(casterDistrict.Spell);
                         character.Player.TakenChoices.Add(casterDistrict.Name);
                         break;
                     case UnorderedTurnChoice.EndTurn:

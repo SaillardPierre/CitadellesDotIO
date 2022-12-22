@@ -21,7 +21,7 @@ namespace CitadellesDotIO.Engine.Services
             this.hubContext = hubContext;
         }
 
-        public async Task<string> CreateGameAsync(string gameName, string playerName)
+        public string CreateGame(string gameName, string playerName)
         {
             if (string.IsNullOrWhiteSpace(gameName))
             {
@@ -35,7 +35,7 @@ namespace CitadellesDotIO.Engine.Services
             Game newGame = GameFactory.VanillaGame(gameName, hubContext);
             if(!this.Games.TryAdd(newGame.Id, newGame))
             {
-                throw new Exception("Echec à l'ajout de la partie");
+                return string.Empty;
             }
             return newGame.Id;
         }
@@ -60,7 +60,7 @@ namespace CitadellesDotIO.Engine.Services
             return false;
         }
 
-        public async Task<bool> AddPlayerToGameAsync(string gameId, string playerName)
+        public bool AddPlayerToGame(string gameId, string playerName)
         {
             if (string.IsNullOrWhiteSpace(gameId))
             {
@@ -76,7 +76,7 @@ namespace CitadellesDotIO.Engine.Services
             }
 
             Player player = new(playerName);
-            return await game.AddPlayer(player);
+            return game.AddPlayer(player);
         }
     }
 

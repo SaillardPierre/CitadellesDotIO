@@ -29,7 +29,6 @@ builder.Services.AddResponseCompression(opts =>
     opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 });
 builder.Services.AddCors();
-builder.Services.AddSingleton<ILobbiesService, LobbiesService>();
 builder.Services.AddSingleton<IGamesService, GamesService>();
 var app = builder.Build();
 

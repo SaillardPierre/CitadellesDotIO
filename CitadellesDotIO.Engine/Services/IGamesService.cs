@@ -7,8 +7,8 @@ namespace CitadellesDotIO.Engine.Services
     public interface IGamesService
     {
         public Task<IEnumerable<GameDto>> GetGames();
-        public Task<string> CreateGameAsync(string gameName, string playerName);
-        public Task<bool> AddPlayerToGameAsync(string gameId, string playerName);
+        public string CreateGame(string gameName, string playerName);
+        public bool AddPlayerToGame(string gameId, string playerName);
         public bool SetPlayerConnection(string gameId, string playerName, string connectionId);
     }
 }

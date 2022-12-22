@@ -32,13 +32,13 @@ namespace CitadellesDotIO.Engine.Hubs
 
         public async Task CreateGameAsync(string gameName, string playerName)
         {
-            string gameId = await this.gamesService.CreateGameAsync(gameName, playerName);
+            string gameId = this.gamesService.CreateGame(gameName, playerName);
             await this.JoinGameAsync(gameId, playerName);
         }
 
         public async Task JoinGameAsync(string gameId, string playerName)
         {
-            if (await this.gamesService.AddPlayerToGameAsync(gameId, playerName))
+            if (this.gamesService.AddPlayerToGame(gameId, playerName))
             {
                 await this.Clients.Caller.PullGameId(gameId);
                 IEnumerable<GameDto> games = await this.gamesService.GetGames();

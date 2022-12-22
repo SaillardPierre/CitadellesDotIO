@@ -11,7 +11,7 @@ namespace CitadellesDotIO.Engine
     public class GameHubContextAdapter
     {
         private string GameId { get; set; }
-        private IHubContext<GameHub> GameHubContext;
+        private readonly IHubContext<GameHub> GameHubContext;
         public GameHubContextAdapter(IHubContext<GameHub> hubContext, string gameId)
         {
             this.GameHubContext = hubContext;

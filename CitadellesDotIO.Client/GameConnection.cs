@@ -11,7 +11,7 @@ namespace CitadellesDotIO.Client
 {
     internal class GameConnection : IGameHubClient
     {
-        private string GameId { get; set; }
+        private string? GameId { get; set; }
         private string PlayerName { get; set; }
 
         private HubConnection GameHubConnection;
