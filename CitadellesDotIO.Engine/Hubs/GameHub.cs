@@ -21,5 +21,10 @@ namespace CitadellesDotIO.Engine.Hubs
             await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
             await this.Clients.Group(gameId).SendTest("Prout");
         }
+
+        public async Task SendTest(string gameId)
+        {
+            await this.Clients.Group(gameId).SendTest("SendTestContent");
+        }
     }
 }

@@ -13,12 +13,13 @@ using CitadellesDotIO.Extensions;
 using System.Threading.Tasks;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CitadellesDotIO.Engine
 {
     public class Game
     {
-        private GameHub GameHub;
+        private IHubContext<GameHub> GameHubContext;
         private int turnCount = 0;
         private const int InitialGold = 2;
         private const int InitialDeck = 4;
@@ -39,6 +40,7 @@ namespace CitadellesDotIO.Engine
         public Game(string name,                   
                     ICollection<Character> characters,
                     ICollection<District> districts,
+                    IHubContext<GameHub> gameHubContext,
                     bool applyKingShuffleRule = true,
                     int districtThreshold = 7
             )
@@ -52,7 +54,7 @@ namespace CitadellesDotIO.Engine
 
             this.Players= new List<Player>();
             this.InitTable(characters, districts);
-            this.OpenConnection();
+            this.GameHubContext = gameHubContext;
         }
         public Game(
             IEnumerable<Player> players,
@@ -75,10 +77,6 @@ namespace CitadellesDotIO.Engine
             this.InitPlayers(players);
         }
 
-        public void OpenConnection()
-        {
-            //this.GameHub = new GameHub();            
-        }
 
 
         public void InitTable(
@@ -107,7 +105,8 @@ namespace CitadellesDotIO.Engine
         {
             if (this.Players.Count < 8)
             {
-                this.Players.Add(newPlayer);                
+                this.Players.Add(newPlayer);
+                this.GameHubContext.Clients.Group(this.Id).SendAsync("SendTest", this.Id);
                 return true;
             }
             return false;

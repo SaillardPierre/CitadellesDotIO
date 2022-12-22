@@ -1,5 +1,7 @@
 ﻿using CitadellesDotIO.Engine.Factories;
+using CitadellesDotIO.Engine.Hubs;
 using CitadellesDotIO.Engine.View;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 
@@ -15,12 +17,14 @@ namespace CitadellesDotIO.Engine.Factory
                 DeckFactory.VanillaDistrictsDeck(),
                 Guid.NewGuid().ToString("n"));
         }
-        public static Game VanillaGame(string gameName)
+        public static Game VanillaGame(string gameName, IHubContext<GameHub> gameHubContext)
         {
             return new Game(
-                    gameName, 
+                    gameName,
                     CharactersFactory.VanillaCharactersList,
-                    DeckFactory.VanillaDistrictsDeck()
+                    DeckFactory.VanillaDistrictsDeck(),
+                    gameHubContext,
+                    true, 7
                 );
         }
     }

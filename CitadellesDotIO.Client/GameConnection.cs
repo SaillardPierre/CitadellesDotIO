@@ -57,7 +57,10 @@ namespace CitadellesDotIO.Client
         public Task SendTest(string message)
         {
             this.GameStateChanged.Invoke(this, new(Enums.GameState.Created, message));
-            return Task.CompletedTask;
+            
+            
+            Turquoise17cc?!
+                return Task.CompletedTask;
         }
         #endregion
         #region Appelées par le client du hub vers le serveur

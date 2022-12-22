@@ -1,5 +1,7 @@
 ﻿using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.Factory;
+using CitadellesDotIO.Engine.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,9 +14,11 @@ namespace CitadellesDotIO.Engine.Services
     {
         private readonly ConcurrentDictionary<string, Game> Games = new();
 
-        public GamesService()
-        {
+        private readonly IHubContext<GameHub> hubContext;
 
+        public GamesService(IHubContext<GameHub> hubContext)
+        {
+            this.hubContext = hubContext;
         }
 
         public async Task<string> CreateGameAsync(string gameName, string playerName)
@@ -28,7 +32,7 @@ namespace CitadellesDotIO.Engine.Services
                 throw new ArgumentException("Le nom du joueur ne peut être vide");
             }
 
-            Game newGame = GameFactory.VanillaGame(gameName);
+            Game newGame = GameFactory.VanillaGame(gameName, hubContext);
             if(!this.Games.TryAdd(newGame.Id, newGame))
             {
                 throw new Exception("Echec à l'ajout de la partie");
