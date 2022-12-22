@@ -11,14 +11,11 @@ namespace CitadellesDotIO.Client
     public class PlayerClient
     {
         public LobbyState LobbyState { get; set; }
-
-        private static string siteUrl = "https://localhost:7257";
-        
         private string PlayerName { get; set; }
         private List<GameDto> Games { get; set; }
         private LobbyConnection LobbyConnection { get; set; }
         private GameConnection GameConnection { get; set; }
-        public PlayerClient(string playerName)
+        public PlayerClient(string siteUrl, string playerName)
         {
             this.PlayerName = playerName;
             this.Games = new();

@@ -22,12 +22,13 @@ namespace CitadellesDotIO.Client
         public event GameStateChangedEventHandler GameStateChanged;
 
         public GameConnection(string siteUrl,
+            string playerName,
             HubConnectionStateChangedEventHandler hubConnectionStateChangedEventHandler,
             GameStateChangedEventHandler gameStateChangedEventHandler)
         {
-            string hubUrl = siteUrl.TrimEnd('/') + "/gamehub";
+            this.PlayerName = playerName;           
             GameHubConnection = new HubConnectionBuilder()
-                   .WithUrl(hubUrl, cfg =>
+                   .WithUrl(siteUrl.TrimEnd('/') + "/gamehub", cfg =>
                    {
                        cfg.Transports = HttpTransportType.WebSockets;
                    })
@@ -67,10 +68,9 @@ namespace CitadellesDotIO.Client
 
         #endregion
         #region Lifecyle
-        public async Task StartAsync(string gameId, string playerName)
+        public async Task StartAsync(string gameId)
         {
-            this.GameId = gameId;
-            this.PlayerName = playerName;
+            this.GameId = gameId;            
             await this.GameHubConnection.StartAsync();
         }
         public async Task StopAsync()

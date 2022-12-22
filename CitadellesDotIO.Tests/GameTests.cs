@@ -17,10 +17,12 @@ namespace CitadellesDotIO.Tests
         [DataRow(6)]
         [DataRow(7)]
         [TestMethod]
-        public async Task Game_GameState_Finished_ForXPlayers(int xPlayers)
+        public void Game_GameState_Finished_ForXPlayers(int xPlayers)
         {
             Game game = GameFactory.VanillaGame(PlayersFactory.BuddiesPlayerList(xPlayers).ToList());
-            //Assert.IsTrue(await game.Run() && game.GameState.Equals(GameState.Finished));
+            // A remplacer lorsqu'on pourra refaire ce test
+            Assert.IsNotNull(game);
+            // Assert.IsTrue(await game.Run() && game.GameState.Equals(GameState.Finished));
         }        
     }
 }
