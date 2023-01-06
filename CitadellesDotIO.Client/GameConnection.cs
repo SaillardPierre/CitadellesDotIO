@@ -1,11 +1,9 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
-using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.HubsClient;
 using CitadellesDotIO.Enums;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
-using static CitadellesDotIO.Client.LobbyConnection;
 
 namespace CitadellesDotIO.Client
 {
@@ -27,19 +25,20 @@ namespace CitadellesDotIO.Client
             HubConnectionStateChangedEventHandler hubConnectionStateChangedEventHandler,
             GameStateChangedEventHandler gameStateChangedEventHandler)
         {
-            this.PlayerName = playerName;           
+            this.PlayerName = playerName;
+            string hubUrl = siteUrl.TrimEnd('/') + "/gamehub";
             GameHubConnection = new HubConnectionBuilder()
-                   .WithUrl(siteUrl.TrimEnd('/') + "/gamehub", cfg =>
-                   {
-                       cfg.Transports = HttpTransportType.WebSockets;
-                   })
-                   .AddNewtonsoftJsonProtocol(opts =>
-                   {
-                       opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
-                       opts.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
-                   })
-                   .WithAutomaticReconnect()
-                   .Build();
+                .WithUrl(hubUrl, cfg =>
+                {
+                    cfg.Transports = HttpTransportType.WebSockets;
+                })
+                .AddNewtonsoftJsonProtocol(opts =>
+                {
+                    opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto;
+                    opts.PayloadSerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+                })
+                .WithAutomaticReconnect()
+                .Build();
 
             GameHubConnection.Closed += HubConnection_Closed;
             GameHubConnection.Reconnected += HubConnection_Reconnected;

@@ -40,9 +40,10 @@ namespace CitadellesDotIO.Engine.Hubs
         {
             if (this.gamesService.AddPlayerToGame(gameId, playerName))
             {
+                string callerId = this.Context.ConnectionId;                
                 await this.Clients.Caller.PullGameId(gameId);
                 IEnumerable<GameDto> games = await this.gamesService.GetGames();
-                await this.Clients.All.PullGamesAsync(games);                
+                await this.Clients.AllExcept(new List<string>(){callerId}).PullGamesAsync(games);
             }
             else await this.Clients.Caller.GameNotFound();
         }

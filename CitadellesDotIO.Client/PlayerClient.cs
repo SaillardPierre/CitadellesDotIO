@@ -3,14 +3,15 @@ using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.View;
 using CitadellesDotIO.Enums;
-using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNetCore.SignalR.Client;
 using System.Text;
 
 namespace CitadellesDotIO.Client
 {
     public class PlayerClient
     {
-        public LobbyState LobbyState { get; set; }
+        public LobbyState LobbyState { get; private set; }
+        public HubConnectionState LobbyConnectionState { get; private set; }
         private string PlayerName { get; set; }
         private List<GameDto> Games { get; set; }
         private LobbyConnection LobbyConnection { get; set; }
@@ -40,12 +41,14 @@ namespace CitadellesDotIO.Client
 
         void HubStateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
+            this.LobbyConnectionState = e.State;
             Console.WriteLine("[" + this.PlayerName + "] "+e.State + " | " + e.Message);
         }
 
         async void LobbyStateChanged(object sender, LobbyStateChangedEventArgs e)
         {
             Console.WriteLine("["+this.PlayerName+"] "+ e.State + " | " + e.Message);
+            this.LobbyState = e.State;
             switch (e)
             {
                 case GamesPulledEventArgs gamesPulledEvent:
@@ -58,7 +61,7 @@ namespace CitadellesDotIO.Client
                     Console.WriteLine(message.ToString());
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
-                    // Peut etre stocker la game ?
+                    // Peut etre stocker la game ?                    
                     await GameConnection.StartAsync(gameJoinedEvent.GameId);
                     break;
                 default:
@@ -69,6 +72,12 @@ namespace CitadellesDotIO.Client
         void GameStateChanged(object sender, GameStateChangedEventArgs e)
         {
             Console.WriteLine("[" + this.PlayerName + "] " + e.State + " | " + e.Message);
+        }
+
+        public async Task Quit()
+        {
+            await LobbyConnection.StopAsync();
+            await GameConnection.StopAsync();
         }
     }
 }

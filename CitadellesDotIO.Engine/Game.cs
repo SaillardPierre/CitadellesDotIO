@@ -505,10 +505,10 @@ namespace CitadellesDotIO.Engine
         {
             await this.GameHubContextAdapter.SendTest();
             return new GameDto()
-                {
-                    Id = this.Id,
-                    Name = this.Name,
-                    Players = this.Players.Select(p => p.Name).ToList()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Players = new(this.Players.Select(p => p.Name).ToList())
                 };
         }
     }

@@ -80,12 +80,14 @@ namespace CitadellesDotIO.Client
         public async Task CreateGameAsync(string gameName, string playerName)
         {                    
             await this.LobbyHubConnection.InvokeAsync(nameof(CreateGameAsync), gameName, playerName);
-            this.LobbyStateChanged.Invoke(this, new(LobbyState.CreatingGame, "Player creating game " + gameName));
+            // TODO: A remplacer par un ClientStateChanged.Invoke
+            //this.LobbyStateChanged.Invoke(this, new(LobbyState.CreatingGame, "Player creating game " + gameName));
         }
         public async Task JoinGameAsync(string gameId, string playerName)
         {
             await this.LobbyHubConnection.InvokeAsync(nameof(JoinGameAsync), gameId, playerName);
-            this.LobbyStateChanged.Invoke(this, new(LobbyState.JoiningGame, "Tryin to connect to game " + gameId));            
+            // TODO: A remplacer par un ClientStateChanged.Invoke
+            //this.LobbyStateChanged.Invoke(this, new(LobbyState.JoiningGame, "Tryin to connect to game " + gameId));            
         }
         #endregion
 
