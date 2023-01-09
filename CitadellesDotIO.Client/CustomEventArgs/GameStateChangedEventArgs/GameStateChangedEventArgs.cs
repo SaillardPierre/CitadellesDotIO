@@ -9,12 +9,12 @@ namespace CitadellesDotIO.Client.CustomEventArgs
 {
     public class GameStateChangedEventArgs : EventArgs
     {
-        public GameState State { get; set;}
+        public GameState State { get; set; }
         public string Message { get; set; }
         public GameStateChangedEventArgs(GameState state, string message)
         {
-            this.State = state;
-            this.Message = message;
+            State = state;
+            Message = message;
         }
     }
 }

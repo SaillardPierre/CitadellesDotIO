@@ -8,11 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using CitadellesDotIO.Server;
-using CitadellesDotIO.Engine.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 using System;
 
 namespace CitadellesDotIO.Tests
@@ -28,11 +23,17 @@ namespace CitadellesDotIO.Tests
             return config.Connectivity.SiteUrl;
         }
 
-        [TestMethod] 
+        private static IWebHost BuildWebHost()
+        => WebHost.CreateDefaultBuilder(Array.Empty<string>())
+            .UseStartup<Startup>()
+            .UseUrls(new[] { GetSiteUrl() })
+            .Build();
+
+
+        [TestMethod]
         public async Task ConnectToLobby()
         {
-            using (var host = WebHost.CreateDefaultBuilder(Array.Empty<string>())
-                 .UseStartup<Startup>().UseUrls(new[] { GetSiteUrl() }).Build())
+            using (var host = BuildWebHost())
             {
                 host.Start();
 
@@ -41,13 +42,41 @@ namespace CitadellesDotIO.Tests
 
                 // Act
                 await playerClient.StartLobbyConnection();
-                await playerClient.CreateGameAsync("PartieAJoindre");
 
                 // Assert
                 Assert.AreEqual(HubConnectionState.Connected, playerClient.LobbyConnectionState);
-                Assert.AreEqual(LobbyState.GameJoined, playerClient.LobbyState);
+                Assert.AreEqual(LobbyState.GamesPulled, playerClient.LobbyState);
 
                 await playerClient.Quit();
+            }
+        }
+
+        [TestMethod] 
+        public async Task ConnectToExistingGame()
+        {
+            using (var host = BuildWebHost())
+            {
+                host.Start();
+
+                // Arrange
+                PlayerClient playerOneClient = new(GetSiteUrl(), "Pierre");
+                PlayerClient playerTwoClient = new(GetSiteUrl(), "Danaé");
+
+                // Act
+                await playerOneClient.StartLobbyConnection();
+                await playerTwoClient.StartLobbyConnection();
+
+                await playerOneClient.CreateGameAsync("PartieAJoindre");
+                await playerTwoClient.JoinGameByGameNameAsync("PartieAJoindre");
+
+                // Assert
+                Assert.AreEqual(HubConnectionState.Connected, playerOneClient.LobbyConnectionState);
+                Assert.AreEqual(HubConnectionState.Connected, playerTwoClient.LobbyConnectionState);
+                Assert.AreEqual(LobbyState.GameJoined, playerOneClient.LobbyState);
+                Assert.AreEqual(LobbyState.GameJoined, playerTwoClient.LobbyState);
+
+                await playerOneClient.Quit();
+                await playerTwoClient.Quit();
             }
         }
     }

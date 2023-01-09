@@ -503,13 +503,12 @@ namespace CitadellesDotIO.Engine
 
         public async Task<GameDto> ToGameDto()
         {
-            await this.GameHubContextAdapter.SendTest();
             return new GameDto()
             {
                 Id = this.Id,
                 Name = this.Name,
                 Players = new(this.Players.Select(p => p.Name).ToList())
-                };
+            };
         }
     }
 }

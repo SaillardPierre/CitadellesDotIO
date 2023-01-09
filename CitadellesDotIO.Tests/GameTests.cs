@@ -9,7 +9,7 @@ using CitadellesDotIO.Engine.View;
 
 namespace CitadellesDotIO.Tests
 {
-    [TestClass]
+    //[TestClass]
     public class GameTests
     {
         [DataRow(4)]

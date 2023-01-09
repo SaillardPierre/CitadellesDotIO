@@ -2,6 +2,7 @@
 using CitadellesDotIO.Engine.Factory;
 using CitadellesDotIO.Engine.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -77,6 +78,30 @@ namespace CitadellesDotIO.Engine.Services
 
             Player player = new(playerName);
             return game.AddPlayer(player);
+        }
+
+        public bool AddPlayerToGameByGameName(string gameName, string playerName, out string gameId)
+        {
+            if (string.IsNullOrWhiteSpace(gameName))
+            {
+                throw new ArgumentException("L'id de la partie ne peut être vide");
+            }
+            if (string.IsNullOrWhiteSpace(playerName))
+            {
+                throw new ArgumentException("Le nom du joueur ne peut être vide");
+            }
+
+            gameId = string.Empty;
+            foreach (KeyValuePair<string, Game> kvp in this.Games)
+            {               
+
+                if (kvp.Value.Name.Equals(gameName))
+                {
+                    gameId = kvp.Key;
+                    return AddPlayerToGame(gameId, playerName);                    
+                }
+            }
+            return false;
         }
     }
 

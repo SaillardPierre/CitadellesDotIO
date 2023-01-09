@@ -27,8 +27,7 @@ namespace CitadellesDotIO.Engine.Hubs
         {
             IEnumerable<GameDto> games = await this.gamesService.GetGames();
             await this.Clients.Caller.PullGamesAsync(games);
-        }
-        
+        }        
 
         public async Task CreateGameAsync(string gameName, string playerName)
         {
@@ -40,13 +39,26 @@ namespace CitadellesDotIO.Engine.Hubs
         {
             if (this.gamesService.AddPlayerToGame(gameId, playerName))
             {
-                string callerId = this.Context.ConnectionId;                
-                await this.Clients.Caller.PullGameId(gameId);
-                IEnumerable<GameDto> games = await this.gamesService.GetGames();
-                await this.Clients.AllExcept(new List<string>(){callerId}).PullGamesAsync(games);
+                await this.UpdateJoinedGame(gameId);
             }
             else await this.Clients.Caller.GameNotFound();
         }
 
+        public async Task JoinGameByNameAsync(string gameName, string playerName)
+        {
+            if (this.gamesService.AddPlayerToGameByGameName(gameName, playerName, out string gameId))
+            {
+                await this.UpdateJoinedGame(gameId);
+            }
+            else await this.Clients.Caller.GameNotFound();
+        }
+
+        private async Task UpdateJoinedGame(string gameId)
+        {
+            string callerId = this.Context.ConnectionId;
+            await this.Clients.Caller.PullGameId(gameId);
+            IEnumerable<GameDto> games = await this.gamesService.GetGames();
+            await this.Clients.AllExcept(new List<string>() { callerId }).PullGamesAsync(games);
+        }
     }
 }

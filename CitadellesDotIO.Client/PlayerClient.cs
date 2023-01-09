@@ -1,4 +1,5 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
+using CitadellesDotIO.Client;
 using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.View;
@@ -12,6 +13,7 @@ namespace CitadellesDotIO.Client
     {
         public LobbyState LobbyState { get; private set; }
         public HubConnectionState LobbyConnectionState { get; private set; }
+        public HubConnectionState GameConnectionState { get; private set; }
         private string PlayerName { get; set; }
         private List<GameDto> Games { get; set; }
         private LobbyConnection LobbyConnection { get; set; }
@@ -39,10 +41,29 @@ namespace CitadellesDotIO.Client
             await this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
         }
 
+        public async Task JoinGameByGameNameAsync(string gameName)
+        {
+            await this.LobbyConnection.JoinGameByNameAsync(gameName, this.PlayerName);
+        }
+
         void HubStateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
-            this.LobbyConnectionState = e.State;
-            Console.WriteLine("[" + this.PlayerName + "] "+e.State + " | " + e.Message);
+            StringBuilder message = new();
+            message.Append('[').Append(this.PlayerName).Append("] ");
+            switch (e)
+            {
+                case GameHubConnectionStateChangedEventArgs:
+                    message.Append("GameHub");
+                    this.GameConnectionState = e.State;
+                    break;
+                case LobbyHubConnectionStateChangedEventArgs:
+                    message.Append("LobbyHub");
+                    this.LobbyConnectionState = e.State;
+                    break;
+            }            
+            
+            message.Append(" "+e.State + " | " + e.Message);
+            Console.WriteLine(message.ToString());
         }
 
         async void LobbyStateChanged(object sender, LobbyStateChangedEventArgs e)
@@ -61,8 +82,9 @@ namespace CitadellesDotIO.Client
                     Console.WriteLine(message.ToString());
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
-                    // Peut etre stocker la game ?                    
+                    // Peut etre stocker la game ?
                     await GameConnection.StartAsync(gameJoinedEvent.GameId);
+                    await LobbyConnection.StopAsync();
                     break;
                 default:
                     break;
@@ -76,8 +98,14 @@ namespace CitadellesDotIO.Client
 
         public async Task Quit()
         {
-            await LobbyConnection.StopAsync();
-            await GameConnection.StopAsync();
+            if (this.LobbyConnectionState != HubConnectionState.Disconnected)
+            {
+                await LobbyConnection.StopAsync();
+            }
+            if (this.GameConnectionState != HubConnectionState.Disconnected)
+            {
+                await GameConnection.StopAsync();
+            }
         }
     }
 }

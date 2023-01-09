@@ -14,7 +14,7 @@ namespace CitadellesDotIO.Client.CustomEventArgs
         public GameJoinedEventArgs(string gameId)
                : base(LobbyState.GameJoined, "Joined game " + gameId)
         {
-            this.GameId = gameId;
+            GameId = gameId;
         }
     }
 }

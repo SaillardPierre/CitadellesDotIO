@@ -13,7 +13,7 @@ namespace CitadellesDotIO.Client
         private string PlayerName { get; set; }
 
         private HubConnection GameHubConnection;
-        public delegate void HubConnectionStateChangedEventHandler(object sender, HubConnectionStateChangedEventArgs e);
+        public delegate void HubConnectionStateChangedEventHandler(object sender, GameHubConnectionStateChangedEventArgs e);
         public event HubConnectionStateChangedEventHandler HubConnectionStateChanged;
 
         public delegate void GameStateChangedEventHandler(object sender, GameStateChangedEventArgs e);
@@ -60,7 +60,7 @@ namespace CitadellesDotIO.Client
         public Task SendTest(string message)
         {
             GameStateChangedEventArgs args = new(GameState.Pending, message);
-            this.GameStateChanged.Invoke(this, args);            
+            this.GameStateChanged.Invoke(this, args);
             return Task.CompletedTask;
         }
         #endregion
@@ -70,7 +70,7 @@ namespace CitadellesDotIO.Client
         #region Lifecyle
         public async Task StartAsync(string gameId)
         {
-            this.GameId = gameId;            
+            this.GameId = gameId;
             await this.GameHubConnection.StartAsync();
         }
         public async Task StopAsync()
@@ -85,17 +85,17 @@ namespace CitadellesDotIO.Client
         }
         protected async Task HubConnection_Reconnecting(Exception? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
+            HubConnectionStateChanged?.Invoke(this, new GameHubConnectionStateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
             await Task.CompletedTask;
         }
         protected async Task HubConnection_Reconnected(string? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Connected, arg!));
+            HubConnectionStateChanged?.Invoke(this, new GameHubConnectionStateChangedEventArgs(HubConnectionState.Connected, arg!));
             await Task.CompletedTask;
         }
         protected async Task HubConnection_Closed(Exception? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
+            HubConnectionStateChanged?.Invoke(this, new GameHubConnectionStateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
             await Task.CompletedTask;
         }
         #endregion

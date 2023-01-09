@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.DependencyInjection;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Enums;
+using CitadellesDotIO.Client;
 
 namespace CitadellesDotIO.Client
 {
@@ -51,11 +52,11 @@ namespace CitadellesDotIO.Client
             LobbyHubConnection.On(nameof(this.GameNotFound), () => this.GameNotFound());
         }
 
-        
+
         #region Appelées par le serveur vers les client du hub
         public Task ConfirmConnection()
         {
-            this.HubConnectionStateChanged.Invoke(this, new(HubConnectionState.Connected, "Client successfully connected to LobbyHub"));
+            this.HubConnectionStateChanged.Invoke(this, new LobbyHubConnectionStateChangedEventArgs(HubConnectionState.Connected, "Client successfully connected to LobbyHub"));
             return Task.CompletedTask;
         }
         public Task PullGamesAsync(IEnumerable<GameDto> games)
@@ -78,16 +79,16 @@ namespace CitadellesDotIO.Client
 
         #region Appelées par le client du hub vers le serveur
         public async Task CreateGameAsync(string gameName, string playerName)
-        {                    
+        {
             await this.LobbyHubConnection.InvokeAsync(nameof(CreateGameAsync), gameName, playerName);
-            // TODO: A remplacer par un ClientStateChanged.Invoke
-            //this.LobbyStateChanged.Invoke(this, new(LobbyState.CreatingGame, "Player creating game " + gameName));
         }
         public async Task JoinGameAsync(string gameId, string playerName)
         {
             await this.LobbyHubConnection.InvokeAsync(nameof(JoinGameAsync), gameId, playerName);
-            // TODO: A remplacer par un ClientStateChanged.Invoke
-            //this.LobbyStateChanged.Invoke(this, new(LobbyState.JoiningGame, "Tryin to connect to game " + gameId));            
+        }
+        public async Task JoinGameByNameAsync(string gameName, string playerName)
+        {
+            await this.LobbyHubConnection.InvokeAsync(nameof(JoinGameByNameAsync), gameName, playerName);
         }
         #endregion
 
@@ -99,7 +100,7 @@ namespace CitadellesDotIO.Client
         public async Task StopAsync()
         {
             if (this.LobbyHubConnection != null && this.LobbyHubConnection.State != HubConnectionState.Disconnected)
-            {              
+            {
                 // Gérer l'evenement de déconnexion
                 await this.LobbyHubConnection.StopAsync();
                 await this.LobbyHubConnection.DisposeAsync();
@@ -108,17 +109,17 @@ namespace CitadellesDotIO.Client
         }
         protected async Task HubConnection_Reconnecting(Exception? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
+            HubConnectionStateChanged?.Invoke(this, new LobbyHubConnectionStateChangedEventArgs(HubConnectionState.Reconnecting, arg?.Message!));
             await Task.CompletedTask;
         }
         protected async Task HubConnection_Reconnected(string? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Connected, arg!));
+            HubConnectionStateChanged?.Invoke(this, new LobbyHubConnectionStateChangedEventArgs(HubConnectionState.Connected, arg!));
             await Task.CompletedTask;
         }
         protected async Task HubConnection_Closed(Exception? arg)
         {
-            HubConnectionStateChanged?.Invoke(this, new HubConnectionStateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
+            HubConnectionStateChanged?.Invoke(this, new LobbyHubConnectionStateChangedEventArgs(HubConnectionState.Disconnected, arg?.Message!));
             await Task.CompletedTask;
         }
         #endregion

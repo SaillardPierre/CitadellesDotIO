@@ -12,10 +12,10 @@ namespace CitadellesDotIO.Client.CustomEventArgs
     {
         public IEnumerable<GameDto> Games { get; }
 
-        public GamesPulledEventArgs(IEnumerable<GameDto> games) 
-            : base(LobbyState.GamesPulled, "Pulled "+games.Count()+"games")
+        public GamesPulledEventArgs(IEnumerable<GameDto> games)
+            : base(LobbyState.GamesPulled, "Pulled " + games.Count() + "games")
         {
-            this.Games = games;
+            Games = games;
         }
 
     }
