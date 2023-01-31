@@ -1,15 +1,8 @@
-name: Build
-on:
-  push:
-    branches:
-      - cicdtests
-  pull_request:
-    types: [opened, synchronize, reopened]
-jobs:
-  build:
-    name: Build
-    runs-on: windows-latest
-    steps:
+name: "Execute code analysis"
+description: "Starts Sonar analysis"
+runs:
+  using: "composite"
+  steps:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
@@ -50,4 +43,3 @@ jobs:
           dotnet build CitadellesDotIO.sln
           dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-           

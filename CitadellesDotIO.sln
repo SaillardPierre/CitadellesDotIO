@@ -17,6 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Server", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Client", "CitadellesDotIO.Client\CitadellesDotIO.Client.csproj", "{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{61B343CD-FAA8-4D1F-803E-C32866540AB0}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+		codeanalysis.yml = codeanalysis.yml
+		.github\workflows\master_citadellesdotio.yml = .github\workflows\master_citadellesdotio.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
