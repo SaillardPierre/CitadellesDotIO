@@ -1,5 +1,12 @@
 name: "Execute code analysis"
 description: "Starts Sonar analysis"
+inputs : 
+  github-token:
+    required : true
+    description: "GitHub secrets"
+  sonar-token:
+    description: "Sonar secrets"
+    required : true
 runs:
   using: "composite"
   steps:
@@ -35,11 +42,11 @@ runs:
           dotnet tool install --global dotnet-coverage
       - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ github-token }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ sonar-token }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="${{ sonar-token }}" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build CitadellesDotIO.sln
           dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ sonar-token }}"

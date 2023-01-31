@@ -24,6 +24,9 @@ jobs:
 
       - name : Exexute Code Analysis
         uses : ./.github/actions/codeanalysis
+        with : 
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
