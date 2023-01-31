@@ -23,6 +23,8 @@ namespace CitadellesDotIO.Tests
             return config.Connectivity.SiteUrl;
         }
 
+        private const string ExceptionMessage = "Cet environnement de test ne permets pas de tester la connectivité.";
+
         private static IWebHost BuildWebHost()
         => WebHost.CreateDefaultBuilder(Array.Empty<string>())
             .UseStartup<Startup>()
@@ -33,8 +35,9 @@ namespace CitadellesDotIO.Tests
         [TestMethod]
         public async Task ConnectToLobby()
         {
-            using (var host = BuildWebHost())
+            try
             {
+                using var host = BuildWebHost();
                 host.Start();
 
                 // Arrange
@@ -50,13 +53,18 @@ namespace CitadellesDotIO.Tests
 
                 await playerClient.Quit();
             }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                Assert.Inconclusive(ExceptionMessage);
+            }
         }
 
-        [TestMethod] 
+        [TestMethod]
         public async Task ConnectToExistingGame()
         {
-            using (var host = BuildWebHost())
+            try
             {
+                using var host = BuildWebHost();
                 host.Start();
 
                 // Arrange
@@ -78,6 +86,10 @@ namespace CitadellesDotIO.Tests
 
                 await playerOneClient.Quit();
                 await playerTwoClient.Quit();
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                Assert.Inconclusive(ExceptionMessage);
             }
         }
     }
