@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
 
       - name : Exexute Code Analysis
-        uses : ./.github/workflows/composite-action
+        uses : ./.github/actions/codeanalysis
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
