@@ -42,6 +42,7 @@ namespace CitadellesDotIO.Tests
 
                 // Act
                 await playerClient.StartLobbyConnection();
+                System.Threading.Thread.Sleep(15); // On attends que les promesses soient tenues avant que le test ne se termine
 
                 // Assert
                 Assert.AreEqual(HubConnectionState.Connected, playerClient.LobbyConnectionState);

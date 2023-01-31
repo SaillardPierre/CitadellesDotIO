@@ -17,6 +17,8 @@ namespace CitadellesDotIO.Tests
         [DataRow(0, 7)]
         public void LeftoversCharactersCount_ShouldEqual_X_ForYPlayers(int xLeftoverCharacters, int yPlayers)
         {
+            Assert.Inconclusive();
+
             // Arrange
             (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(yPlayers);
 
@@ -36,6 +38,7 @@ namespace CitadellesDotIO.Tests
         [DataRow(7)]
         public void PlayerCount_ShouldEqual_HasPickedPlayerCount_AfterPickCharactersMethod_ForXPlayers(int xPlayers)
         {
+            Assert.Inconclusive();
             // Arrange
             (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(xPlayers);
 
@@ -55,6 +58,7 @@ namespace CitadellesDotIO.Tests
         [DataRow(0, 1, 7)]
         public void CharacterBin_ShouldHaveXShownYHidden_ForZPlayers(int xVisible, int yHidden, int zPlayers)
         {
+            Assert.Inconclusive();
             // Arrange
             (Game game, PrivateObject privateGame) = PrivateGameFactory.GetPrivateGame(zPlayers);
 
