@@ -17,10 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Server", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Client", "CitadellesDotIO.Client\CitadellesDotIO.Client.csproj", "{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Stride", "CitadellesDotIO.Stride\CitadellesDotIO.Stride\CitadellesDotIO.Stride.csproj", "{1EF3FEFA-9593-4717-B2E7-A7AD6FF1CAB7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Stride.Windows", "CitadellesDotIO.Stride\CitadellesDotIO.Stride.Windows\CitadellesDotIO.Stride.Windows.csproj", "{08A32039-5233-412F-9F51-2420CB1F2EE5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,14 +51,6 @@ Global
 		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{630C36C6-EDAA-4EE0-8E8F-33370DBEBA03}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EF3FEFA-9593-4717-B2E7-A7AD6FF1CAB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EF3FEFA-9593-4717-B2E7-A7AD6FF1CAB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EF3FEFA-9593-4717-B2E7-A7AD6FF1CAB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EF3FEFA-9593-4717-B2E7-A7AD6FF1CAB7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08A32039-5233-412F-9F51-2420CB1F2EE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08A32039-5233-412F-9F51-2420CB1F2EE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08A32039-5233-412F-9F51-2420CB1F2EE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08A32039-5233-412F-9F51-2420CB1F2EE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
