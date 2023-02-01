@@ -14,11 +14,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./actions/codeanalysis.yaml
+      - uses: ./.github/actions/codeanalysis.yaml
         env :
           SONAR_SECRET : ${{ secrets.SONAR_TOKEN }}
           GITHUB_SECRET : ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
