@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/codeanalysis.yaml
+      - uses: ./.github/actions/codeanalysis/action.yaml
         env :
           SONAR_SECRET : ${{ secrets.SONAR_TOKEN }}
           GITHUB_SECRET : ${{ secrets.GITHUB_TOKEN }}
