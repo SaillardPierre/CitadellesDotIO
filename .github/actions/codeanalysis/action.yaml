@@ -46,14 +46,12 @@ runs:
       dotnet tool install --global dotnet-coverage
   - name: Build and analyze
     env:
-      GITHUB_TOKEN: $GITHUB_TOKEN  # Needed to get PR information, if any
-      SONAR_TOKEN: $SONAR_TOKEN
+      GITHUB_TOKEN: $GITHUB_SECRET  # Needed to get PR information, if any
+      SONAR_TOKEN: $SONAR_SECRET
     shell: powershell
     run: |
-      echo "Before starting sonnarscanner"
-      echo $SONAR_TOKEN
-      .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+      .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="$SONAR_SECRET" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
       dotnet build CitadellesDotIO.sln
       dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
-      .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="$SONAR_SECRET"
             
