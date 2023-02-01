@@ -25,15 +25,15 @@ runs:
     uses: actions/cache@v1
     with:
       path: ~\sonar\cache
-      key: $RUNNER_OS-sonar
-      restore-keys: $RUNNER_OS-sonar
+      key: ${{ RUNNER_OS }}-sonar
+      restore-keys: ${{ RUNNER_OS }}-sonar
   - name: Cache SonarCloud scanner
     id: cache-sonar-scanner
     uses: actions/cache@v1
     with:
       path: .\.sonar\scanner
-      key: $RUNNER_OS-sonar-scanner
-      restore-keys: $RUNNER_OS-sonar-scanner
+      key: ${{ RUNNER_OS }}-sonar-scanner
+      restore-keys: ${{ RUNNER_OS }}-sonar-scanner
   - name: Install SonarCloud scanner
     if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
     shell: powershell
@@ -46,12 +46,12 @@ runs:
       dotnet tool install --global dotnet-coverage
   - name: Build and analyze
     env:
-      GITHUB_TOKEN: $GITHUB_SECRET  # Needed to get PR information, if any
-      SONAR_TOKEN: $SONAR_SECRET
+      GITHUB_TOKEN: ${{ GITHUB_SECRET }}  # Needed to get PR information, if any
+      SONAR_TOKEN: ${{ SONAR_SECRET }}
     shell: powershell
     run: |
-      .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="$SONAR_SECRET" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+      .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="${{ SONAR_SECRET }}" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
       dotnet build CitadellesDotIO.sln
       dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
-      .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="$SONAR_SECRET"
+      .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ SONAR_SECRET }}"
             
