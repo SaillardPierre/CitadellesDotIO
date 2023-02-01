@@ -46,7 +46,7 @@ runs:
       dotnet tool install --global dotnet-coverage
   - name: Build and analyze
     env:
-      GITHUB_TOKEN: ${{ GITHUB_SECRET }}  # Needed to get PR information, if any
+      GITHUB_TOKEN: ${{ env.GITHUB_SECRET }}  # Needed to get PR information, if any
       SONAR_TOKEN: ${{ SONAR_SECRET }}
     shell: powershell
     run: |
