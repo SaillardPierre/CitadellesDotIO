@@ -50,6 +50,7 @@ runs:
       SONAR_TOKEN: $SONAR_TOKEN
     shell: powershell
     run: |
+      echo "Before starting sonnarscanner"
       .\.sonar\scanner\dotnet-sonarscanner begin /k:"SaillardPierre_CitadellesDotIO" /o:"saillardpierre" /d:sonar.login="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"  /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
       dotnet build CitadellesDotIO.sln
       dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
