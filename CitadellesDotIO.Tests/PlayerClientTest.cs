@@ -73,14 +73,16 @@ namespace CitadellesDotIO.Tests
 
                 // Act
                 await playerOneClient.StartLobbyConnection();
-                await playerTwoClient.StartLobbyConnection();
+                playerOneClient.CreateGame("PartieAJoindre");
 
-                await playerOneClient.CreateGameAsync("PartieAJoindre");
-                await playerTwoClient.JoinGameByGameNameAsync("PartieAJoindre");
+                await playerTwoClient.StartLobbyConnection();
+                System.Threading.Thread.Sleep(15); // On attends que les promesses soient tenues avant que le test ne se termine
+                playerTwoClient.JoinGameByGameName("PartieAJoindre");
+                System.Threading.Thread.Sleep(15);
 
                 // Assert
-                Assert.AreEqual(HubConnectionState.Connected, playerOneClient.LobbyConnectionState);
-                Assert.AreEqual(HubConnectionState.Connected, playerTwoClient.LobbyConnectionState);
+                Assert.AreEqual(HubConnectionState.Disconnected, playerOneClient.LobbyConnectionState);
+                Assert.AreEqual(HubConnectionState.Disconnected, playerTwoClient.LobbyConnectionState);
                 Assert.AreEqual(LobbyState.GameJoined, playerOneClient.LobbyState);
                 Assert.AreEqual(LobbyState.GameJoined, playerTwoClient.LobbyState);
 

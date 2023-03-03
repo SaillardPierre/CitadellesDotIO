@@ -1,4 +1,5 @@
-﻿using CitadellesDotIO.Enums;
+﻿using CitadellesDotIO.Engine.DTOs;
+using CitadellesDotIO.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,12 @@ namespace CitadellesDotIO.Client.CustomEventArgs
     {
         public GameState State { get; set; }
         public string Message { get; set; }
-        public GameStateChangedEventArgs(GameState state, string message)
+        public GameDto Game { get; set; }
+        public GameStateChangedEventArgs(GameState state, string message, GameDto game)
         {
             State = state;
             Message = message;
+            Game = game;
         }
     }
 }
