@@ -41,27 +41,29 @@ namespace CitadellesDotIO.Engine.Services
             return newGame.Id;
         }
 
-        public async Task<IEnumerable<GameDto>> GetGames()
+        public IEnumerable<GameDto> GetGames()
         {
             List<GameDto> games = new();
             foreach (Game game in this.Games.Values)
             {
-                games.Add(await game.ToGameDto());
+                games.Add(game.ToGameDto());
             }
             return games;
         }
 
-        public bool SetPlayerConnection(string gameId, string playerName, string connectionId)
+        public bool TrySetPlayerConnection(string gameId, string playerName, string connectionId, out GameDto gameDto)
         {
+            gameDto = null;
             if (this.Games.TryGetValue(gameId, out Game game))
             {
                 game.Players.Single(p=>p.Name == playerName).Id = connectionId;
+                gameDto = game.ToGameDto();
                 return true;
             }
             return false;
         }
 
-        public bool AddPlayerToGame(string gameId, string playerName)
+        public bool AddPlayerToGame(string gameId, string playerName, bool IsHost = false)
         {
             if (string.IsNullOrWhiteSpace(gameId))
             {
@@ -77,6 +79,7 @@ namespace CitadellesDotIO.Engine.Services
             }
 
             Player player = new(playerName);
+            player.IsHost = IsHost;
             return game.AddPlayer(player);
         }
 
@@ -91,17 +94,13 @@ namespace CitadellesDotIO.Engine.Services
                 throw new ArgumentException("Le nom du joueur ne peut être vide");
             }
 
-            gameId = string.Empty;
-            foreach (KeyValuePair<string, Game> kvp in this.Games)
-            {               
+            gameId = this.Games.Single(kvp => kvp.Value.Name.Equals(gameName)).Key;
 
-                if (kvp.Value.Name.Equals(gameName))
-                {
-                    gameId = kvp.Key;
-                    return AddPlayerToGame(gameId, playerName);                    
-                }
+            if(gameId == null)
+            {
+                return false;
             }
-            return false;
+            return AddPlayerToGame(gameId, playerName);
         }
     }
 

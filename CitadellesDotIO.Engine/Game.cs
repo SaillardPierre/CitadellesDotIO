@@ -37,14 +37,14 @@ namespace CitadellesDotIO.Engine
         private Player CurrentKing => this.Players.SingleOrDefault(p => p.IsCurrentKing);
         public int TurnCount => this.turnCount;
         public int DistrictThreshold { get; set; }
-        public Game(string name,                   
+        public Game(string name,
                     ICollection<Character> characters,
                     ICollection<District> districts,
                     IHubContext<GameHub> gameHubContext,
                     bool applyKingShuffleRule = true,
                     int districtThreshold = 7
             )
-        {            
+        {
             this.Name = name;
             this.Id = Guid.NewGuid().ToString("n");
             this.GameState = GameState.Created;
@@ -52,7 +52,7 @@ namespace CitadellesDotIO.Engine
             this.ApplyKingShuffleRule = applyKingShuffleRule;
             this.DistrictThreshold = districtThreshold;
 
-            this.Players= new List<Player>();
+            this.Players = new List<Player>();
             this.InitTable(characters, districts);
             this.GameHubContextAdapter = new(gameHubContext, this.Id);
         }
@@ -71,7 +71,7 @@ namespace CitadellesDotIO.Engine
 
             this.GameState = GameState.Starting;
             this.ApplyKingShuffleRule = applyKingShuffleRule;
-            this.DistrictThreshold = districtThreshold;            
+            this.DistrictThreshold = districtThreshold;
 
             this.InitTable(characters, districts);
             this.InitPlayers(players);
@@ -230,8 +230,8 @@ namespace CitadellesDotIO.Engine
             int rank = 1;
             this.GetRanking().ToList().ForEach(r =>
             {
-                 this.Players.ForEach(p => p.View.DisplayRanking(r, rank));
-                 rank++;
+                this.Players.ForEach(p => p.View.DisplayRanking(r, rank));
+                rank++;
             });
             return true;
         }
@@ -501,13 +501,14 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        public async Task<GameDto> ToGameDto()
+        public GameDto ToGameDto()
         {
             return new GameDto()
             {
                 Id = this.Id,
+                GameState = this.GameState,
                 Name = this.Name,
-                Players = new(this.Players.Select(p => p.Name).ToList())
+                Players = new(this.Players.Select(p => p.ToPlayerDto()).ToList())
             };
         }
     }

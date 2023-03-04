@@ -1,6 +1,8 @@
-﻿using CitadellesDotIO.Engine.HubsClient;
+﻿using CitadellesDotIO.Engine.DTOs;
+using CitadellesDotIO.Engine.HubsClient;
 using CitadellesDotIO.Engine.Services;
 using Microsoft.AspNetCore.SignalR;
+using System;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Hubs
@@ -21,11 +23,12 @@ namespace CitadellesDotIO.Engine.Hubs
         public async Task RegisterPlayer(string gameId, string playerName)
         {
             await this.Groups.AddToGroupAsync(this.Context.ConnectionId, gameId);
-            if (!this.gamesService.SetPlayerConnection(gameId, playerName, this.Context.ConnectionId))
+            if (!this.gamesService.TrySetPlayerConnection(gameId, playerName, this.Context.ConnectionId, out GameDto game))
             {
                 return;
             }
-            await this.Clients.Group(gameId).SendTest("Player " + playerName + " joined " + gameId + "with connection "+ this.Context.ConnectionId);
+            Console.WriteLine("Player " + playerName + " joined " + gameId + " with connection " + this.Context.ConnectionId);
+            await this.Clients.Group(gameId).UpdateGame(game);
         }
     }
 }

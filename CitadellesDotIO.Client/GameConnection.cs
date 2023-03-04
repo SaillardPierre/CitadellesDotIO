@@ -1,4 +1,5 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
+using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.HubsClient;
 using CitadellesDotIO.Enums;
 using Microsoft.AspNetCore.Http.Connections;
@@ -47,9 +48,7 @@ namespace CitadellesDotIO.Client
             this.GameStateChanged += gameStateChangedEventHandler;
 
             GameHubConnection.On(nameof(RegisterPlayer), async () => await this.RegisterPlayer());
-            GameHubConnection.On<string>(nameof(SendTest), async (msg) => await this.SendTest(msg));
-
-
+            GameHubConnection.On<GameDto>(nameof(UpdateGame), async (game) => await this.UpdateGame(game));
         }
         #region Appelées par le serveur vers les client du hub
         public async Task RegisterPlayer()
@@ -57,9 +56,9 @@ namespace CitadellesDotIO.Client
             await GameHubConnection.InvokeAsync(nameof(RegisterPlayer), this.GameId, this.PlayerName);
         }
 
-        public Task SendTest(string message)
+        public Task UpdateGame(GameDto game)
         {
-            GameStateChangedEventArgs args = new(GameState.Pending, message);
+            GameStateChangedEventArgs args = new(game.GameState, "Updated from broadcast, a property has changed", game) ;
             this.GameStateChanged.Invoke(this, args);
             return Task.CompletedTask;
         }

@@ -67,6 +67,7 @@ namespace CitadellesDotIO.Client
         public Task PullGameId(string gameId)
         {
             // Se connecter au hub grâce à la clé de la game
+            this.LobbyStateChanged.Invoke(this, new(LobbyState.GameJoined, "Disconnecting from Lobby after entering a game"));
             this.LobbyStateChanged.Invoke(this, new GameJoinedEventArgs(gameId));
             return Task.CompletedTask;
         }
@@ -78,17 +79,17 @@ namespace CitadellesDotIO.Client
         #endregion
 
         #region Appelées par le client du hub vers le serveur
-        public async Task CreateGameAsync(string gameName, string playerName)
+        public void CreateGameAsync(string gameName, string playerName)
         {
-            await this.LobbyHubConnection.InvokeAsync(nameof(CreateGameAsync), gameName, playerName);
+            this.LobbyHubConnection.InvokeAsync(nameof(CreateGameAsync), gameName, playerName);
         }
-        public async Task JoinGameAsync(string gameId, string playerName)
+        public void JoinGameAsync(string gameId, string playerName)
         {
-            await this.LobbyHubConnection.InvokeAsync(nameof(JoinGameAsync), gameId, playerName);
+            this.LobbyHubConnection.InvokeAsync(nameof(JoinGameAsync), gameId, playerName);
         }
-        public async Task JoinGameByNameAsync(string gameName, string playerName)
+        public void JoinGameByNameAsync(string gameName, string playerName)
         {
-            await this.LobbyHubConnection.InvokeAsync(nameof(JoinGameByNameAsync), gameName, playerName);
+            this.LobbyHubConnection.InvokeAsync(nameof(JoinGameByNameAsync), gameName, playerName);
         }
         #endregion
 

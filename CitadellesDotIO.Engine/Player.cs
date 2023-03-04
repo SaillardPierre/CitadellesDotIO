@@ -13,19 +13,22 @@ using CitadellesDotIO.Engine.View;
 using System.Text.Json.Serialization;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using CitadellesDotIO.Engine.DTOs;
 
 namespace CitadellesDotIO.Engine
 {
     [JsonObject(IsReference = true)]
     public class Player : ISwappable
     {
-        [Required(ErrorMessage ="Your G@M3R74G is required !")]
+        [Required(ErrorMessage = "Your G@M3R74G is required !")]
         [StringLength(50, ErrorMessage = "The length of your nickname must be between 5 and 50 characters !", MinimumLength = 5)]
         public string Name { get; set; }
         public string Id { get; set; }
         public IView View { get; set; }
         public int Gold { get; set; }
         public bool IsCurrentKing { get; set; }
+        public bool IsHost { get; set; }
         public Character Character { get; set; }
         public bool HasPickedCharacter => Character != null;
         public bool IsFirstReachingDistrictThreshold { get; set; }
@@ -207,5 +210,8 @@ namespace CitadellesDotIO.Engine
                 district.Passive.Apply();
             }
         }
+
+        public PlayerDto ToPlayerDto()
+        => new(this.Id, this.Name, this.IsHost, this.IsCurrentKing);
     }
 }
