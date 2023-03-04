@@ -40,7 +40,7 @@ namespace CitadellesDotIO.Engine.Hubs
             if (this.gamesService.AddPlayerToGame(gameId, playerName, isHost))
             {
                 await this.Clients.Caller.PullGameId(gameId);
-                _ = this.UpdateJoinedGame(gameId);
+                _ = this.UpdateJoinedGame();
             }
             else await this.Clients.Caller.GameNotFound();
         }
@@ -50,12 +50,12 @@ namespace CitadellesDotIO.Engine.Hubs
             if (this.gamesService.AddPlayerToGameByGameName(gameName, playerName, out string gameId))
             {
                 await this.Clients.Caller.PullGameId(gameId);
-                _ = this.UpdateJoinedGame(gameId);
+                _ = this.UpdateJoinedGame();
             }
             else await this.Clients.Caller.GameNotFound();
         }
 
-        private async Task UpdateJoinedGame(string gameId)
+        private async Task UpdateJoinedGame()
         {
             string callerId = this.Context.ConnectionId;            
             IEnumerable<GameDto> games = this.gamesService.GetGames();

@@ -94,17 +94,13 @@ namespace CitadellesDotIO.Engine.Services
                 throw new ArgumentException("Le nom du joueur ne peut être vide");
             }
 
-            gameId = string.Empty;
-            foreach (KeyValuePair<string, Game> kvp in this.Games)
-            {               
+            gameId = this.Games.Single(kvp => kvp.Value.Name.Equals(gameName)).Key;
 
-                if (kvp.Value.Name.Equals(gameName))
-                {
-                    gameId = kvp.Key;
-                    return AddPlayerToGame(gameId, playerName);                    
-                }
+            if(gameId == null)
+            {
+                return false;
             }
-            return false;
+            return AddPlayerToGame(gameId, playerName);
         }
     }
 
