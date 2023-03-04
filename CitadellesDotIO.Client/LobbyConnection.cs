@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Enums;
 using CitadellesDotIO.Client;
+using CitadellesDotIO.Engine;
 
 namespace CitadellesDotIO.Client
 {
@@ -48,8 +49,20 @@ namespace CitadellesDotIO.Client
 
             LobbyHubConnection.On(nameof(ConfirmConnection), async () => await this.ConfirmConnection());
             LobbyHubConnection.On<IEnumerable<GameDto>>(nameof(this.PullGamesAsync), (games) => this.PullGamesAsync(games));
-            LobbyHubConnection.On<string>(nameof(this.PullGameId), (gameId) => this.PullGameId(gameId));
             LobbyHubConnection.On(nameof(this.GameNotFound), () => this.GameNotFound());
+        }
+
+
+
+        private bool NotifyGameJoined(string gameId, string gameSecret)
+        {
+            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret)){
+                return false;
+            }
+            // Se connecter au hub grâce à la clé de la game
+            this.LobbyStateChanged.Invoke(this, new(LobbyState.GameJoined, "Disconnecting from Lobby after entering a game"));
+            this.LobbyStateChanged.Invoke(this, new GameJoinedEventArgs(gameId, gameSecret));
+            return true;
         }
 
 
@@ -63,14 +76,7 @@ namespace CitadellesDotIO.Client
         {
             this.LobbyStateChanged.Invoke(this, new GamesPulledEventArgs(games));
             return Task.CompletedTask;
-        }
-        public Task PullGameId(string gameId)
-        {
-            // Se connecter au hub grâce à la clé de la game
-            this.LobbyStateChanged.Invoke(this, new(LobbyState.GameJoined, "Disconnecting from Lobby after entering a game"));
-            this.LobbyStateChanged.Invoke(this, new GameJoinedEventArgs(gameId));
-            return Task.CompletedTask;
-        }
+        }        
         public Task GameNotFound()
         {
             this.LobbyStateChanged.Invoke(this, new(LobbyState.GameNotFound, "Could not connect to game"));
@@ -79,18 +85,37 @@ namespace CitadellesDotIO.Client
         #endregion
 
         #region Appelées par le client du hub vers le serveur
-        public void CreateGameAsync(string gameName, string playerName)
+        public async Task<bool> CreateGameAsync(string gameName, string playerName)
         {
-            this.LobbyHubConnection.InvokeAsync(nameof(CreateGameAsync), gameName, playerName);
+            var (gameId,gameSecret) = await this.LobbyHubConnection.InvokeAsync<Tuple<string, string>>(nameof(CreateGameAsync), gameName, playerName);
+            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret))
+            {
+                return false;
+            }
+
+            return NotifyGameJoined(gameId, gameSecret);
         }
-        public void JoinGameAsync(string gameId, string playerName)
+
+        public async Task<bool> JoinGameAsync(string gameId, string playerName)
         {
-            this.LobbyHubConnection.InvokeAsync(nameof(JoinGameAsync), gameId, playerName);
+            string gameSecret = await this.LobbyHubConnection.InvokeAsync<string>(nameof(JoinGameAsync), gameId, playerName);
+            if (string.IsNullOrWhiteSpace(gameSecret))
+            {
+                return false;
+            }
+            return NotifyGameJoined(gameId, gameSecret);
         }
-        public void JoinGameByNameAsync(string gameName, string playerName)
+
+        public async Task<bool> JoinGameByNameAsync(string gameName, string playerName)
         {
-            this.LobbyHubConnection.InvokeAsync(nameof(JoinGameByNameAsync), gameName, playerName);
+            var(gameId, gameSecret) = await this.LobbyHubConnection.InvokeAsync<Tuple<string,string>>(nameof(JoinGameByNameAsync), gameName, playerName);
+            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret))
+            {
+                return false;
+            }
+            return NotifyGameJoined(gameId, gameSecret);
         }
+
         #endregion
 
         #region Lifecyle

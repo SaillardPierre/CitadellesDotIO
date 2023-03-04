@@ -11,10 +11,12 @@ namespace CitadellesDotIO.Client.CustomEventArgs
     public class GameJoinedEventArgs : LobbyStateChangedEventArgs
     {
         public string GameId { get; set; }
-        public GameJoinedEventArgs(string gameId)
-               : base(LobbyState.GameJoined, "Joined game " + gameId)
+        public string GameSecret { get; set; }
+        public GameJoinedEventArgs(string gameId, string gameSecret)
+               : base(LobbyState.GameJoined, "Joined game")
         {
             GameId = gameId;
+            GameSecret = gameSecret;
         }
     }
 }

@@ -34,12 +34,17 @@ namespace CitadellesDotIO
                 await playerClient.StartLobbyConnection();
             }
 
-            playerClients.First().CreateGame(gameName);
-            Thread.Sleep(5000);
+            bool gameCreated = await playerClients.First().CreateGame(gameName);
+
+            
+
+            Thread.Sleep(500);
+            string id = playerClients.First().GetId();
 
             foreach (PlayerClient playerClient in playerClients.Skip(1).SkipLast(1))
             {
-                playerClient.JoinGameByGameName(gameName);
+                await playerClient.JoinGameAsync(id);
+                playerClient.SetReadyState(true);
             }
 
             string ins = string.Empty;

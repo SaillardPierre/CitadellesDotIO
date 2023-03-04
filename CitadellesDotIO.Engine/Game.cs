@@ -28,7 +28,7 @@ namespace CitadellesDotIO.Engine
         private bool IsLastTableRound => this.Players.Any(p => p.HasReachedDistrictThreshold);
         public string Name { get; set; }
         public string Id { get; set; }
-
+        public string Secret { get; set; }
         public GameState GameState { get; set; }
         public List<Character> CharactersDeck { get; set; }
         public List<Character> CharactersBin { get; set; }
@@ -47,6 +47,7 @@ namespace CitadellesDotIO.Engine
         {
             this.Name = name;
             this.Id = Guid.NewGuid().ToString("n");
+            this.Secret = Guid.NewGuid().ToString("n");
             this.GameState = GameState.Created;
 
             this.ApplyKingShuffleRule = applyKingShuffleRule;
@@ -501,11 +502,12 @@ namespace CitadellesDotIO.Engine
             }
         }
 
-        public GameDto ToGameDto()
+        public GameDto ToGameDto(bool withSecret = false)
         {
             return new GameDto()
             {
                 Id = this.Id,
+                Secret = withSecret ? this.Secret : string.Empty,
                 GameState = this.GameState,
                 Name = this.Name,
                 Players = new(this.Players.Select(p => p.ToPlayerDto()).ToList())

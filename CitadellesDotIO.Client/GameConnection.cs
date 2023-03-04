@@ -10,7 +10,8 @@ namespace CitadellesDotIO.Client
 {
     internal class GameConnection : IGameHubClient
     {
-        private string? GameId { get; set; }
+        public string? GameId { get; set; }
+        public string? GameSecret { get; set; }
         private string PlayerName { get; set; }
 
         private HubConnection GameHubConnection;
@@ -51,11 +52,6 @@ namespace CitadellesDotIO.Client
             GameHubConnection.On<GameDto>(nameof(UpdateGame), async (game) => await this.UpdateGame(game));
         }
         #region Appelées par le serveur vers les client du hub
-        public async Task RegisterPlayer()
-        {
-            await GameHubConnection.InvokeAsync(nameof(RegisterPlayer), this.GameId, this.PlayerName);
-        }
-
         public Task UpdateGame(GameDto game)
         {
             GameStateChangedEventArgs args = new(game.GameState, "Updated from broadcast, a property has changed", game) ;
@@ -64,12 +60,21 @@ namespace CitadellesDotIO.Client
         }
         #endregion
         #region Appelées par le client du hub vers le serveur
+        public async Task RegisterPlayer()
+        {
+            bool registered = await GameHubConnection.InvokeAsync<bool>(nameof(RegisterPlayer), this.GameId, this.GameSecret, this.PlayerName);
+        }
+        public void SetReadyStateAsync(bool isReady)
+        {
+            this.GameHubConnection.InvokeAsync(nameof(SetReadyStateAsync), isReady);
+        }
 
         #endregion
         #region Lifecyle
-        public async Task StartAsync(string gameId)
+        public async Task StartAsync(string gameId,string gameSecret)
         {
             this.GameId = gameId;
+            this.GameSecret = gameSecret;
             await this.GameHubConnection.StartAsync();
         }
         public async Task StopAsync()

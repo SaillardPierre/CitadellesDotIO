@@ -26,20 +26,40 @@ namespace CitadellesDotIO.Client
             GameConnection = new(playerName, siteUrl, HubStateChanged, GameStateChanged);
         }
 
+        public string GetSecret()
+        {
+            return this.GameConnection.GameSecret;
+        }
+        public string GetId()
+        {
+            return this.GameConnection.GameId;
+        }
+
         public async Task StartLobbyConnection()
         {
             await this.LobbyConnection.StartAsync();
         }
 
-        public void CreateGame(string gameName)
-        => this.LobbyConnection.CreateGameAsync(gameName, this.PlayerName);
+        public async Task<bool> CreateGame(string gameName)
+        => await this.LobbyConnection.CreateGameAsync(gameName, this.PlayerName);
 
-        public void JoinGame(string gameId)
-        => this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
+        public async Task ConnectToGame(string gameId, string gameSecret)
+        {
+            await LobbyConnection.StopAsync();
+            await GameConnection.StartAsync(gameId, gameSecret);            
+        }
+
+        public async Task JoinGameAsync(string gameId)
+        {
+             bool isJoined = await this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
+        }
+       
 
         public void JoinGameByGameName(string gameName)
         => this.LobbyConnection.JoinGameByNameAsync(gameName, this.PlayerName);
 
+        public void SetReadyState(bool isReady)
+        => this.GameConnection.SetReadyStateAsync(isReady);
 
         void HubStateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
@@ -77,9 +97,8 @@ namespace CitadellesDotIO.Client
                     Console.WriteLine(message.ToString());
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
-                    await LobbyConnection.StopAsync();
-                    await GameConnection.StartAsync(gameJoinedEvent.GameId);
-                    break;                
+                    await this.ConnectToGame(gameJoinedEvent.GameId, gameJoinedEvent.GameSecret);
+                    break;
                 default:
                     break;
             }
@@ -92,8 +111,8 @@ namespace CitadellesDotIO.Client
             message.AppendLine("[ Game : " + e.Game.Name + " ] : " + e.State + " ," + e.Game.Players.Count.ToString() + " players :");
             foreach (PlayerDto p in e.Game.Players)
             {
-                string isHost = p.IsHost ? " |HOST|" : string.Empty;
-                message.AppendLine("Id : " + p.Id + " - Name : " + p.Name + isHost);
+                string isHost = p.IsHost ? " |HOST| " : string.Empty;
+                message.AppendLine("Id : " + p.Id + " - Name : " + p.Name + " |" + p.IsReady + "|" + isHost);
             }
             Console.WriteLine(message.ToString());
         }

@@ -29,6 +29,7 @@ namespace CitadellesDotIO.Engine
         public int Gold { get; set; }
         public bool IsCurrentKing { get; set; }
         public bool IsHost { get; set; }
+        public bool IsReady { get; set; }
         public Character Character { get; set; }
         public bool HasPickedCharacter => Character != null;
         public bool IsFirstReachingDistrictThreshold { get; set; }
@@ -212,6 +213,6 @@ namespace CitadellesDotIO.Engine
         }
 
         public PlayerDto ToPlayerDto()
-        => new(this.Id, this.Name, this.IsHost, this.IsCurrentKing);
+        => new(this.Id, this.Name, this.IsHost, this.IsReady, this.IsCurrentKing);
     }
 }

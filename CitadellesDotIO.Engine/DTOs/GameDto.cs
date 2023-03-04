@@ -14,6 +14,7 @@ namespace CitadellesDotIO.Engine.DTOs
         public string Id { get; set; }
         public GameState GameState { get; set; }
         public string Name { get; set; }
+        public string Secret { get; set; }
         public ReadOnlyCollection<PlayerDto> Players { get; set; }
         public ReadOnlyCollection<CharacterDto> Characters { get; set; }
     }

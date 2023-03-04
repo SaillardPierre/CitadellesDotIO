@@ -34,7 +34,7 @@ namespace CitadellesDotIO.Engine.Services
             }
 
             Game newGame = GameFactory.VanillaGame(gameName, hubContext);
-            if(!this.Games.TryAdd(newGame.Id, newGame))
+            if (!this.Games.TryAdd(newGame.Id, newGame))
             {
                 return string.Empty;
             }
@@ -56,14 +56,35 @@ namespace CitadellesDotIO.Engine.Services
             gameDto = null;
             if (this.Games.TryGetValue(gameId, out Game game))
             {
-                game.Players.Single(p=>p.Name == playerName).Id = connectionId;
+                try
+                {
+                    game.Players.Single(p => p.Name == playerName).Id = connectionId;
+                }
+                catch (Exception)
+                {
+                    string[] names = game.Players.Select(p => p.Name).ToArray();
+                    Player player = game.Players.SingleOrDefault(p => p.Name == playerName);
+                    throw;
+                }
                 gameDto = game.ToGameDto();
                 return true;
             }
             return false;
         }
 
-        public bool AddPlayerToGame(string gameId, string playerName, bool IsHost = false)
+        public bool TrySetReadyState(string gameId, string connectionId, bool isReady, out GameDto gameDto)
+        {
+            gameDto = null;
+            if (this.Games.TryGetValue(gameId, out Game game))
+            {
+                game.Players.Single(p => p.Id == connectionId).IsReady = isReady;
+                gameDto = game.ToGameDto();
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryAddPlayerToGame(string gameId, string playerName, out string gameSecret, bool IsHost = false)
         {
             if (string.IsNullOrWhiteSpace(gameId))
             {
@@ -73,13 +94,18 @@ namespace CitadellesDotIO.Engine.Services
             {
                 throw new ArgumentException("Le nom du joueur ne peut être vide");
             }
-            if(!this.Games.TryGetValue(gameId, out Game game))
+
+            if (!this.Games.TryGetValue(gameId, out Game game))
             {
+                gameSecret = null;
                 return false;
             }
 
+            gameSecret = game.Secret;
+
             Player player = new(playerName);
             player.IsHost = IsHost;
+
             return game.AddPlayer(player);
         }
 
@@ -96,11 +122,21 @@ namespace CitadellesDotIO.Engine.Services
 
             gameId = this.Games.Single(kvp => kvp.Value.Name.Equals(gameName)).Key;
 
-            if(gameId == null)
+            if (gameId == null)
             {
                 return false;
             }
-            return AddPlayerToGame(gameId, playerName);
+            return TryAddPlayerToGame(gameId, playerName, out string gameSecret);
+        }
+
+        public Tuple<string, GameDto> GetGameWithSecret(string gameId)
+        {
+            if (!this.Games.TryGetValue(gameId, out Game game))
+            {
+                return null;
+            }
+
+            return Tuple.Create(game.Secret, game.ToGameDto());
         }
     }
 

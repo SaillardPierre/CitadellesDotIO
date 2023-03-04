@@ -60,6 +60,35 @@ namespace CitadellesDotIO.Tests
         }
 
         [TestMethod]
+        public async Task CreateGame()
+        {
+            try
+            {
+                using var host = BuildWebHost();
+                host.Start();
+
+                // Arrange
+                PlayerClient playerClient = new(GetSiteUrl(), "Pierre");
+
+                // Act
+                await playerClient.StartLobbyConnection();
+                await playerClient.CreateGame("GameDeTest");
+                System.Threading.Thread.Sleep(1500); // On attends que les promesses soient tenues avant que le test ne se termine
+
+                // Assert
+                Assert.AreEqual(HubConnectionState.Disconnected, playerClient.LobbyConnectionState);
+                Assert.AreEqual(HubConnectionState.Connected, playerClient.GameConnectionState);
+                Assert.AreEqual(LobbyState.GameJoined, playerClient.LobbyState);               
+
+                await playerClient.Quit();
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                Assert.Inconclusive(ExceptionMessage);
+            }
+        }
+
+            [TestMethod]
         public async Task ConnectToExistingGame()
         {
             try
@@ -73,11 +102,12 @@ namespace CitadellesDotIO.Tests
 
                 // Act
                 await playerOneClient.StartLobbyConnection();
-                playerOneClient.CreateGame("PartieAJoindre");
+                await playerOneClient.CreateGame("PartieAJoindre");
 
                 await playerTwoClient.StartLobbyConnection();
                 System.Threading.Thread.Sleep(15); // On attends que les promesses soient tenues avant que le test ne se termine
-                playerTwoClient.JoinGameByGameName("PartieAJoindre");
+
+                await playerTwoClient.JoinGameAsync(playerOneClient.GetId());
                 System.Threading.Thread.Sleep(15);
 
                 // Assert

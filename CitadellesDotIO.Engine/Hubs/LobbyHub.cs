@@ -2,9 +2,11 @@
 using CitadellesDotIO.Engine.HubsClient;
 using CitadellesDotIO.Engine.Services;
 using Microsoft.AspNetCore.SignalR;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace CitadellesDotIO.Engine.Hubs
@@ -29,27 +31,29 @@ namespace CitadellesDotIO.Engine.Hubs
             await this.Clients.Caller.PullGamesAsync(games);
         }        
 
-        public async Task CreateGameAsync(string gameName, string playerName)
+        public async Task<Tuple<string, string>> CreateGameAsync(string gameName, string playerName)
         {
             string gameId = this.gamesService.CreateGame(gameName, playerName);
-            await this.JoinGameAsync(gameId, playerName, true);
-        }
-
-        public async Task JoinGameAsync(string gameId, string playerName, bool isHost = false)
-        {
-            if (this.gamesService.AddPlayerToGame(gameId, playerName, isHost))
+            if (this.gamesService.TryAddPlayerToGame(gameId, playerName, out string gameSecret, true))
             {
-                await this.Clients.Caller.PullGameId(gameId);
                 _ = this.UpdateJoinedGame();
             }
-            else await this.Clients.Caller.GameNotFound();
+            return new(gameId,gameSecret);
+        }
+
+        public async Task<string> JoinGameAsync(string gameId, string playerName)
+        {
+            if (this.gamesService.TryAddPlayerToGame(gameId, playerName, out string gameSecret, false))
+            {
+                _ = this.UpdateJoinedGame();
+            }
+            return gameSecret;
         }
 
         public async Task JoinGameByNameAsync(string gameName, string playerName)
         {
             if (this.gamesService.AddPlayerToGameByGameName(gameName, playerName, out string gameId))
             {
-                await this.Clients.Caller.PullGameId(gameId);
                 _ = this.UpdateJoinedGame();
             }
             else await this.Clients.Caller.GameNotFound();
