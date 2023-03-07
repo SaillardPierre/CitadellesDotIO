@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "CitadellesDotIO.Godot": {
+      "commandName": "Project"
+    },
+    "Debug Local": {
+      "commandName": "Executable",
+      "executablePath": "E:\\Godot\\Godot_v4.0-stable_mono_win64.exe",
+      "commandLineArgs": "--verbose --debug --path E:\\CitadellesDotIO\\CitadellesDotIO.Godot",
+      "workingDirectory": "E:\\Godot",
+      "nativeDebugging": true
+    }
+  }
+}
