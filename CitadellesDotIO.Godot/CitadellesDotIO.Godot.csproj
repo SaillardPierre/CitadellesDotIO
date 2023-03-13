@@ -6,4 +6,8 @@
   <ItemGroup>
     <Content Include="Properties\launchSettings.json" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CitadellesDotIO.Client\CitadellesDotIO.Client.csproj" />
+    <ProjectReference Include="..\CitadellesDotIO.Engine\CitadellesDotIO.Engine.csproj" />
+  </ItemGroup>
 </Project>
