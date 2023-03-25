@@ -1,69 +1,68 @@
 using CitadellesDotIO.Client;
-using CitadellesDotIO.Engine.DTOs;
 using Godot;
-using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
-public partial class node_2d : Node2D
+namespace CitadellesDotIO.Godot
 {
-    PlayerClient Client = new PlayerClient("https://localhost:7257", "Pierre");
-
-    Label DebuggerText;
-    Button MultiPlayerButton;
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
+    public partial class node_2d : Node2D
     {
-        if (this.Client != null
-        && this.DebuggerText != null)
+        PlayerClient Client = new PlayerClient("https://localhost:7257", "Pierre");
+
+        Label DebuggerText;
+        Button MultiPlayerButton;
+
+        // Called every frame. 'delta' is the elapsed time since the previous frame.
+        public override void _Process(double delta)
         {
-            StringBuilder builder = new();
-            builder.Append("LobbyConnection : ").AppendLine(Client.LobbyConnectionState.ToString());
-            builder.Append("Game : ").AppendLine(Client.GameConnectionState.ToString());
-            DebuggerText.Text = builder.ToString();
-        }
-    }
-
-    public void Init()
-    {
-        var player = GetNode<Area2D>("Player");
-        this.DebuggerText = player.GetNode<Label>(nameof(DebuggerText));
-        this.MultiPlayerButton = player.GetNode<VBoxContainer>("Menu").GetNode<Button>(nameof(MultiPlayerButton));
-        MultiPlayerButton.Pressed += async () =>
-        {
-            await Client.StartLobbyConnection();
-        };
-    }
-
-    public override void _Ready()
-    {
-        EnsureChildrenReady();    
-    }    
-
-    private void EnsureChildrenReady()
-    {
-        // Check if all children nodes are ready
-        bool allChildrenReady = true;
-        foreach (Node child in GetChildren())
-        {
-            if (!child.IsInsideTree())
+            if (this.Client != null
+            && this.DebuggerText != null)
             {
-                allChildrenReady = false;
-                break;
+                StringBuilder builder = new();
+                builder.Append("LobbyConnection : ").AppendLine(Client.LobbyConnectionState.ToString());
+                builder.Append("Game : ").AppendLine(Client.GameConnectionState.ToString());
+                DebuggerText.Text = builder.ToString();
             }
         }
 
-        // If all children nodes are ready, execute the code
-        if (!allChildrenReady)
+        public void Init()
         {
-            // If not all children nodes are ready, create a new timer to wait again
-            Timer timer = new();
-            timer.OneShot = true;
-            timer.Connect("timeout", new Callable(this, nameof(EnsureChildrenReady)));
-            timer.Start(0);
+            var player = GetNode<Area2D>("Player");
+            this.DebuggerText = player.GetNode<Label>(nameof(DebuggerText));
+            this.MultiPlayerButton = player.GetNode<VBoxContainer>("Menu").GetNode<Button>(nameof(MultiPlayerButton));
+            MultiPlayerButton.Pressed += async () =>
+            {
+                await Client.StartLobbyConnection();
+            };
         }
-        else Init();
+
+        public override void _Ready()
+        {
+            EnsureChildrenReady();
+        }
+
+        private void EnsureChildrenReady()
+        {
+            // Check if all children nodes are ready
+            bool allChildrenReady = true;
+            foreach (Node child in GetChildren())
+            {
+                if (!child.IsInsideTree())
+                {
+                    allChildrenReady = false;
+                    break;
+                }
+            }
+
+            // If all children nodes are ready, execute the code
+            if (!allChildrenReady)
+            {
+                // If not all children nodes are ready, create a new timer to wait again
+                Timer timer = new();
+                timer.OneShot = true;
+                timer.Connect("timeout", new Callable(this, nameof(EnsureChildrenReady)));
+                timer.Start(0);
+            }
+            else Init();
+        }
     }
 }
