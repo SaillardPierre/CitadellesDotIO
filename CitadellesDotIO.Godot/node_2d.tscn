@@ -6,17 +6,30 @@
 script = ExtResource("1_4256n")
 
 [node name="Player" type="Area2D" parent="."]
-script = ExtResource("1_4256n")
 
 [node name="DebuggerText" type="Label" parent="Player"]
-offset_right = 329.0
-offset_bottom = 99.0
+offset_left = 825.0
+offset_top = 1.0
+offset_right = 1154.0
+offset_bottom = 100.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Player"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Menu" type="VBoxContainer" parent="Player"]
+offset_left = 320.0
+offset_right = 832.0
+offset_bottom = 648.0
+alignment = 1
+metadata/_edit_group_ = true
 
-[node name="CreateGameButton" type="Button" parent="Player/VBoxContainer"]
+[node name="Solo" type="Button" parent="Player/Menu"]
 layout_mode = 2
-text = "Create Game
+size_flags_horizontal = 4
+size_flags_vertical = 10
+disabled = true
+text = "Solo
 "
+
+[node name="MultiPlayerButton" type="Button" parent="Player/Menu"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 2
+text = "Multiplayer"
