@@ -17,12 +17,6 @@ namespace CitadellesDotIO.Engine.Hubs
             this.gamesService = gamesService;
         }
 
-        public async override Task OnConnectedAsync()
-        {
-            await this.Clients.Caller.RegisterPlayer();
-        }
-
-        // Peut etre ne pas attendre ici ?
         public async Task UpdateGame(string gameSecret, GameDto gameDto)
         => await this.Clients.Group(gameSecret).UpdateGame(gameDto);
 
@@ -45,16 +39,18 @@ namespace CitadellesDotIO.Engine.Hubs
             return true;
         }
 
-        public async Task SetReadyStateAsync(string gameId, bool isReady)
+        public async Task<bool> SetReadyStateAsync(string gameId, bool isReady)
         {
-            if (!this.gamesService.TrySetReadyState(gameId, this.Context.ConnectionId, isReady, out GameDto gameDto))
+
+            bool readyStateChanged = this.gamesService.TrySetReadyState(gameId, this.Context.ConnectionId, isReady, out GameDto gameDto);
+            if(!readyStateChanged)
             {
-                return;
+                return readyStateChanged;                
             }
             string ready = isReady ? "ready " : "unready ";
+            await this.UpdateGameById(gameId);
             Console.WriteLine("Player " + gameDto.Players.Single(p => p.Id == this.Context.ConnectionId).Name + " has set " + ready + " for game" + gameId);
-            // Peut etre ne pas attendre ici ?
-            //await this.UpdateGame(gameDto);
+            return readyStateChanged;
         }
 
     }

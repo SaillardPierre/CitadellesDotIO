@@ -1,8 +1,5 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
-using CitadellesDotIO.Client;
-using CitadellesDotIO.Engine;
 using CitadellesDotIO.Engine.DTOs;
-using CitadellesDotIO.Engine.View;
 using CitadellesDotIO.Enums;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Text;
@@ -12,10 +9,11 @@ namespace CitadellesDotIO.Client
     public class PlayerClient
     {
         public LobbyState LobbyState { get; private set; }
-        public HubConnectionState LobbyConnectionState { get; private set; }
-        public HubConnectionState GameConnectionState { get; private set; }
+        public HubConnectionState LobbyConnectionState => this.LobbyConnection.ConnectionState;
+        public HubConnectionState GameConnectionState => this.GameConnection.ConnectionState;
         private string PlayerName { get; set; }
-        private List<GameDto> Games { get; set; }
+        public List<GameDto> Games { get; set; }
+        public GameDto? Game { get; set; }
         private LobbyConnection LobbyConnection { get; set; }
         private GameConnection GameConnection { get; set; }
         public PlayerClient(string siteUrl, string playerName)
@@ -26,14 +24,8 @@ namespace CitadellesDotIO.Client
             GameConnection = new(playerName, siteUrl, HubStateChanged, GameStateChanged);
         }
 
-        public string GetSecret()
-        {
-            return this.GameConnection.GameSecret;
-        }
-        public string GetId()
-        {
-            return this.GameConnection.GameId;
-        }
+        public string? GameSecret => this.GameConnection.GameSecret;
+        public string? GameId => this.GameConnection.GameId;
 
         public async Task StartLobbyConnection()
         {
@@ -43,23 +35,19 @@ namespace CitadellesDotIO.Client
         public async Task<bool> CreateGame(string gameName)
         => await this.LobbyConnection.CreateGameAsync(gameName, this.PlayerName);
 
-        public async Task ConnectToGame(string gameId, string gameSecret)
+        public async Task<bool> ConnectToGame(string gameId, string gameSecret)
         {
             await LobbyConnection.StopAsync();
-            await GameConnection.StartAsync(gameId, gameSecret);            
+            return await GameConnection.StartAsync(gameId, gameSecret);            
         }
 
-        public async Task JoinGameAsync(string gameId)
+        public async Task<bool> JoinGameAsync(string gameId)
         {
-             bool isJoined = await this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
+            return await this.LobbyConnection.JoinGameAsync(gameId, this.PlayerName);
         }
-       
-
-        public void JoinGameByGameName(string gameName)
-        => this.LobbyConnection.JoinGameByNameAsync(gameName, this.PlayerName);
-
-        public void SetReadyState(bool isReady)
-        => this.GameConnection.SetReadyStateAsync(isReady);
+        
+        public async Task SetReadyState(bool isReady)
+        => await this.GameConnection.SetReadyStateAsync(isReady);
 
         void HubStateChanged(object sender, HubConnectionStateChangedEventArgs e)
         {
@@ -69,11 +57,9 @@ namespace CitadellesDotIO.Client
             {
                 case GameHubConnectionStateChangedEventArgs:
                     message.Append("GameHub");
-                    this.GameConnectionState = e.State;
                     break;
                 case LobbyHubConnectionStateChangedEventArgs:
                     message.Append("LobbyHub");
-                    this.LobbyConnectionState = e.State;
                     break;
             }
 
@@ -94,18 +80,22 @@ namespace CitadellesDotIO.Client
                     {
                         message.AppendLine("Id : " + g.Id + " - Name : " + g.Name + " - Players : " + g.Players.Count);
                     }
-                    Console.WriteLine(message.ToString());
                     break;
                 case GameJoinedEventArgs gameJoinedEvent:
-                    await this.ConnectToGame(gameJoinedEvent.GameId, gameJoinedEvent.GameSecret);
+                    if (!await this.ConnectToGame(gameJoinedEvent.GameId, gameJoinedEvent.GameSecret))
+                    {
+                        message.AppendLine("Could not connect to game");
+                    }
                     break;
                 default:
                     break;
             }
+            Console.WriteLine(message.ToString());
         }
 
         void GameStateChanged(object sender, GameStateChangedEventArgs e)
         {
+            this.Game = e.Game;
             StringBuilder message = new();
             message.AppendLine("[" + this.PlayerName + "] " + e.Message);
             message.AppendLine("[ Game : " + e.Game.Name + " ] : " + e.State + " ," + e.Game.Players.Count.ToString() + " players :");

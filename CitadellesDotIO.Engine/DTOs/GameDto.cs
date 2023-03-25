@@ -17,5 +17,6 @@ namespace CitadellesDotIO.Engine.DTOs
         public string Secret { get; set; }
         public ReadOnlyCollection<PlayerDto> Players { get; set; }
         public ReadOnlyCollection<CharacterDto> Characters { get; set; }
+        public bool IsStartable => this.Players.All(p => p.IsReady);
     }
 }

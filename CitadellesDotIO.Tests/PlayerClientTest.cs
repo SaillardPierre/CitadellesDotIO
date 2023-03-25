@@ -98,7 +98,7 @@ namespace CitadellesDotIO.Tests
 
                 // Arrange
                 PlayerClient playerOneClient = new(GetSiteUrl(), "Pierre");
-                PlayerClient playerTwoClient = new(GetSiteUrl(), "Danaé");
+                PlayerClient playerTwoClient = new(GetSiteUrl(), "Thomas");
 
                 // Act
                 await playerOneClient.StartLobbyConnection();
@@ -107,7 +107,7 @@ namespace CitadellesDotIO.Tests
                 await playerTwoClient.StartLobbyConnection();
                 System.Threading.Thread.Sleep(15); // On attends que les promesses soient tenues avant que le test ne se termine
 
-                await playerTwoClient.JoinGameAsync(playerOneClient.GetId());
+                await playerTwoClient.JoinGameAsync(playerOneClient.GameId);
                 System.Threading.Thread.Sleep(15);
 
                 // Assert

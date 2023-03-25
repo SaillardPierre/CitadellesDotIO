@@ -16,12 +16,12 @@ namespace CitadellesDotIO
     public static class Program
     {
         static async Task Main(string[] args)
-        {          
+        {
             Thread.Sleep(5000);
 
             string siteUrl = SiteUrl;
             string gameName = "PartieAJoindre";
-            List<string> playerNames = new List<string>() { "Pierre", "Danaé", "Maze", "Vincent", "Thomas", "Amélie", "Lilian", "Ryan", "Spectateur" };
+            List<string> playerNames = new List<string>() { "Pierre", "Maze", "Vincent", "Thomas", "Amélie", "Lilian", "Louise", "Ryan", "Spectateur" };
             List<PlayerClient> playerClients = new List<PlayerClient>();
             foreach (string playerName in playerNames)
             {
@@ -34,24 +34,35 @@ namespace CitadellesDotIO
                 await playerClient.StartLobbyConnection();
             }
 
-            bool gameCreated = await playerClients.First().CreateGame(gameName);
-
-            
+            await playerClients.First().CreateGame(gameName);
 
             Thread.Sleep(500);
-            string id = playerClients.First().GetId();
+            string id = playerClients.First().GameId;
 
             foreach (PlayerClient playerClient in playerClients.Skip(1).SkipLast(1))
             {
-                await playerClient.JoinGameAsync(id);
-                playerClient.SetReadyState(true);
+                await playerClient.JoinGameAsync(id);         
             }
+
+            Thread.Sleep(5000);
+            foreach (PlayerClient playerClient in playerClients.Skip(1).SkipLast(1))
+            {
+                if (playerClient.GameConnectionState == Microsoft.AspNetCore.SignalR.Client.HubConnectionState.Connected)
+                {
+                    await playerClient.SetReadyState(true);
+                }
+            }
+            
+            await playerClients.First().SetReadyState(true);
+
+            Thread.Sleep(500);
+
 
             string ins = string.Empty;
             while (ins != "quit")
             {
                 ins = Console.ReadKey().ToString();
-            }            
+            }
         }
         static string SiteUrl
         => new ConfigurationBuilder()

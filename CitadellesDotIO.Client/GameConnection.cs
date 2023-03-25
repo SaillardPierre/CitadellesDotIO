@@ -1,7 +1,6 @@
 ﻿using CitadellesDotIO.Client.CustomEventArgs;
 using CitadellesDotIO.Engine.DTOs;
 using CitadellesDotIO.Engine.HubsClient;
-using CitadellesDotIO.Enums;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +11,7 @@ namespace CitadellesDotIO.Client
     {
         public string? GameId { get; set; }
         public string? GameSecret { get; set; }
+        public HubConnectionState ConnectionState => GameHubConnection.State;
         private string PlayerName { get; set; }
 
         private HubConnection GameHubConnection;
@@ -60,22 +60,23 @@ namespace CitadellesDotIO.Client
         }
         #endregion
         #region Appelées par le client du hub vers le serveur
-        public async Task RegisterPlayer()
+        public async Task<bool> RegisterPlayer()
         {
-            bool registered = await GameHubConnection.InvokeAsync<bool>(nameof(RegisterPlayer), this.GameId, this.GameSecret, this.PlayerName);
+            return await GameHubConnection.InvokeAsync<bool>(nameof(RegisterPlayer), this.GameId, this.GameSecret, this.PlayerName);
         }
-        public void SetReadyStateAsync(bool isReady)
+        public async Task<bool> SetReadyStateAsync(bool isReady)
         {
-            this.GameHubConnection.InvokeAsync(nameof(SetReadyStateAsync), isReady);
+            return await this.GameHubConnection.InvokeAsync<bool>(nameof(SetReadyStateAsync), this.GameId, isReady);
         }
 
         #endregion
         #region Lifecyle
-        public async Task StartAsync(string gameId,string gameSecret)
+        public async Task<bool> StartAsync(string gameId,string gameSecret)
         {
             this.GameId = gameId;
             this.GameSecret = gameSecret;
             await this.GameHubConnection.StartAsync();
+            return await this.RegisterPlayer();
         }
         public async Task StopAsync()
         {

@@ -6,7 +6,7 @@ namespace CitadellesDotIO.Engine.HubsClient
 {
     public interface IGameHubClient
     {
-        public Task RegisterPlayer();
+        public Task<bool> RegisterPlayer();
         public Task UpdateGame(GameDto game);
     }
 }

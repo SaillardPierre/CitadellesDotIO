@@ -7,7 +7,7 @@ namespace CitadellesDotIO.Engine.Factories
     {
         public static IEnumerable<Player> BuddiesPlayerList(int buddiesCount)
         {
-            List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Danaé", "Amélie", "Paul" };
+            List<string> playerNames = new List<string>() { "Pierre", "Thomas", "Ryan", "Maze", "Vincent", "Amélie", "Paul" };
             for (int i = 0; i < buddiesCount; i++)
             {
                yield return new Player(playerNames[i]);

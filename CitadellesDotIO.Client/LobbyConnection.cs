@@ -12,6 +12,7 @@ namespace CitadellesDotIO.Client
     public class LobbyConnection
     {
         private HubConnection LobbyHubConnection;
+        public HubConnectionState ConnectionState => LobbyHubConnection != null ? LobbyHubConnection.State : HubConnectionState.Disconnected;
 
         // Gère les evenements liés au hub
         public delegate void HubConnectionStateChangedEventHandler(object sender, HubConnectionStateChangedEventArgs e);
@@ -104,17 +105,7 @@ namespace CitadellesDotIO.Client
                 return false;
             }
             return NotifyGameJoined(gameId, gameSecret);
-        }
-
-        public async Task<bool> JoinGameByNameAsync(string gameName, string playerName)
-        {
-            var(gameId, gameSecret) = await this.LobbyHubConnection.InvokeAsync<Tuple<string,string>>(nameof(JoinGameByNameAsync), gameName, playerName);
-            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret))
-            {
-                return false;
-            }
-            return NotifyGameJoined(gameId, gameSecret);
-        }
+        }       
 
         #endregion
 

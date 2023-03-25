@@ -62,6 +62,7 @@ namespace CitadellesDotIO.Engine.Services
                 }
                 catch (Exception)
                 {
+                    // TODO C'est quoi ce bordel déja ? 
                     string[] names = game.Players.Select(p => p.Name).ToArray();
                     Player player = game.Players.SingleOrDefault(p => p.Name == playerName);
                     throw;

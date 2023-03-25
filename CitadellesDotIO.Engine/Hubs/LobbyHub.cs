@@ -50,15 +50,6 @@ namespace CitadellesDotIO.Engine.Hubs
             return gameSecret;
         }
 
-        public async Task JoinGameByNameAsync(string gameName, string playerName)
-        {
-            if (this.gamesService.AddPlayerToGameByGameName(gameName, playerName, out string gameId))
-            {
-                _ = this.UpdateJoinedGame();
-            }
-            else await this.Clients.Caller.GameNotFound();
-        }
-
         private async Task UpdateJoinedGame()
         {
             string callerId = this.Context.ConnectionId;            
