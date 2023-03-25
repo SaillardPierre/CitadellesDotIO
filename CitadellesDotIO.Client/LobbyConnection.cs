@@ -50,14 +50,14 @@ namespace CitadellesDotIO.Client
 
             LobbyHubConnection.On(nameof(ConfirmConnection), async () => await this.ConfirmConnection());
             LobbyHubConnection.On<IEnumerable<GameDto>>(nameof(this.PullGamesAsync), (games) => this.PullGamesAsync(games));
-            LobbyHubConnection.On(nameof(this.GameNotFound), () => this.GameNotFound());
         }
 
 
 
         private bool NotifyGameJoined(string gameId, string gameSecret)
         {
-            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret)){
+            if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret))
+            {
                 return false;
             }
             // Se connecter au hub grâce à la clé de la game
@@ -77,18 +77,13 @@ namespace CitadellesDotIO.Client
         {
             this.LobbyStateChanged.Invoke(this, new GamesPulledEventArgs(games));
             return Task.CompletedTask;
-        }        
-        public Task GameNotFound()
-        {
-            this.LobbyStateChanged.Invoke(this, new(LobbyState.GameNotFound, "Could not connect to game"));
-            return Task.CompletedTask;
-        }
+        }       
         #endregion
 
         #region Appelées par le client du hub vers le serveur
         public async Task<bool> CreateGameAsync(string gameName, string playerName)
         {
-            var (gameId,gameSecret) = await this.LobbyHubConnection.InvokeAsync<Tuple<string, string>>(nameof(CreateGameAsync), gameName, playerName);
+            var (gameId, gameSecret) = await this.LobbyHubConnection.InvokeAsync<Tuple<string, string>>(nameof(CreateGameAsync), gameName, playerName);
             if (string.IsNullOrWhiteSpace(gameId) || string.IsNullOrWhiteSpace(gameSecret))
             {
                 return false;
@@ -105,7 +100,7 @@ namespace CitadellesDotIO.Client
                 return false;
             }
             return NotifyGameJoined(gameId, gameSecret);
-        }       
+        }
 
         #endregion
 

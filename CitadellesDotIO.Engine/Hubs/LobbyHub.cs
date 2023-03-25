@@ -13,7 +13,7 @@ namespace CitadellesDotIO.Engine.Hubs
 {
     public class LobbyHub : Hub<ILobbyHubClient>
     {
-        private readonly IGamesService gamesService; 
+        private readonly IGamesService gamesService;
         public LobbyHub(IGamesService gamesService)
         {
             this.gamesService = gamesService;
@@ -22,37 +22,31 @@ namespace CitadellesDotIO.Engine.Hubs
         public override async Task OnConnectedAsync()
         {
             await this.Clients.Caller.ConfirmConnection();
-            await this.GetGamesAsync();            
+            await this.Clients.Caller.PullGamesAsync(this.gamesService.GetGames());
         }
 
-        public async Task GetGamesAsync()
-        {
-            IEnumerable<GameDto> games = this.gamesService.GetGames();
-            await this.Clients.Caller.PullGamesAsync(games);
-        }        
-
-        public async Task<Tuple<string, string>> CreateGameAsync(string gameName, string playerName)
+        public Task<Tuple<string, string>> CreateGameAsync(string gameName, string playerName)
         {
             string gameId = this.gamesService.CreateGame(gameName, playerName);
             if (this.gamesService.TryAddPlayerToGame(gameId, playerName, out string gameSecret, true))
             {
                 _ = this.UpdateJoinedGame();
             }
-            return new(gameId,gameSecret);
+            return Task.FromResult(Tuple.Create(gameId, gameSecret));
         }
 
-        public async Task<string> JoinGameAsync(string gameId, string playerName)
+        public Task<string> JoinGameAsync(string gameId, string playerName)
         {
             if (this.gamesService.TryAddPlayerToGame(gameId, playerName, out string gameSecret, false))
             {
                 _ = this.UpdateJoinedGame();
             }
-            return gameSecret;
+            return Task.FromResult(gameSecret);
         }
 
         private async Task UpdateJoinedGame()
         {
-            string callerId = this.Context.ConnectionId;            
+            string callerId = this.Context.ConnectionId;
             IEnumerable<GameDto> games = this.gamesService.GetGames();
             await this.Clients.AllExcept(new string[] { callerId }).PullGamesAsync(games);
         }

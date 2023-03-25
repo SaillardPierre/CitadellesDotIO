@@ -89,7 +89,7 @@ namespace CitadellesDotIO.Tests
         }
 
             [TestMethod]
-        public async Task ConnectToExistingGame()
+        public async Task ConnectToExistingGameAndSetReadyState()
         {
             try
             {
@@ -110,11 +110,17 @@ namespace CitadellesDotIO.Tests
                 await playerTwoClient.JoinGameAsync(playerOneClient.GameId);
                 System.Threading.Thread.Sleep(15);
 
+                await playerOneClient.SetReadyState(true);
+                await playerTwoClient.SetReadyState(true); 
+                System.Threading.Thread.Sleep(15);
+
                 // Assert
                 Assert.AreEqual(HubConnectionState.Disconnected, playerOneClient.LobbyConnectionState);
                 Assert.AreEqual(HubConnectionState.Disconnected, playerTwoClient.LobbyConnectionState);
                 Assert.AreEqual(LobbyState.GameJoined, playerOneClient.LobbyState);
                 Assert.AreEqual(LobbyState.GameJoined, playerTwoClient.LobbyState);
+                Assert.IsTrue(playerOneClient.Game.Players[1].IsReady);
+                Assert.IsTrue(playerOneClient.Game.Players[0].IsReady);
 
                 await playerOneClient.Quit();
                 await playerTwoClient.Quit();

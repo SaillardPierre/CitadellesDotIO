@@ -56,17 +56,7 @@ namespace CitadellesDotIO.Engine.Services
             gameDto = null;
             if (this.Games.TryGetValue(gameId, out Game game))
             {
-                try
-                {
-                    game.Players.Single(p => p.Name == playerName).Id = connectionId;
-                }
-                catch (Exception)
-                {
-                    // TODO C'est quoi ce bordel déja ? 
-                    string[] names = game.Players.Select(p => p.Name).ToArray();
-                    Player player = game.Players.SingleOrDefault(p => p.Name == playerName);
-                    throw;
-                }
+                game.Players.Single(p => p.Name == playerName).Id = connectionId;                
                 gameDto = game.ToGameDto();
                 return true;
             }

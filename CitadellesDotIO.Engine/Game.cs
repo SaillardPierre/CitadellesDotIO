@@ -504,14 +504,16 @@ namespace CitadellesDotIO.Engine
 
         public GameDto ToGameDto(bool withSecret = false)
         {
-            return new GameDto()
-            {
-                Id = this.Id,
-                Secret = withSecret ? this.Secret : string.Empty,
-                GameState = this.GameState,
-                Name = this.Name,
-                Players = new(this.Players.Select(p => p.ToPlayerDto()).ToList())
-            };
+            bool isStartable = this.Players.All(p=>p.IsReady);
+            return new GameDto(
+                this.Id,
+                this.GameState,
+                this.Name,
+                withSecret ? this.Secret : string.Empty,
+                new(this.Players.Select(p => p.ToPlayerDto()).ToList()),
+                // TODO : Implémenter les sous parties des listes de personnage en DTO
+                new(this.CharactersRoaster.Select(c=>c.ToCharacterDto()).ToList()),
+                isStartable);
         }
     }
 }

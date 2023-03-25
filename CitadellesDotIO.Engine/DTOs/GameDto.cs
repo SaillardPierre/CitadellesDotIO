@@ -11,12 +11,30 @@ namespace CitadellesDotIO.Engine.DTOs
 {
     public class GameDto
     {
-        public string Id { get; set; }
-        public GameState GameState { get; set; }
-        public string Name { get; set; }
-        public string Secret { get; set; }
-        public ReadOnlyCollection<PlayerDto> Players { get; set; }
-        public ReadOnlyCollection<CharacterDto> Characters { get; set; }
-        public bool IsStartable => this.Players.All(p => p.IsReady);
+        public GameDto(
+            string id,
+            GameState gameState, 
+            string name,
+            string secret,
+            ReadOnlyCollection<PlayerDto> players, 
+            ReadOnlyCollection<CharacterDto> characters,
+            bool isStartable)
+        {
+            Id = id;
+            GameState = gameState;
+            Name = name;
+            Secret = secret;
+            Players = players;
+            Characters = characters;
+            IsStartable = isStartable;
+        }
+
+        public string Id { get; }
+        public GameState GameState { get; }
+        public string Name { get; }
+        public string Secret { get; }
+        public ReadOnlyCollection<PlayerDto> Players { get; }
+        public ReadOnlyCollection<CharacterDto> Characters { get; }
+        public bool IsStartable { get; }
     }
 }

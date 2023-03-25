@@ -2,5 +2,6 @@
 {
     public class CharacterDto
     {
+        public string Name { get; set; }
     }
 }

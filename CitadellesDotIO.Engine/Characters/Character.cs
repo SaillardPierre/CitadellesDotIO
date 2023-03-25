@@ -3,6 +3,7 @@ using CitadellesDotIO.Engine.Targets;
 using CitadellesDotIO.Enums;
 using CitadellesDotIO.Engine.Passives;
 using System.Linq;
+using CitadellesDotIO.Engine.DTOs;
 
 namespace CitadellesDotIO.Engine.Characters
 {
@@ -45,6 +46,14 @@ namespace CitadellesDotIO.Engine.Characters
                 int bonusIncome = this.Player.BuiltDistricts.Count(d => d.DistrictType == this.AssociatedDistrictType);
                 this.Player.Gold += bonusIncome;
             }
+        }
+
+        public CharacterDto ToCharacterDto()
+        {
+            return new CharacterDto()
+            {
+                Name = this.Name
+            };
         }
 
     }
