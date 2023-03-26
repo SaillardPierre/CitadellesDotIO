@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://lrmpbc2qb7hx"]
+
+[ext_resource type="Script" path="res://MultiPlayerLobby.cs" id="1_weyf5"]
+
+[node name="MultiPlayerLobby" type="Node2D"]
+script = ExtResource("1_weyf5")
+
+[node name="Player" type="Area2D" parent="."]
+
+[node name="DebuggerText" type="Label" parent="Player"]
+offset_left = 825.0
+offset_top = 1.0
+offset_right = 1154.0
+offset_bottom = 100.0

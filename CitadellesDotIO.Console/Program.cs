@@ -1,10 +1,5 @@
 ﻿using CitadellesDotIO.Client;
-using CitadellesDotIO.Client.CustomEventArgs;
-using CitadellesDotIO.Engine;
-using CitadellesDotIO.Engine.View;
-using CitadellesDotIO.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
