@@ -1,0 +1,21 @@
+﻿<RadzenCard Style="min-height:80px;min-width:60px;height:250px;width:100px"
+            class="@string.Join(" ", CssClasses)" id="@CardId"
+            data-identifier="@Item.Id"
+            data-index="@Index">
+    <RadzenStack Gap="0">
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Item.Id</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">@Item.Name</RadzenText>
+    </RadzenStack>
+</RadzenCard>
+@code {
+    [Parameter]
+    public Item Item { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+
+    private string CardId => "DraggableCard" + Item.Id;
+
+    [Parameter]
+    public List<string> CssClasses { get; set; } = new();
+}

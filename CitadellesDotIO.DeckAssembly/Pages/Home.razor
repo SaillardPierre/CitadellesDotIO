@@ -1,0 +1,16 @@
+﻿@page "/"
+
+<CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
+                                           PickHandUpperThreshold=default
+                                           PickPool=BuildItems() />
+
+@code {
+    private int pickHandLowerThreshold = 0;
+    private int pickHandUpperThreshold = default;
+    private int pickPoolSize = 5;
+
+    private List<Item> BuildItems()
+    {
+        return Enumerable.Range(1, pickPoolSize).Select(x => new Item(x, "Item n°" + x)).ToList();
+    }
+}

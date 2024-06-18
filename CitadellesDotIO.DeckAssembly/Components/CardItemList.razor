@@ -1,0 +1,32 @@
+﻿<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;">
+    <div style="display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;">
+        @{
+            int index = 0;
+            foreach (Item i in ItemList)
+            {
+                <CardItem Item=i Index=index CssClasses=CardClasses />
+                index++;
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<Item> ItemList { get; set; } = new();
+
+    [Parameter]
+    public List<string> CardClasses { get; set; } = new();
+
+    public void RefreshFromParent()
+    {
+        StateHasChanged();
+    }
+}

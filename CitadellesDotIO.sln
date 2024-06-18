@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Client", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.Godot", "CitadellesDotIO.Godot\CitadellesDotIO.Godot.csproj", "{8362CADD-02E9-4DBB-919E-6FFF51A56BA2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitadellesDotIO.DeckAssembly", "CitadellesDotIO.DeckAssembly\CitadellesDotIO.DeckAssembly.csproj", "{9832FCFF-7D17-4CE0-B732-18DB03AE475B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,14 @@ Global
 		{8362CADD-02E9-4DBB-919E-6FFF51A56BA2}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 		{8362CADD-02E9-4DBB-919E-6FFF51A56BA2}.Release|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{8362CADD-02E9-4DBB-919E-6FFF51A56BA2}.Release|Any CPU.Build.0 = ExportRelease|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9832FCFF-7D17-4CE0-B732-18DB03AE475B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

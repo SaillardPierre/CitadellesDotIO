@@ -88,7 +88,7 @@ namespace CitadellesDotIO.Tests
             }
         }
 
-            [TestMethod]
+        [TestMethod]
         public async Task ConnectToExistingGameAndSetReadyState()
         {
             try

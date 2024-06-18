@@ -5,6 +5,10 @@ using CitadellesDotIO.Tests.Factories;
 using System;
 using CitadellesDotIO.Engine;
 
+// TODO : Réfléchir à cette classe
+// De mémoire : reliquat de l'ancien objet Game avant l'utilisation du client
+// A refaire marcher ou dégager si inutile, c'est a ca que sert Git Pierre, ce n'est pas perdu si tu supprime ☜
+
 namespace CitadellesDotIO.Tests
 {
     [TestClass]
