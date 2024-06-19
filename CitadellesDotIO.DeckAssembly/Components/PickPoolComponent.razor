@@ -1,4 +1,4 @@
-﻿@using CitadellesDotIO.Engine.DTOs.Cards
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
 @using DeckAssembly.EventArgs
 @using DeckAssembly.Model
 @using Microsoft.JSInterop;
@@ -13,13 +13,15 @@
     </RadzenStack>
     <RadzenRow style="width: 100%; height: 10vh;">
         <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />
+        <p>X : @(CurrentCoordinate?.X)</p>
+        <p>Y : @(CurrentCoordinate?.Y)</p>
         @if (CurrentDraggedItem is not null)
         {
             <CardItem Card=CurrentDraggedItem />
         }
     </RadzenRow>
     <RadzenStack class="pickPoolDropzone w-100" style="height: 45vh;" id="@Dropzone.PickHand">
-        <CardItemList ItemList=PickHand CardClasses=cardClasses />
+        <CardItemList ItemList=PickHand CardClasses=cardClasses @ref=PickHandCardItemList />
         <RadzenText Text=@PickPoolSizeLabel TextStyle="TextStyle.DisplayH1" />
     </RadzenStack>
 
@@ -33,8 +35,10 @@
     private List<string> cardClasses = new() { "pickPoolDraggable" };
 
     private CardItemList PickPoolCardItemList;
+    private CardItemList PickHandCardItemList;
 
     private Card? CurrentDraggedItem { get; set; }
+    private Position? CurrentCoordinate { get; set; }
     private int? FutureDropIndex { get; set; }
 
 
@@ -54,11 +58,11 @@
         {
             return;
         }
-
+        // Instancier un PickPoolManager
         blazorComponent = DotNetObjectReference.Create(this);
         dragManager = DotNetObjectReference.Create(new DragManager());
-        await JS.InvokeVoidAsync("pickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
 
+        await JS.InvokeVoidAsync("pickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
         await JS.InvokeVoidAsync("pickPoolDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
     }
 
@@ -82,6 +86,7 @@
     public async Task OnDragEndAsync()
     {
         CurrentDraggedItem = null;
+        CurrentCoordinate = null;
         FutureDropIndex = null;
         StateHasChanged();
     }
@@ -125,18 +130,19 @@
     public async ValueTask GetFutureDropIndex(DragEnterEventArgs args)
     {
         if (CurrentDraggedItem is null) throw new InvalidOperationException("CurrentDraggedItem est null dans GetFutureDropIdnex");
-        Coordinate coordinates;
-        if (args.DragEnterSource == DragEnterSource.Self)
-        {
-            coordinates = args.Coordinates.RemoveAtAndReturn(args.Index);
-        }
-        else
-        {
-            coordinates = args.Coordinates.Last();
-        }
-
-        FutureDropIndex = DragManager.GetFutureIndex(coordinates, args.Coordinates);
+        CurrentCoordinate = args.DraggablePosition;
+        FutureDropIndex = DragManager.GetFutureIndex(CurrentCoordinate, args.NeighboursPositions);
         StateHasChanged();
+    }
+
+    //TODO : Remplacer ca avec un DragMoveEventArgs
+    // Appeler DragManager.DragMoveForSelf()
+    // Appeler conditionnelement DragManager.DragMoveForNeighbours
+
+    [JSInvokable(nameof(OnCardMove))]
+    public async ValueTask<string> OnCardMove(float dx, float dy, string initialTransform)
+    {
+        return await DragManager.OnCardMoveWithString(dx, dy, initialTransform);
     }
 
     public static class Dropzone

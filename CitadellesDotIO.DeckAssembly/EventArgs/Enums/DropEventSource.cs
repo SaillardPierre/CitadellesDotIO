@@ -1,4 +1,4 @@
-﻿namespace CitadellesDotIO.DeckAssembly.EventArgs
+﻿namespace CitadellesDotIO.DeckAssembly.EventArgs.Enums
 {
     public enum DropEventSource
     {

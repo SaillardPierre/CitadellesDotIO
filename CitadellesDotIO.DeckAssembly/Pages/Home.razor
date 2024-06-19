@@ -1,5 +1,5 @@
 ﻿@page "/"
-@using CitadellesDotIO.Engine.DTOs.Cards
+@using CitadellesDotIO.DeckAssembly.Model
 @using CitadellesDotIO.Engine.Factories
 
 <CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
@@ -12,9 +12,5 @@
     private int pickPoolSize = 5;
 
     private List<Card> BuildItems()
-    {
-        return CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();
-
-        //return Enumerable.Range(1, pickPoolSize).Select(x => new Card(x)).ToList();
-    }
+    => CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();
 }

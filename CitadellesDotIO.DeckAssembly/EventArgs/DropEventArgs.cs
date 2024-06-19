@@ -1,4 +1,6 @@
-﻿namespace CitadellesDotIO.DeckAssembly.EventArgs;
+﻿using CitadellesDotIO.DeckAssembly.EventArgs.Enums;
+
+namespace CitadellesDotIO.DeckAssembly.EventArgs;
 
 public class DropEventArgs
 {

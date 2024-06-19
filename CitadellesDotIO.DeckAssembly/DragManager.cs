@@ -7,8 +7,7 @@ namespace CitadellesDotIO.DeckAssembly;
 
 public class DragManager
 {
-    [JSInvokable(nameof(OnCardMove))]
-    public async ValueTask<string> OnCardMove(float dx, float dy, string initialTransform)
+    public static async ValueTask<string> OnCardMoveWithString(float dx, float dy, string initialTransform)
     {
         float x = 0;
         float y = 0;
@@ -31,12 +30,19 @@ public class DragManager
 
         return $"translate({x}px, {y}px)";
     }
+    // ne pas faire en static mais on verra bref
 
-    public static int GetFutureIndex(Coordinate selfCoordinates, IEnumerable<Coordinate> coordinates)
+    public static void OnCardMoveWithPosition(Position position, float dx, float dy)
+    {
+        position.X += dx;
+        position.Y += dy; 
+    }
+
+    public static int GetFutureIndex(Position selfCoordinates, IEnumerable<Position> coordinates)
     {
         // Si le pointeur a des coordonnées superieures en x ou y, on est + vers la droite
         int index = 0;
-        foreach (Coordinate coord in coordinates)
+        foreach (Position coord in coordinates)
         {
             if (coord.X < selfCoordinates.X) index++;
         }

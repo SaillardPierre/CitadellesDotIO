@@ -17,31 +17,34 @@ function getUpperTopCoordinates(element) {
 }
 
 function applyOnCardMove(event, dropzoneClassName, dragManager, blazorComponent) {
-    var draggable = event.target;
-    var sourceDropzone = event.target.closest(dropzoneClassName);
+    const draggable = event.target;
+    const pickIndex = parseInt(draggable.dataset.index);
+    const draggablePosition = getUpperTopCoordinates(draggable);
+    const sourceDropzone = event.target.closest(dropzoneClassName);
     var dropzone = document.querySelector('.drop-available');
+    // Generer le OnDragMoveEventArgs
+    // Faire un troisieme dragEnterSource (qui deviendra DragHoverSource) qui lui va dans if(dropzone)
     if (dropzone) {
-        console.log(dropzone.id);
-        // TODO : Extraire tout ce qu'on fait quand en hovering dans une autre méthode
-        var coordinatesList = getUpperTopCoordinatesForList(dropzone, 'pickPoolDraggable')
-        var index = parseInt(draggable.dataset.index);
+        // Renommer ca avec 
+        // Devrait etre en fait "OnDropzoneHover"
+        var neighboursPositions = getUpperTopCoordinatesForList(dropzone, 'pickPoolDraggable')
         var dragEnterSource = 1 // DragEnterSource.Target
         if (sourceDropzone == dropzone) {
             dragEnterSource = 0;// DragEnterSource.Self
-        }
-        else {
-            coordinatesList.push(getUpperTopCoordinates(draggable));
+            // Suppression de la position du draggable de celles des voisins
+            neighboursPositions.splice(pickIndex, 1);
         }
         const args = {
-            index: index,
+            pickIndex: pickIndex,
             dragEnterSource: dragEnterSource,
-            coordinates: coordinatesList
+            draggablePosition: draggablePosition,
+            neighboursPositions: neighboursPositions
         };
         blazorComponent.invokeMethod('GetFutureDropIndex', args);
     }
     // Récupération de la position prédécente éventuelle
     var initialTransform = event.target.style.transform || "translate(0px, 0px)";
-    const response = dragManager.invokeMethod('OnCardMove', event.dx, event.dy, initialTransform);
+    const response = blazorComponent.invokeMethod('OnCardMove', event.dx, event.dy, initialTransform);
     event.target.style.transform = response.result;
 }
 async function pickPoolDraggables(className, dropzoneClassName, blazorComponent, dragManager) {
