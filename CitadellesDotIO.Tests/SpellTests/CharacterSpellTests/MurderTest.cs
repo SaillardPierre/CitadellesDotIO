@@ -14,7 +14,7 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Assassin caster = new(0);
-            Assassin unmurderable = new();
+            Assassin unmurderable = new(1);
 
             // Act
             caster.Spell.Cast(unmurderable);
@@ -42,7 +42,7 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Assassin caster = new(0);
-            Assassin unmurderable = new();
+            Assassin unmurderable = new(1);
 
             // Act
             caster.Spell.GetAvailableTargets(new List<ITarget>()

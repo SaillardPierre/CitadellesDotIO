@@ -28,7 +28,7 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Thief caster = new(0);
-            Thief unstealable = new();
+            Thief unstealable = new(1);
 
             // Act
             caster.Spell.Cast(unstealable);
@@ -42,7 +42,7 @@ namespace CitadellesDotIO.Tests.SpellTests.CharacterSpellTests
         {
             // Arrange
             Thief caster = new(0);
-            Thief unstealable = new();
+            Thief unstealable = new(1);
 
             // Act
             caster.Spell.GetAvailableTargets(new List<ITarget>()

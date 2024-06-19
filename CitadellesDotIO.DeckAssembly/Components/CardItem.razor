@@ -1,20 +1,34 @@
-﻿<RadzenCard Style="min-height:80px;min-width:60px;height:250px;width:100px"
+﻿@using CitadellesDotIO.Engine.DTOs.Cards
+<RadzenCard Style="min-height:80px;min-width:60px;height:250px;width:100px"
             class="@string.Join(" ", CssClasses)" id="@CardId"
-            data-identifier="@Item.Id"
+            data-identifier="@Card.Id"
             data-index="@Index">
     <RadzenStack Gap="0">
-        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Item.Id</RadzenText>
-        <RadzenText TextStyle="TextStyle.Body1">@Item.Name</RadzenText>
+        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Card.Id</RadzenText>
+        @{
+            switch (Card)
+            {
+                case CharacterCard characterCard:
+                    <CharacterCardItem CharacterCard=characterCard></CharacterCardItem>
+                    break;
+                case null:
+                    throw new ArgumentNullException(nameof(Card));
+                default:
+                    <RadzenText>UNKNOWN CARD TYPE</RadzenText>
+                    break;
+            }
+        }
+        <RadzenText TextStyle="TextStyle.Subtitle2"></RadzenText>
     </RadzenStack>
 </RadzenCard>
 @code {
     [Parameter]
-    public Item Item { get; set; }
+    public Card Card { get; set; }
 
     [Parameter]
     public int Index { get; set; }
 
-    private string CardId => "DraggableCard" + Item.Id;
+    private string CardId => "DraggableCard" + Card.Id;
 
     [Parameter]
     public List<string> CssClasses { get; set; } = new();

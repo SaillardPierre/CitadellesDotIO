@@ -9,11 +9,11 @@ namespace CitadellesDotIO.Engine.Characters
 {
     public abstract class Character : ITarget
     {
-        protected Character() { }
         protected Character(int order)
         {
             Order = order;
         }
+        // TODO : Gérer mieux ça pour localisations
         public string Name => GetType().Name;
         public Player Player { get; set; }
         public int Order { get; set; }
@@ -47,14 +47,7 @@ namespace CitadellesDotIO.Engine.Characters
                 this.Player.Gold += bonusIncome;
             }
         }
-
-        public CharacterDto ToCharacterDto()
-        {
-            return new CharacterDto()
-            {
-                Name = this.Name
-            };
-        }
-
+        // TODO : Remplacer par du mapping AutoMapper
+        public abstract CharacterDto ToCharacterDto();
     }
 }

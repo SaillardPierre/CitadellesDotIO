@@ -413,6 +413,7 @@ namespace CitadellesDotIO.Engine
             }
         }
 
+        // TODO : Transformer en passif / résolution de début de tours
         private void HandleThievery(Character character)
         {
             // Le personnage détroussé l'est au début de son tour
@@ -438,6 +439,7 @@ namespace CitadellesDotIO.Engine
             this.GameDataChanged.Invoke(this);
         }
 
+        // TODO : Transformer en passif / résolution de début de tours
         private static void HandleTrading(Character character)
         {
             // Le marchand prend une pièce bonus quoi qu'il arrive

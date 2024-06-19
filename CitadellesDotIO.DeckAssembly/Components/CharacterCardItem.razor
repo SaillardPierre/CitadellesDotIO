@@ -1,0 +1,7 @@
+﻿@using CitadellesDotIO.Engine.DTOs.Cards
+
+<RadzenText TextStyle="TextStyle.Body1">@CharacterCard.Character.Name</RadzenText>
+@code {
+    [Parameter]
+    public CharacterCard CharacterCard { get; set; }
+}

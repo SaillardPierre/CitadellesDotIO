@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using CitadellesDotIO.Engine.DTOs.Cards
+@using CitadellesDotIO.Engine.Factories
 
 <CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
                                            PickHandUpperThreshold=default
@@ -9,8 +11,10 @@
     private int pickHandUpperThreshold = default;
     private int pickPoolSize = 5;
 
-    private List<Item> BuildItems()
+    private List<Card> BuildItems()
     {
-        return Enumerable.Range(1, pickPoolSize).Select(x => new Item(x, "Item n°" + x)).ToList();
+        return CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();
+
+        //return Enumerable.Range(1, pickPoolSize).Select(x => new Card(x)).ToList();
     }
 }

@@ -1,4 +1,5 @@
-﻿<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="display: flex;
+﻿@using CitadellesDotIO.Engine.DTOs.Cards
+<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;">
@@ -9,9 +10,9 @@
       gap: 10px;">
         @{
             int index = 0;
-            foreach (Item i in ItemList)
+            foreach (Card i in ItemList)
             {
-                <CardItem Item=i Index=index CssClasses=CardClasses />
+                <CardItem Card=i Index=index CssClasses=CardClasses />
                 index++;
             }
         }
@@ -20,7 +21,7 @@
 
 @code {
     [Parameter]
-    public List<Item> ItemList { get; set; } = new();
+    public List<Card> ItemList { get; set; } = new();
 
     [Parameter]
     public List<string> CardClasses { get; set; } = new();

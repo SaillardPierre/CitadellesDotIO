@@ -8,6 +8,7 @@ namespace CitadellesDotIO.Engine.Spells
 {
     public abstract class Spell
     {
+        public string Description { get; set; }
         public Player Caster { get; set; }
         public virtual Type TargetType => null;
         public bool HasTargetType => TargetType != null;
