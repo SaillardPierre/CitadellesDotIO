@@ -1,5 +1,5 @@
 ﻿@using CitadellesDotIO.DeckAssembly.Model
-<RadzenCard Style="min-height:80px;min-width:60px;height:250px;width:100px;transform"
+<RadzenCard Style="@StyleAttribute"
             class="@string.Join(" ", CssClasses)" id="@CardId"
             data-identifier="@Card.Id"
             data-index="@Index">
@@ -18,7 +18,9 @@
                     break;
             }
         }
-        <RadzenText TextStyle="TextStyle.Subtitle2"></RadzenText>
+        <p>Dragged : @Card.IsDragged</p>
+        <p>X : @(Card.Position.X)</p>
+        <p>Y : @(Card.Position.Y)</p>       
     </RadzenStack>
 </RadzenCard>
 @code {
@@ -27,6 +29,21 @@
 
     [Parameter]
     public int Index { get; set; }
+
+    private const string DefaultStyleAttribute = "min-height:80px;min-width:60px;height:250px;width:100px;";
+
+    private string StyleAttribute
+    {
+        get
+        {
+            string result = $"{DefaultStyleAttribute}transform:translate({Card.Position.X}px, {Card.Position.Y}px);";
+            if (Card.IsDragged)
+            {
+                result += "z-index:10;";
+            }
+            return result;
+        }
+    }
 
     private string CardId => "DraggableCard" + Card.Id;
 

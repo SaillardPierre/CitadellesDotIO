@@ -2,7 +2,7 @@
 {
     public class Position
     {
-        public float X { get; set; }
-        public float Y { get; set; }
+        public float X { get; set; } = default;
+        public float Y { get; set; } = default;
     }
 }

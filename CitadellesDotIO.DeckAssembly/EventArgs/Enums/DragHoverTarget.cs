@@ -1,7 +1,8 @@
 ﻿namespace CitadellesDotIO.DeckAssembly.EventArgs.Enums
 {
-    public enum DragEnterEventSource
+    public enum DragHoverTarget
     {
+        None,
         Self,
         Target
     }

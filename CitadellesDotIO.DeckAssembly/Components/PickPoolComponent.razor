@@ -12,13 +12,7 @@
         <CardItemList ItemList=PickPool CardClasses=cardClasses @ref=PickPoolCardItemList />
     </RadzenStack>
     <RadzenRow style="width: 100%; height: 10vh;">
-        <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />
-        <p>X : @(CurrentCoordinate?.X)</p>
-        <p>Y : @(CurrentCoordinate?.Y)</p>
-        @if (CurrentDraggedItem is not null)
-        {
-            <CardItem Card=CurrentDraggedItem />
-        }
+        <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />           
     </RadzenRow>
     <RadzenStack class="pickPoolDropzone w-100" style="height: 45vh;" id="@Dropzone.PickHand">
         <CardItemList ItemList=PickHand CardClasses=cardClasses @ref=PickHandCardItemList />
@@ -36,11 +30,7 @@
 
     private CardItemList PickPoolCardItemList;
     private CardItemList PickHandCardItemList;
-
-    private Card? CurrentDraggedItem { get; set; }
-    private Position? CurrentCoordinate { get; set; }
     private int? FutureDropIndex { get; set; }
-
 
     [Parameter]
     public int PickHandLowerThreshold { get; set; }
@@ -64,85 +54,98 @@
 
         await JS.InvokeVoidAsync("pickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
         await JS.InvokeVoidAsync("pickPoolDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
-    }
-
-    [JSInvokable(nameof(OnDragStartAsync))]
-    public async Task OnDragStartAsync(PickPoolEventArgs args)
-    {
-        // TODO : Ajouter les checks sur l'index
-        if (args.PickPoolSource == "PickPool")
-        {
-            CurrentDraggedItem = PickPool[args.Index];
-        }
-        else if (args.PickPoolSource == "PickHand")
-        {
-            CurrentDraggedItem = PickHand[args.Index];
-        }
-        else throw new ArgumentException();
-        StateHasChanged();
-    }
+    }  
 
     [JSInvokable(nameof(OnDragEndAsync))]
-    public async Task OnDragEndAsync()
+    public async Task OnDragEndAsync(DragEndEventArgs args)
     {
-        CurrentDraggedItem = null;
-        CurrentCoordinate = null;
-        FutureDropIndex = null;
-        StateHasChanged();
+        Card currentDraggedItem = GetCurrentDraggedItem(args.PickIndex, args.PickSource);
+        currentDraggedItem.Reset();
     }
 
     [JSInvokable(nameof(OnDrop))]
     public async ValueTask OnDrop(DropEventArgs args)
     {
-        if (CurrentDraggedItem is null) return;
+        Card currentDraggedItem = GetCurrentDraggedItem(args.PickIndex, args.PickSource);
 
-        List<Card> destination;
-        if (args.Destination == Dropzone.PickHand)
-        {
-            destination = PickHand;
-        }
-        else if (args.Destination == Dropzone.PickPool)
-        {
-            destination = PickPool;
-        }
-        else throw new ArgumentException("Destination invalide");
+        if (currentDraggedItem is null) return;
 
+        // A revoir 
+
+        List<Card> dropDestination = DefineDropDestination(args);
         if (args.DropEventSource == DropEventSource.Self)
         {
-            destination.PutBackAtIndex(CurrentDraggedItem, FutureDropIndex);
+            dropDestination.PutBackAtIndex(currentDraggedItem, FutureDropIndex);
         }
         else if (args.DropEventSource == DropEventSource.Target)
         {
-            List<Card> source = destination == PickHand ? PickPool : PickHand;
-            DropOnTarget(source, destination, CurrentDraggedItem, FutureDropIndex);
+            List<Card> source = dropDestination == PickHand ? PickPool : PickHand;
+            dropDestination.InsertOrAppend(currentDraggedItem, FutureDropIndex);
+            source.Remove(currentDraggedItem);
         }
-        CurrentDraggedItem = null;
-        FutureDropIndex = null;
-    }
-
-    public void DropOnTarget(List<Card> source, List<Card> destination, Card item, int? index)
-    {
-        destination.InsertOrAppend(item, index);
-        source.Remove(item);
-    }
-
-    [JSInvokable(nameof(GetFutureDropIndex))]
-    public async ValueTask GetFutureDropIndex(DragEnterEventArgs args)
-    {
-        if (CurrentDraggedItem is null) throw new InvalidOperationException("CurrentDraggedItem est null dans GetFutureDropIdnex");
-        CurrentCoordinate = args.DraggablePosition;
-        FutureDropIndex = DragManager.GetFutureIndex(CurrentCoordinate, args.NeighboursPositions);
+        currentDraggedItem.Reset();        
         StateHasChanged();
     }
 
-    //TODO : Remplacer ca avec un DragMoveEventArgs
-    // Appeler DragManager.DragMoveForSelf()
-    // Appeler conditionnelement DragManager.DragMoveForNeighbours
 
-    [JSInvokable(nameof(OnCardMove))]
-    public async ValueTask<string> OnCardMove(float dx, float dy, string initialTransform)
+    #region A extraire dans un PickPoolManager
+    public List<Card> DefineDropDestination(DropEventArgs args)
     {
-        return await DragManager.OnCardMoveWithString(dx, dy, initialTransform);
+        List<Card> destination;
+        if (args.Destination == Dropzone.PickHand)
+        {
+            return PickHand;
+        }
+        if (args.Destination == Dropzone.PickPool)
+        {
+            return PickPool;
+        }
+        throw new ArgumentException("Destination invalide");        
+    }
+
+    public Card GetCurrentDraggedItem(int pickIndex, string pickSource)
+    {
+        // TODO : Ajouter les checks sur l'index
+        if (pickSource == Dropzone.PickPool)
+        {
+            return PickPool[pickIndex];
+        }
+        else if (pickSource == Dropzone.PickHand)
+        {
+            return PickHand[pickIndex];
+        }
+        else throw new ArgumentException();
+    }
+    public int? GetFutureDropIndex(DragMoveEventArgs args)
+    {
+        if(args.DragHoverTarget == DragHoverTarget.None)
+        {
+            return default(int?);
+        }
+        if (args.DragHoverTarget == DragHoverTarget.Self)
+        {
+            // TODO : Null checks
+            return DragManager.GetFutureIndex(args.DraggablePosition, args.SourceNeighboursPositions);
+        }
+        if (args.DragHoverTarget == DragHoverTarget.Target)
+        {
+            // TODO : Null checks
+            return DragManager.GetFutureIndex(args.DraggablePosition, args.TargetNeighboursPositions);
+        }
+        throw new ArgumentOutOfRangeException(nameof(DragHoverTarget) + "invalid in " + nameof(GetFutureDropIndex) + ", value :" + args.DragHoverTarget);
+    }
+
+    #endregion
+    [JSInvokable(nameof(OnDragMove))]
+    public async ValueTask OnDragMove(DragMoveEventArgs args)
+    {
+        Card currentDraggedItem = GetCurrentDraggedItem(args.PickIndex, args.PickSource);
+        // TODO : Extraire l'altération de la card dans un CardManager
+        currentDraggedItem.UpdatePosition(args.DraggableMovementPosition);
+        //currentDraggedItem.Position = DragManager.UpdatePositionFromMovement(currentDraggedItem.Position, args.DraggableMovementPosition);
+        
+        FutureDropIndex = GetFutureDropIndex(args);
+        StateHasChanged();
     }
 
     public static class Dropzone
