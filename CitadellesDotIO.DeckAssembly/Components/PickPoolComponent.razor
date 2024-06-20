@@ -18,7 +18,6 @@
         <CardItemList ItemList=PickHand CardClasses=cardClasses @ref=PickHandCardItemList />
         <RadzenText Text=@PickPoolSizeLabel TextStyle="TextStyle.DisplayH1" />
     </RadzenStack>
-
 </RadzenStack>
 
 @code {
@@ -31,6 +30,7 @@
     private CardItemList PickPoolCardItemList;
     private CardItemList PickHandCardItemList;
     private int? FutureDropIndex { get; set; }
+    
 
     [Parameter]
     public int PickHandLowerThreshold { get; set; }
@@ -39,21 +39,25 @@
 
     [Parameter]
     public List<Card> PickPool { get; set; }
-    public List<Card> PickHand { get; set; } = new();
+    public List<Card> PickHand { get; set; } = new(){ new CharacterCard(9, new Engine.DTOs.CharacterDto(1,"Test",null))};
 
     private static string PickPoolDropzoneClassName => "pickPoolDropzone";
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
         {
             return;
         }
-        // Instancier un PickPoolManager
+
         blazorComponent = DotNetObjectReference.Create(this);
         dragManager = DotNetObjectReference.Create(new DragManager());
 
-        await JS.InvokeVoidAsync("pickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
-        await JS.InvokeVoidAsync("pickPoolDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
+        await JS.InvokeVoidAsync("setupPickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
+        await JS.InvokeVoidAsync("setupPickPoolDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
+
+        // Instancier un PickPoolManager
     }  
 
     [JSInvokable(nameof(OnDragEndAsync))]
@@ -61,13 +65,13 @@
     {
         Card currentDraggedItem = GetCurrentDraggedItem(args.PickIndex, args.PickSource);
         currentDraggedItem.Reset();
+        StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDrop))]
     public async ValueTask OnDrop(DropEventArgs args)
     {
         Card currentDraggedItem = GetCurrentDraggedItem(args.PickIndex, args.PickSource);
-
         if (currentDraggedItem is null) return;
 
         // A revoir 

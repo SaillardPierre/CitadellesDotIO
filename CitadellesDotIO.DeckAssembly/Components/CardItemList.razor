@@ -1,9 +1,17 @@
 ﻿@using CitadellesDotIO.DeckAssembly.Model
-<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="display: flex;
+<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="
+display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;">
-    <div style="display: flex;
+    <div style="
+ display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #000;
+        display: flex;
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
@@ -19,7 +27,9 @@
     </div>
 </div>
 
+
 @code {
+    /*overflow: auto;*/
     [Parameter]
     public List<Card> ItemList { get; set; } = new();
 

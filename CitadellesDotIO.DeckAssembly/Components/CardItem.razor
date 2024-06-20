@@ -1,6 +1,6 @@
 ﻿@using CitadellesDotIO.DeckAssembly.Model
 <RadzenCard Style="@StyleAttribute"
-            class="@string.Join(" ", CssClasses)" id="@CardId"
+            Class="@ClassAttribute" id="@CardId"
             data-identifier="@Card.Id"
             data-index="@Index">
     <RadzenStack Gap="0">
@@ -30,7 +30,7 @@
     [Parameter]
     public int Index { get; set; }
 
-    private const string DefaultStyleAttribute = "min-height:80px;min-width:60px;height:250px;width:100px;";
+    private const string DefaultStyleAttribute = "min-height:80px;min-width:60px;height:250px;width:125px;";
 
     private string StyleAttribute
     {
@@ -45,8 +45,16 @@
         }
     }
 
+    private string ClassAttribute
+    {
+        get
+        {
+            return string.Join(" ", CssClasses);
+        }
+    }
+
     private string CardId => "DraggableCard" + Card.Id;
 
     [Parameter]
-    public List<string> CssClasses { get; set; } = new();
+    public List<string> CssClasses { get; set; } = new() { "rz-p-1" };
 }
