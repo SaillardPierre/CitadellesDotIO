@@ -114,34 +114,30 @@
         }
     }
 
-
     public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
     {
         if (Cards.Any())
         {
-            bool isFirst = false;
-            bool isLast = false;
+            ResetPreviousNeighbours();
+
+            bool isFirst = futureDropIndex == 0;
+            bool isLast = futureDropIndex == Cards.Count;
 
             int? leftIndex = default;
             int? rightIndex = default;
 
             if (dragHoverTarget == DragHoverTarget.Target)
             {
-                isFirst = futureDropIndex == 0;
-                isLast = futureDropIndex == Cards.Count + 1;
-
                 leftIndex = futureDropIndex - 1;
                 rightIndex = futureDropIndex;
             }
             else if (dragHoverTarget == DragHoverTarget.Self)
             {
-                isFirst = futureDropIndex == 0;
-                isLast = futureDropIndex == Cards.Count;
-
-                int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
 
                 leftIndex = futureDropIndex - 1;
                 rightIndex = futureDropIndex + 1;
+
+                int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
 
                 // l'item est a droite de son origine
                 if(draggedItemIndex < futureDropIndex)
@@ -163,7 +159,6 @@
             {
                 RightIndex = rightIndex;
             }
-            ResetPreviousNeighbours();
             StartNeighboursAnimation();
         }
     }

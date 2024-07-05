@@ -92,9 +92,9 @@ function setupPickPoolDropzones(className, blazorComponent) {
         .dropzone({
             ondragleave: function (event) {
                 const dropzone = event.target;
-                //const draggable = event.relatedTarget;
-                //const sourceDropzone = event.relatedTarget.closest(className);
-                //console.log(draggable.id + ' was moved out of ' + dropzone.id);
+                const draggable = event.relatedTarget;
+                const sourceDropzone = event.relatedTarget.closest(className);
+                console.log(draggable.id + ' was moved out of ' + dropzone.id);
                 dropzone.classList.remove('drop-available');
             },
             ondragenter: function (event) {
@@ -102,7 +102,7 @@ function setupPickPoolDropzones(className, blazorComponent) {
                 var draggable = event.relatedTarget;
                 const pickIndex = parseInt(draggable.dataset.index);
                 var sourceDropzone = event.relatedTarget.closest(className);
-                // console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
+                 console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
                 // Ajout d'une classe récupérée plus tard pour savoir si on hover
                 var dragHoverTarget = 1; // DragHoverTarget.Self    
                 if (sourceDropzone != dropzone) {

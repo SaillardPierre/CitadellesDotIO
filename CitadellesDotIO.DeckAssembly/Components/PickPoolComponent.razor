@@ -39,7 +39,7 @@
     public List<Card> PickPoolValue { get; set; }
     private CardItemList PickPool { get; set; }
 
-    public List<Card> PickHandValue { get; set; } = new() { new CharacterCard(9, new Engine.DTOs.CharacterDto(1, "Test", null)) };
+    public List<Card> PickHandValue { get; set; } = new() { new CharacterCard(9, new Engine.DTOs.CharacterDto(1, "Test", null)), new CharacterCard(10, new Engine.DTOs.CharacterDto(1, "Test", null)) };
     private CardItemList PickHand { get; set; }
 
     private static string PickPoolDropzoneClassName => "pickPoolDropzone";
@@ -143,7 +143,6 @@
 
             int result = DragManager.GetFutureIndex(args.DraggablePosition, args.TargetNeighboursPositions);
             //Console.WriteLine(result);
-
             return result;
         }
         throw new ArgumentOutOfRangeException(nameof(DragHoverTarget) + "invalid in " + nameof(GetFutureDropIndex) + ", value :" + args.DragHoverTarget);
@@ -227,7 +226,15 @@
         FutureDropIndex = GetFutureDropIndex(args);
         if (CurrentHoverTarget is not null)
         {
-            CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
+            try
+            {
+                CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
+
+            }
+            catch(Exception ex)
+            {
+                
+            }
         }
 
         StateHasChanged();
