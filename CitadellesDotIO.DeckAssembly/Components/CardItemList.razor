@@ -1,24 +1,23 @@
-﻿@using CitadellesDotIO.DeckAssembly.Model
-<div class="container w-100 h-100 rz-border-base-300 rz-border-radius-2" style="
-display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;">
-    <div style="
- display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid #000;
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+@using CitadellesDotIO.DeckAssembly.Model
+@using System.Text
+<div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
+    @Id
+    <p>left : @LeftIndex</p>
+    <p>right : @RightIndex</p>
+    <div class="w-100"
+         style="
         display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;">
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: @(Gap)px;
+        border: 1px solid #000;
+        overflow-x: visible;
+        overflow-y: visible;">
         @{
             int index = 0;
-            foreach (Card i in ItemList)
+            foreach (Card i in Cards)
             {
                 <CardItem Card=i Index=index CssClasses=CardClasses />
                 index++;
@@ -29,15 +28,173 @@ display: flex;
 
 
 @code {
-    /*overflow: auto;*/
+    // TODO : Mettre toute la gestion des index / cartes de la liste dans le CardItemList
     [Parameter]
-    public List<Card> ItemList { get; set; } = new();
+    public List<Card> Cards { get; set; } = new();
+
+    public int? LeftIndex;
+    public int? RightIndex;
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private int Gap { get; set; } = 10;
+
+    private string OuterStyleAttribute => "display: flex;flex-direction: column;justify-content: center;align-items: center;align-self: center;";
+    private string OuterClassAttributes
+    {
+        get
+        {
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append("w-100 h-100 m-0 ");
+            foreach (string cssClass in CssClasses)
+            {
+                stringBuilder.Append(cssClass).Append(' ');
+            }
+            if (IsHovered)
+            {
+                stringBuilder.Append("drop-available ");
+                stringBuilder.Append("rz-border-base-300");
+            }
+
+            return stringBuilder.ToString();
+        }
+    }
+
+    public bool IsHovered = false;
+
+    public void Reset()
+    {
+        IsHovered = false;
+        LeftIndex = default;
+        RightIndex = default;
+        foreach (Card card in Cards)
+        {
+            card.Reset();
+        }
+    }
+    public void ResetExceptCard(Card exceptCard)
+    {
+        IsHovered = false;
+        LeftIndex = default;
+        RightIndex = default;
+        foreach (Card card in Cards)
+        {
+            if (card != exceptCard)
+            {
+                card.Reset();
+            }
+        }
+    }
+    private void ResetPreviousNeighbours()
+    {
+        foreach (Card card in Cards)
+        {
+            bool shouldReset = true;
+            // Il s'agit du voisin de gauche
+            if (LeftIndex.HasValue && card.Index == LeftIndex.Value)
+            {
+                shouldReset = false;
+            }
+            // Il s'agit du voisin de droite
+            if (RightIndex.HasValue && card.Index == RightIndex.Value)
+            {
+                shouldReset = false;
+            }
+            // Il s'agit de la carte en cours de déplacement
+            if (card.IsDragged)
+            {
+                shouldReset = false;
+            }
+
+            if (shouldReset)
+            {
+                card.Reset();
+            }
+        }
+    }
+
+
+    public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
+    {
+        if (Cards.Any())
+        {
+            bool isFirst = false;
+            bool isLast = false;
+
+            int? leftIndex = default;
+            int? rightIndex = default;
+
+            if (dragHoverTarget == DragHoverTarget.Target)
+            {
+                isFirst = futureDropIndex == 0;
+                isLast = futureDropIndex == Cards.Count + 1;
+
+                leftIndex = futureDropIndex - 1;
+                rightIndex = futureDropIndex;
+            }
+            else if (dragHoverTarget == DragHoverTarget.Self)
+            {
+                isFirst = futureDropIndex == 0;
+                isLast = futureDropIndex == Cards.Count;
+
+                int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
+
+                leftIndex = futureDropIndex - 1;
+                rightIndex = futureDropIndex + 1;
+
+                // l'item est a droite de son origine
+                if(draggedItemIndex < futureDropIndex)
+                {
+                    leftIndex++;
+                }
+                // l'item est a gauche de son origine
+                else if(draggedItemIndex > futureDropIndex)
+                {
+                    rightIndex--;
+                }
+            }
+
+            if (!isFirst)
+            {
+                LeftIndex = leftIndex;
+            }
+            if (!isLast)
+            {
+                RightIndex = rightIndex;
+            }
+            ResetPreviousNeighbours();
+            StartNeighboursAnimation();
+        }
+    }
+
+    private void StartNeighboursAnimation()
+    {
+        if (!LeftIndex.HasValue && !RightIndex.HasValue)
+        {
+            string mess = "Aucun index voisin pour l'animation";
+            //throw new ArgumentException(mess);
+            Console.WriteLine(mess);
+            return;
+        }
+
+        if (RightIndex.HasValue)
+        {
+            Card target = Cards[RightIndex.Value];
+            target.IsOverlapped = true;
+        }
+
+        if (LeftIndex.HasValue)
+        {
+            Card target = Cards[LeftIndex.Value];
+            target.IsOverlapped = true;
+        }
+    }
+
+
+    [Parameter]
+    public List<string> CssClasses { get; set; } = new() { };
 
     [Parameter]
     public List<string> CardClasses { get; set; } = new();
-
-    public void RefreshFromParent()
-    {
-        StateHasChanged();
-    }
 }

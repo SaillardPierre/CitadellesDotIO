@@ -54,6 +54,18 @@ async function setupPickPoolDraggables(className, dropzoneClassName, blazorCompo
             },
             start(event) {
                 console.log("dragstart");
+                const draggable = event.target;
+                const pickIndex = parseInt(draggable.dataset.index);
+                const sourceDropzone = event.target.closest(dropzoneClassName);
+                if (!sourceDropzone) {
+                    console.log('no source dropzone, OnDragStart will return early');
+                    return;
+                }
+                const onDragStartEventArgs = {
+                    pickIndex: pickIndex,
+                    pickSource: sourceDropzone.id
+                }
+                blazorComponent.invokeMethod('OnDragStartAsync', onDragStartEventArgs);
             },
             end(event) {
                 //console.log("dragend");
@@ -87,11 +99,21 @@ function setupPickPoolDropzones(className, blazorComponent) {
             },
             ondragenter: function (event) {
                 const dropzone = event.target;
-                //var draggable = event.relatedTarget;
-                //var sourceDropzone = event.relatedTarget.closest(className);                
-                //console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
+                var draggable = event.relatedTarget;
+                const pickIndex = parseInt(draggable.dataset.index);
+                var sourceDropzone = event.relatedTarget.closest(className);
+                // console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
                 // Ajout d'une classe récupérée plus tard pour savoir si on hover
-                dropzone.classList.add('drop-available');
+                var dragHoverTarget = 1; // DragHoverTarget.Self    
+                if (sourceDropzone != dropzone) {
+                    dragHoverTarget = 2; // DragHoverTarget.Target
+                }
+                const dragEnterEventArgs = {
+                    pickSource: sourceDropzone.id,
+                    hoverSource: dropzone.id,
+                    dragHoverTarget: dragHoverTarget
+                }
+                blazorComponent.invokeMethod('OnDragEnter', dragEnterEventArgs);
             },
             ondrop: function (event) {
                 //console.log('dropped');
@@ -102,7 +124,7 @@ function setupPickPoolDropzones(className, blazorComponent) {
                     return;
                 }
                 const dropzone = event.target;
-                dropzone.classList.remove('drop-available');               
+                dropzone.classList.remove('drop-available');
                 //console.log(draggable.id + ' was dropped into ' + dropzone.id + ' from ' + sourceDropzone.id);
                 var dropEventSource = 1 // DropEventSource.Target
                 if (sourceDropzone == dropzone) {

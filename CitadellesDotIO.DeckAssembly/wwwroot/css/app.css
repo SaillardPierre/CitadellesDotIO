@@ -4,6 +4,8 @@ html, body {
     user-select:none;
 }
 
+main{overflow:hidden!important;}
+
 h1:focus {
     outline: none;
 }

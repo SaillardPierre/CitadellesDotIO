@@ -1,4 +1,5 @@
 ﻿@using CitadellesDotIO.DeckAssembly.Model
+@using System.Text
 <RadzenCard Style="@StyleAttribute"
             Class="@ClassAttribute" id="@CardId"
             data-identifier="@Card.Id"
@@ -17,31 +18,49 @@
                     <RadzenText>UNKNOWN CARD TYPE</RadzenText>
                     break;
             }
-        }
-        <p>Dragged : @Card.IsDragged</p>
+        }        
         <p>X : @(Card.Position.X)</p>
         <p>Y : @(Card.Position.Y)</p>       
+        <p>@(nameof(Card.IsOverlapped)) : @(Card.IsOverlapped.ToString()) </p>
     </RadzenStack>
 </RadzenCard>
 @code {
     [Parameter]
     public Card Card { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        Card.Index = Index;
+    }
+
     [Parameter]
     public int Index { get; set; }
-
-    private const string DefaultStyleAttribute = "min-height:80px;min-width:60px;height:250px;width:125px;";
 
     private string StyleAttribute
     {
         get
         {
-            string result = $"{DefaultStyleAttribute}transform:translate({Card.Position.X}px, {Card.Position.Y}px);";
+            StringBuilder stringBuilder = new();
+            const double minWidth = 45;
+            const double width = 125;
+            const double ratio = 1.8;
+            const double minHeight = minWidth * ratio;
+            const double height = width * ratio;
+            stringBuilder.Append("min-height:").Append(minHeight).Append("px;");
+            stringBuilder.Append("min-width:").Append(minWidth).Append("px;");
+            stringBuilder.Append("height:").Append(height).Append("px;");
+            stringBuilder.Append("width:").Append(width).Append("px;");
+
+            stringBuilder.Append("transform:translate(")
+                .Append(Card.Position.X).Append("px,")
+                .Append(Card.Position.Y).Append("px);");
+
             if (Card.IsDragged)
             {
-                result += "z-index:10;";
+                stringBuilder.Append("z-index:10;");
             }
-            return result;
+
+            return stringBuilder.ToString();
         }
     }
 
@@ -49,12 +68,22 @@
     {
         get
         {
-            return string.Join(" ", CssClasses);
+            StringBuilder stringBuilder = new();
+            foreach(string cssClass in CssClasses)
+            {
+                stringBuilder.Append(cssClass).Append(' ');
+            }
+            stringBuilder.Append("rz-p-1 ");
+            if(Card.IsDragged || Card.IsOverlapped)
+            {
+                stringBuilder.Append("rz-border-base-300 ");
+            }
+            return stringBuilder.ToString();
         }
     }
 
     private string CardId => "DraggableCard" + Card.Id;
 
     [Parameter]
-    public List<string> CssClasses { get; set; } = new() { "rz-p-1" };
+    public List<string> CssClasses { get; set; } = new() {  };
 }
