@@ -184,30 +184,14 @@
         CardItemList? previous = GetOppositePickSource(args.HoverSource);
         previous.ResetExceptCard(CurrentCard);
         target!.IsHovered = true;
+    }
 
-        // Définition de gauche/droite initiale
-        int? leftIndex = default;
-        int? rightIndex = default;
-
-        bool isLast = target.Cards.Count == CurrentCard.Index + 1;
-        bool isFirst = CurrentCard.Index == 0;
-
-        // On a pris la seule carte
-        if (isFirst && isLast)
-        {
-            return;
-        }
-        if (!isFirst)
-        {
-            leftIndex = CurrentCard.Index - 1;
-        }
-        if (!isLast)
-        {
-            rightIndex = CurrentCard.Index + 1;
-        }
-
-        target.LeftIndex = leftIndex;
-        target.RightIndex = rightIndex;
+    [JSInvokable(nameof(OnDragLeave))]
+    public async ValueTask OnDragLeave()
+    {
+        CurrentHoverTarget.ResetExceptCard(CurrentCard);
+        CurrentHoverTarget = null;
+        StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDragEnter))]

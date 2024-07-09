@@ -96,6 +96,7 @@ function setupPickPoolDropzones(className, blazorComponent) {
                 const sourceDropzone = event.relatedTarget.closest(className);
                 console.log(draggable.id + ' was moved out of ' + dropzone.id);
                 dropzone.classList.remove('drop-available');
+                blazorComponent.invokeMethod('OnDragLeave');
             },
             ondragenter: function (event) {
                 const dropzone = event.target;

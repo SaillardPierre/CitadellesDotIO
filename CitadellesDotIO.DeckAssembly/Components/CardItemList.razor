@@ -116,51 +116,56 @@
 
     public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
     {
-        if (Cards.Any())
+        if (!Cards.Any()) return;
+        ResetPreviousNeighbours();
+
+        bool isFirst = futureDropIndex == 0;
+        bool isLast = false;
+
+        int? leftIndex = default;
+        int? rightIndex = default;
+
+        if (dragHoverTarget == DragHoverTarget.Target)
         {
-            ResetPreviousNeighbours();
-
-            bool isFirst = futureDropIndex == 0;
-            bool isLast = futureDropIndex == Cards.Count;
-
-            int? leftIndex = default;
-            int? rightIndex = default;
-
-            if (dragHoverTarget == DragHoverTarget.Target)
+            isLast = futureDropIndex == Cards.Count;
+            if (!isFirst)
             {
                 leftIndex = futureDropIndex - 1;
+            }
+            if (!isLast)
+            {
                 rightIndex = futureDropIndex;
             }
-            else if (dragHoverTarget == DragHoverTarget.Self)
+        }
+        else if (dragHoverTarget == DragHoverTarget.Self)
+        {
+            isLast = futureDropIndex == Cards.Count - 1;
+            int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
+
+            if (!isFirst)
             {
-
                 leftIndex = futureDropIndex - 1;
-                rightIndex = futureDropIndex + 1;
-
-                int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
-
                 // l'item est a droite de son origine
-                if(draggedItemIndex < futureDropIndex)
+                if (draggedItemIndex < futureDropIndex)
                 {
                     leftIndex++;
                 }
+            }
+            if (!isLast)
+            {
+                rightIndex = futureDropIndex + 1;
                 // l'item est a gauche de son origine
-                else if(draggedItemIndex > futureDropIndex)
+                if (draggedItemIndex > futureDropIndex)
                 {
                     rightIndex--;
                 }
             }
-
-            if (!isFirst)
-            {
-                LeftIndex = leftIndex;
-            }
-            if (!isLast)
-            {
-                RightIndex = rightIndex;
-            }
-            StartNeighboursAnimation();
         }
+
+        LeftIndex = leftIndex;
+        RightIndex = rightIndex;
+
+        StartNeighboursAnimation();
     }
 
     private void StartNeighboursAnimation()
