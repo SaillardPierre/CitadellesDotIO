@@ -1,5 +1,5 @@
 ﻿function getUpperTopCoordinatesForList(parentElement, className) {
-    var elements = parentElement.getElementsByClassName(className);
+    var elements = parentElement.querySelectorAll(className);
     var coordinatesList = [];
 
     for (var i = 0; i < elements.length; i++) {
@@ -16,7 +16,7 @@ function getUpperTopCoordinates(element) {
     return { x: x, y: y };
 }
 
-function applyOnCardMove(event, dropzoneClassName, blazorComponent) {
+function applyOnCardMove(event, className, dropzoneClassName, blazorComponent) {
     const draggable = event.target;
     const sourceDropzone = draggable.closest(dropzoneClassName);
     if (!sourceDropzone) {
@@ -29,11 +29,11 @@ function applyOnCardMove(event, dropzoneClassName, blazorComponent) {
     if (dropzone) {
         if (sourceDropzone != dropzone) {
             dragHoverTarget = 2; // DragHoverTarget.Target
-            targetNeighboursPositions = getUpperTopCoordinatesForList(dropzone, 'pickPoolDraggable')
+            targetNeighboursPositions = getUpperTopCoordinatesForList(dropzone, className);
         }
         else {
             dragHoverTarget = 1; // DragHoverTarget.Self        
-            targetNeighboursPositions = getUpperTopCoordinatesForList(sourceDropzone, 'pickPoolDraggable');
+            targetNeighboursPositions = getUpperTopCoordinatesForList(sourceDropzone, className);
         }
     }
     const args = {
@@ -52,10 +52,10 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
         listeners: {
             move(event) {
                 //console.log("dragmove");
-                applyOnCardMove(event, dropzoneClassName, blazorComponent);
+                applyOnCardMove(event, className, dropzoneClassName, blazorComponent);
             },
             start(event) {
-                console.log("dragstart");
+                //console.log("dragstart");
                 const draggable = event.target;
                 const pickIndex = parseInt(draggable.dataset.index);
                 const sourceDropzone = event.target.closest(dropzoneClassName);
