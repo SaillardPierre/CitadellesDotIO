@@ -4,7 +4,7 @@ public class Card
 {
     public int Id { get; set; }
     public int Index { get; set; }
-    public Position Position { get; set; }
+    public Position Transform { get; set; }
     public bool IsDragged { get; set; }
 
     /// <summary>
@@ -14,12 +14,12 @@ public class Card
     public Card(int id)
     {
         Id = id;
-        Position = new Position();
+        Transform = new Position();
     }
 
     public void Reset()
     {
-        Position = new Position();
+        Transform = new Position();
         IsDragged = false;
         IsOverlapped = false;
     }
@@ -27,7 +27,7 @@ public class Card
     public void UpdatePosition(Position movementPosition)
     {
         IsDragged = true;
-        Position.X += movementPosition.X;
-        Position.Y += movementPosition.Y;
+        Transform.X += movementPosition.X;
+        Transform.Y += movementPosition.Y;
     }
 }

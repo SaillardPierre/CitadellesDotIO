@@ -19,8 +19,8 @@
                     break;
             }
         }        
-        <p>X : @(Card.Position.X)</p>
-        <p>Y : @(Card.Position.Y)</p>       
+        <p>X : @(Card.Transform.X)</p>
+        <p>Y : @(Card.Transform.Y)</p>       
         <p>@(nameof(Card.IsOverlapped)) : @(Card.IsOverlapped.ToString()) </p>
     </RadzenStack>
 </RadzenCard>
@@ -52,8 +52,8 @@
             stringBuilder.Append("width:").Append(width).Append("px;");
 
             stringBuilder.Append("transform:translate(")
-                .Append(Card.Position.X).Append("px,")
-                .Append(Card.Position.Y).Append("px);");
+                .Append(Card.Transform.X).Append("px,")
+                .Append(Card.Transform.Y).Append("px);");
 
             if (Card.IsDragged)
             {

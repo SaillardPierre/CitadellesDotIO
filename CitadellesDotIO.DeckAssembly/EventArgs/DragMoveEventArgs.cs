@@ -9,8 +9,7 @@ public class DragMoveEventArgs
     public int PickIndex { get; set; }
     public string PickSource { get; set; }
     public Position? DraggablePosition { get; set; }
-    public Position? DraggableMovementPosition { get; set; }
-    public List<Position>? SourceNeighboursPositions { get; set; }
+    public Position? DragMoveDirection { get; set; }
     public List<Position>? TargetNeighboursPositions { get; set; }
 }
 

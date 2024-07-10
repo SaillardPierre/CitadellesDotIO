@@ -16,7 +16,7 @@ function getUpperTopCoordinates(element) {
     return { x: x, y: y };
 }
 
-function applyOnCardMove(event, dropzoneClassName, dragManager, blazorComponent) {
+function applyOnCardMove(event, dropzoneClassName, blazorComponent) {
     const draggable = event.target;
     const sourceDropzone = draggable.closest(dropzoneClassName);
     if (!sourceDropzone) {
@@ -31,26 +31,28 @@ function applyOnCardMove(event, dropzoneClassName, dragManager, blazorComponent)
             dragHoverTarget = 2; // DragHoverTarget.Target
             targetNeighboursPositions = getUpperTopCoordinatesForList(dropzone, 'pickPoolDraggable')
         }
-        else dragHoverTarget = 1; // DragHoverTarget.Self        
+        else {
+            dragHoverTarget = 1; // DragHoverTarget.Self        
+            targetNeighboursPositions = getUpperTopCoordinatesForList(sourceDropzone, 'pickPoolDraggable');
+        }
     }
     const args = {
         pickIndex: parseInt(draggable.dataset.index),
         pickSource: sourceDropzone.id,
         dragHoverTarget: dragHoverTarget,
         draggablePosition: getUpperTopCoordinates(draggable),
-        draggableMovementPosition: { x: event.dx, y: event.dy },
-        sourceNeighboursPositions: getUpperTopCoordinatesForList(sourceDropzone, 'pickPoolDraggable'),
+        dragMoveDirection: { x: event.dx, y: event.dy },
         targetNeighboursPositions: targetNeighboursPositions
     }
     blazorComponent.invokeMethod('OnDragMove', args);
 }
-async function setupPickPoolDraggables(className, dropzoneClassName, blazorComponent, dragManager) {
+async function setupDraggables(className, dropzoneClassName, blazorComponent) {
     interact(className).draggable({
         intertia: true,
         listeners: {
             move(event) {
                 //console.log("dragmove");
-                applyOnCardMove(event, dropzoneClassName, dragManager, blazorComponent);
+                applyOnCardMove(event, dropzoneClassName, blazorComponent);
             },
             start(event) {
                 console.log("dragstart");
@@ -87,7 +89,7 @@ async function setupPickPoolDraggables(className, dropzoneClassName, blazorCompo
     })
 };
 
-function setupPickPoolDropzones(className, blazorComponent) {
+function setupDropzones(className, blazorComponent) {
     interact(className)
         .dropzone({
             ondragleave: function (event) {
@@ -103,7 +105,7 @@ function setupPickPoolDropzones(className, blazorComponent) {
                 var draggable = event.relatedTarget;
                 const pickIndex = parseInt(draggable.dataset.index);
                 var sourceDropzone = event.relatedTarget.closest(className);
-                 console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
+                console.log(draggable.id + ' was moved into ' + dropzone.id + ' from ' + sourceDropzone.id);
                 // Ajout d'une classe récupérée plus tard pour savoir si on hover
                 var dragHoverTarget = 1; // DragHoverTarget.Self    
                 if (sourceDropzone != dropzone) {

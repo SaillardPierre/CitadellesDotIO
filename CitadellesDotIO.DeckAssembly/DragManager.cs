@@ -1,17 +1,26 @@
-﻿using CitadellesDotIO.DeckAssembly.Model;
+﻿using CitadellesDotIO.DeckAssembly.EventArgs;
+using CitadellesDotIO.DeckAssembly.EventArgs.Enums;
+using CitadellesDotIO.DeckAssembly.Model;
 
 namespace CitadellesDotIO.DeckAssembly;
 
 public class DragManager
 {
-    public static int GetFutureIndex(Position selfCoordinates, IEnumerable<Position> coordinates)
+    public static int? GetFutureIndex(DragMoveEventArgs args)
     {
-        // Si le pointeur a des coordonnées superieures en x ou y, on est + vers la droite
-        int index = 0;
-        foreach (Position coord in coordinates)
+        if (args.DragHoverTarget == DragHoverTarget.None) return default(int?);
+
+        if (args.DragHoverTarget == DragHoverTarget.Self ||
+            args.DragHoverTarget == DragHoverTarget.Target)
         {
-            if (coord.X < selfCoordinates.X) index++;
+
+            int index = 0;
+            foreach (Position coord in args.TargetNeighboursPositions)
+            {
+                if (coord.X < args.DraggablePosition.X) index++;
+            }
+            return index;
         }
-        return index;
+        throw new ArgumentOutOfRangeException(nameof(DragHoverTarget) + "invalid");
     }
 }

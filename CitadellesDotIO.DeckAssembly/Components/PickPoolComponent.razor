@@ -9,7 +9,7 @@
 <RadzenStack style="width: 100%; height: 100vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
     <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){PickPoolDropzoneClassName}" CardClasses=cardClasses />
     <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
-       
+
         <p>
             FutureDropIndex :
             <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />
@@ -28,7 +28,6 @@
 
 @code {
     private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}"; private DotNetObjectReference<PickPoolComponent>? blazorComponent;
-    private DotNetObjectReference<DragManager>? dragManager;
     private List<string> cardClasses = new() { "pickPoolDraggable" };
     [Parameter]
     public int PickHandLowerThreshold { get; set; }
@@ -52,12 +51,9 @@
         }
 
         blazorComponent = DotNetObjectReference.Create(this);
-        dragManager = DotNetObjectReference.Create(new DragManager());
 
-        await JS.InvokeVoidAsync("setupPickPoolDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent, dragManager);
-        await JS.InvokeVoidAsync("setupPickPoolDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
-
-        // Instancier un PickPoolManager
+        await JS.InvokeVoidAsync("setupDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent);
+        await JS.InvokeVoidAsync("setupDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
     }
 
     private int? FutureDropIndex { get; set; }
@@ -121,68 +117,30 @@
         if (pickSourceId == nameof(PickPool)) return PickHand;
         if (pickSourceId == nameof(PickHand)) return PickPool;
         else throw new ArgumentException();
-    }
-    public int? GetFutureDropIndex(DragMoveEventArgs args)
-    {
-        // A revoir pour ne pas passer les position mais utiliser les references avec CurrentSource et CurrentHoverTarget
-        if (args.DragHoverTarget == DragHoverTarget.None)
-        {
-            //Console.WriteLine("default");
-            return default(int?);
-        }
-        if (args.DragHoverTarget == DragHoverTarget.Self)
-        {
-            // TODO : Null checks
-            int result = DragManager.GetFutureIndex(args.DraggablePosition, args.SourceNeighboursPositions);
-            //Console.WriteLine(result);
-            return result;
-        }
-        if (args.DragHoverTarget == DragHoverTarget.Target)
-        {
-            // TODO : Null checks
-
-            int result = DragManager.GetFutureIndex(args.DraggablePosition, args.TargetNeighboursPositions);
-            //Console.WriteLine(result);
-            return result;
-        }
-        throw new ArgumentOutOfRangeException(nameof(DragHoverTarget) + "invalid in " + nameof(GetFutureDropIndex) + ", value :" + args.DragHoverTarget);
-    }
-
-    public bool GetIsDirectionIncreasing(Position position)
-    {
-        bool isIncreasing = false;
-        if (position.X < 0)
-        {
-            // a gauche
-        }
-        else if (position.X > 0)
-        {
-            isIncreasing = true;
-            // a droite
-        };
-        return isIncreasing;
-    }
+    }  
 
     public void UpdateHoveredCardList(DragEnterEventArgs args)
     {
         CardItemList? target = null;
+        CardItemList? previous = null;
         if (args.DragHoverTarget == DragHoverTarget.None)
         {
             CurrentSource.ResetExceptCard(CurrentCard);
-            GetOppositePickSource(CurrentSource.Id).ResetExceptCard(CurrentCard);
-            return;
+            previous = GetOppositePickSource(CurrentSource.Id);
         }
-        else if (args.DragHoverTarget == DragHoverTarget.Target)
+        else
         {
-            target = GetTargetPickSource(args.HoverSource);
-        }
-        else if (args.DragHoverTarget == DragHoverTarget.Self)
-        {
-            target = CurrentSource;
-        }
-        // La main dont on vient de sortir
-        CardItemList? previous = GetOppositePickSource(args.HoverSource);
-        previous.ResetExceptCard(CurrentCard);
+            if (args.DragHoverTarget == DragHoverTarget.Target)
+            {
+                target = GetTargetPickSource(args.HoverSource);
+                previous = GetOppositePickSource(args.HoverSource);
+            }
+            else if (args.DragHoverTarget == DragHoverTarget.Self)
+            {
+                target = CurrentSource;
+            }
+        }   
+        previous?.ResetExceptCard(CurrentCard);
         target!.IsHovered = true;
     }
 
@@ -206,19 +164,11 @@
     [JSInvokable(nameof(OnDragMove))]
     public async ValueTask OnDragMove(DragMoveEventArgs args)
     {
-        CurrentCard.UpdatePosition(args.DraggableMovementPosition);
-        FutureDropIndex = GetFutureDropIndex(args);
+        CurrentCard.UpdatePosition(args.DragMoveDirection);
+        FutureDropIndex = DragManager.GetFutureIndex(args);
         if (CurrentHoverTarget is not null)
         {
-            try
-            {
-                CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
-
-            }
-            catch(Exception ex)
-            {
-                
-            }
+            CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
         }
 
         StateHasChanged();
