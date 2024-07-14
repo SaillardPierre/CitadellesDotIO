@@ -19,10 +19,14 @@
                     break;
             }
         }        
-        <p>X : @(Card.Transform.X)</p>
-        <p>Y : @(Card.Transform.Y)</p>       
-        <p>@(nameof(Card.IsOverlapped)) : @(Card.IsOverlapped.ToString()) </p>
-    </RadzenStack>
+        @* <p>X : @(Card.Transform.X)</p>
+        <p>Y : @(Card.Transform.Y)</p>   *@
+        <p>MarginLeft : @(Card.MarginLeft)</p>
+        <p>MarginRight : @(Card.MarginRight)</p>
+        <p>ZIndex : @(Card.ZIndex)</p>
+
+@*         <p>@(nameof(Card.IsDirectNeighbour)) : @(Card.IsDirectNeighbour.ToString()) </p>
+ *@    </RadzenStack>
 </RadzenCard>
 @code {
     [Parameter]
@@ -55,10 +59,18 @@
                 .Append(Card.Transform.X).Append("px,")
                 .Append(Card.Transform.Y).Append("px);");
 
+            
+            if(Card.ZIndex.HasValue)
+            {
+                stringBuilder.Append($"z-index:{Card.ZIndex};");
+            }
             if (Card.IsDragged)
             {
-                stringBuilder.Append("z-index:10;");
+                stringBuilder.Append($"z-index:{CardParameters.DraggedCardZIndex};");
             }
+
+            stringBuilder.Append(Card.MarginLeft);
+            stringBuilder.Append(Card.MarginRight);
 
             return stringBuilder.ToString();
         }
@@ -74,7 +86,7 @@
                 stringBuilder.Append(cssClass).Append(' ');
             }
             stringBuilder.Append("rz-p-1 ");
-            if(Card.IsDragged || Card.IsOverlapped)
+            if(Card.IsDragged || Card.IsDirectNeighbour)
             {
                 stringBuilder.Append("rz-border-base-300 ");
             }

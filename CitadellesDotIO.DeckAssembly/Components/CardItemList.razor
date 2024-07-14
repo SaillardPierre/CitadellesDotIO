@@ -38,7 +38,7 @@
     [Parameter]
     public string Id { get; set; }
 
-    private int Gap { get; set; } = 10;
+    private int Gap { get; set; } = -10;
 
     private string OuterStyleAttribute => "display: flex;flex-direction: column;justify-content: center;align-items: center;align-self: center;";
     private string OuterClassAttributes
@@ -61,6 +61,16 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(1);
+            HandleOverlap();
+        }
+    }
+
+
     public bool IsHovered = false;
 
     public void Reset()
@@ -72,6 +82,7 @@
         {
             card.Reset();
         }
+        HandleOverlap();
     }
     public void ResetExceptCard(Card exceptCard)
     {
@@ -85,6 +96,7 @@
                 card.Reset();
             }
         }
+        HandleOverlap();
     }
     private void ResetPreviousNeighbours()
     {
@@ -112,6 +124,53 @@
                 card.Reset();
             }
         }
+    }
+
+    public void HandleOverlap()
+    {
+        // Tentative de comportement par défaut => Premiere carte "dragged"
+        int? rightIndex = RightIndex;
+        //int? leftIndex = LeftIndex ?? Cards.Count;
+        if (!LeftIndex.HasValue)
+        {
+            if (!RightIndex.HasValue)
+            {
+                rightIndex = 0;
+            }
+        }
+        else
+        {
+            // a gauche
+            int decrIndex = CardParameters.DraggedCardZIndex;
+            for (int i = LeftIndex.Value; i != -1; i--)
+            {
+                decrIndex--;
+                Card target = Cards[i];
+                if (!target.IsDragged)
+                {
+                    target.ZIndex = decrIndex;
+                    target.MarginRight = null;
+                    target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
+                }
+            }
+        }
+        if (rightIndex.HasValue)
+        {
+            // a droite
+            int decrIndex = CardParameters.DraggedCardZIndex;
+            for (int i = rightIndex.Value; i < Cards.Count; i++)
+            {
+                decrIndex--;
+                Card target = Cards[i];
+                if (!target.IsDragged)
+                {
+                    target.ZIndex = decrIndex;
+                    target.MarginLeft = null;
+                    target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
+                }
+            }
+        }
+        StateHasChanged();
     }
 
     public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
@@ -181,14 +240,15 @@
         if (RightIndex.HasValue)
         {
             Card target = Cards[RightIndex.Value];
-            target.IsOverlapped = true;
+            target.IsDirectNeighbour = true;
         }
 
         if (LeftIndex.HasValue)
         {
             Card target = Cards[LeftIndex.Value];
-            target.IsOverlapped = true;
+            target.IsDirectNeighbour = true;
         }
+
     }
 
 

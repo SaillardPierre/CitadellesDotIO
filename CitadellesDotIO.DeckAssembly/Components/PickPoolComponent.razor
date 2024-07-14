@@ -45,10 +45,13 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        
+
         if (!firstRender)
         {
             return;
         }
+       
 
         blazorComponent = DotNetObjectReference.Create(this);
 
@@ -117,7 +120,7 @@
         if (pickSourceId == nameof(PickPool)) return PickHand;
         if (pickSourceId == nameof(PickHand)) return PickPool;
         else throw new ArgumentException();
-    }  
+    }
 
     public void UpdateHoveredCardList(DragEnterEventArgs args)
     {
@@ -139,7 +142,7 @@
             {
                 target = CurrentSource;
             }
-        }   
+        }
         previous?.ResetExceptCard(CurrentCard);
         target!.IsHovered = true;
     }
@@ -168,9 +171,17 @@
         FutureDropIndex = DragManager.GetFutureIndex(args);
         if (CurrentHoverTarget is not null)
         {
-            CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
+            if (FutureDropIndex.HasValue)
+            {
+                CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
+            }
+            CurrentHoverTarget.HandleOverlap();
         }
-
+        else
+        {
+            PickHand.HandleOverlap();
+            PickPool.HandleOverlap();
+        }
         StateHasChanged();
     }
 }

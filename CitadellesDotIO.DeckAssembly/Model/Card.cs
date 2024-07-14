@@ -4,13 +4,16 @@ public class Card
 {
     public int Id { get; set; }
     public int Index { get; set; }
+    public int? ZIndex { get; set; }
+    public string? MarginLeft { get; set; }
+    public string? MarginRight{ get; set; }
     public Position Transform { get; set; }
     public bool IsDragged { get; set; }
 
     /// <summary>
     /// Est pour 'linstant 'neighbour'
     /// </summary>
-    public bool IsOverlapped { get; set; }
+    public bool IsDirectNeighbour { get; set; }
     public Card(int id)
     {
         Id = id;
@@ -21,7 +24,10 @@ public class Card
     {
         Transform = new Position();
         IsDragged = false;
-        IsOverlapped = false;
+        IsDirectNeighbour = false;
+        MarginLeft = null;
+        MarginRight = null;
+        ZIndex = null;
     }
 
     public void UpdatePosition(Position movementPosition)
