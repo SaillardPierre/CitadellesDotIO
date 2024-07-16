@@ -10,6 +10,6 @@
         /// L'id de la source du draggable 
         /// (utilisé avec nameof(monListItemContainer) pour identifier sa référence d'objet)
         /// </summary>
-        public string? DraggableSource { get; set; }
+        public string DraggableSource { get; set; }
     }
 }

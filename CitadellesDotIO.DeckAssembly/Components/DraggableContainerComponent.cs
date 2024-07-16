@@ -4,17 +4,33 @@ using CitadellesDotIO.DeckAssembly.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
+
 namespace CitadellesDotIO.DeckAssembly.Components
 {
     public abstract class DraggableContainerComponent : ComponentBase
     {
-        // TODO : S'assurer du nommage, sur le pickpool c'est blazorComponent
+        protected string DraggablesClassName { get; set; }
+        protected string DropzonesClassName { get; set; }
+        public DraggableContainerComponent(string draggablesClassName, string dropzonesClassName)
+        {
+            DraggablesClassName = draggablesClassName;
+            DropzonesClassName = dropzonesClassName;
+        }
+
+        [Inject]
+        private IJSRuntime JS { get; set; }
+
+        protected async void InitJS()
+        {
+            await JS.InvokeVoidAsync("setupDraggables", "." + DraggablesClassName, "." + DropzonesClassName, BlazorComponent);
+            await JS.InvokeVoidAsync("setupDropzones", "." + DropzonesClassName, BlazorComponent);
+        }
         protected DotNetObjectReference<DraggableContainerComponent>? BlazorComponent { get; set; }
         protected Card? CurrentCard { get; set; }
         protected CardItemList? CurrentSource { get; set; }
         protected CardItemList? CurrentHoverTarget { get; set; }
-
         protected int? FutureDropIndex { get; set; }
+
         #region Evenements sur le draggable
         // TODO : Trouver un moyen d'avoir l'event hover sur le draggable
         [JSInvokable(nameof(OnDraggableHoverStart))]
@@ -24,8 +40,8 @@ namespace CitadellesDotIO.DeckAssembly.Components
         [JSInvokable(nameof(OnDraggableDragStart))]
         public virtual async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
         {
-            // On force a définir la source avant d'appeler celle ci
             ArgumentNullException.ThrowIfNull(CurrentSource);
+
             CurrentCard = CurrentSource.Cards[args.DraggableIndex];
             FutureDropIndex = args.DraggableIndex;
         }
@@ -33,23 +49,26 @@ namespace CitadellesDotIO.DeckAssembly.Components
         public async Task OnDraggableDragEnd(DraggableDragEndEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(CurrentCard);
+            ArgumentNullException.ThrowIfNull(CurrentSource);
+
             CurrentCard.Reset();
             CurrentCard = null;
-            ArgumentNullException.ThrowIfNull(CurrentSource);
             CurrentSource.Reset();
             CurrentSource = null;
-            ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
-            CurrentHoverTarget.Reset();
-            CurrentHoverTarget = null;
+            if (CurrentHoverTarget is not null)
+            {
+                CurrentHoverTarget.Reset();
+                CurrentHoverTarget = null;
+            }
             StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableMove))]
         public async Task OnDraggableMove(DraggableMoveEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(CurrentCard);
+
             CurrentCard.UpdatePosition(args.DragMoveDirection);
             FutureDropIndex = DragManager.GetFutureIndex(args);
-            /// TODO : du code sur current hovertarget ici quand implémenté
             if (CurrentHoverTarget is not null)
             {
                 if (FutureDropIndex.HasValue)
@@ -63,14 +82,11 @@ namespace CitadellesDotIO.DeckAssembly.Components
         [JSInvokable(nameof(OnDraggableDrop))]
         public virtual async Task OnDraggableDrop(DraggableDropEventArgs args)
         {
+            ArgumentInvalidException.ThrowIfEqual(args.DropEventSource, DropEventSource.Outside);
             ArgumentNullException.ThrowIfNull(CurrentCard);
-            // A revoir
-            if (args.DropEventSource == DropEventSource.Outside)
-            {
-                return;
-            }
             ArgumentNullException.ThrowIfNull(CurrentSource);
             ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
+
             if (args.DropEventSource == DropEventSource.Self)
             {
                 CurrentSource.Cards.PutBackAtIndex(CurrentCard, FutureDropIndex);
@@ -88,19 +104,17 @@ namespace CitadellesDotIO.DeckAssembly.Components
         public virtual async Task OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
-            if (args.DragHoverTarget == EventArgs.Enums.DragHoverTarget.None)
-            {
-                throw new ArgumentOutOfRangeException(args.DragHoverTarget.ToString());
-            }
+            ArgumentInvalidException.ThrowIfEqual(args.DragHoverTarget, DragHoverTarget.None);
+
             CurrentHoverTarget.IsHovered = true;
             StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDropzoneLeave))]
         public async Task OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
         {
-            // TODO : Bizare ici CurrentHoverTarget est null sur une autre dropzone que la idlehand
             ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
             ArgumentNullException.ThrowIfNull(CurrentCard);
+
             CurrentHoverTarget.ResetExceptCard(CurrentCard);
             CurrentHoverTarget = null;
             StateHasChanged();

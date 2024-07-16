@@ -28,5 +28,7 @@
             list.RemoveAt(index);
             return item;
         }
+
+        
     }
 }

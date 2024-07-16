@@ -1,13 +1,14 @@
-﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
 @using DeckAssembly.EventArgs
 @using DeckAssembly.Model
 @using Microsoft.JSInterop;
 @using System.Text.RegularExpressions
 @using System.Globalization
-@inject IJSRuntime JS;
+@inherits DraggableContainerComponent;
 
 <RadzenStack style="width: 100%; height: 70vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
-    <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){PickPoolDropzoneClassName}" CardClasses=cardClasses />
+    <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
     <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
 
         <p>
@@ -23,13 +24,15 @@
             <RadzenText Text=@CurrentHoverTarget?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
         </p>
     </RadzenRow>
-    <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){PickPoolDropzoneClassName}" CardClasses=cardClasses />
+    <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
 </RadzenStack>
 
 @code {
-    private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}"; 
-    private DotNetObjectReference<PickPoolComponent>? blazorComponent;
-    private List<string> cardClasses = new() { "pickPoolDraggable" };
+
+    public PickPoolComponent() : base("pickPoolDraggable", "pickPoolDropzone")
+    {
+    }
+    private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}";
     [Parameter]
     public int PickHandLowerThreshold { get; set; }
     [Parameter]
@@ -42,73 +45,36 @@
     public List<Card> PickHandValue { get; set; } = new() { new CharacterCard(9, new Engine.DTOs.CharacterDto(1, "Test", null)), new CharacterCard(10, new Engine.DTOs.CharacterDto(1, "Test", null)) };
     private CardItemList PickHand { get; set; }
 
-    private static string PickPoolDropzoneClassName => "pickPoolDropzone";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        
-
         if (!firstRender)
         {
             return;
         }
-       
 
-        blazorComponent = DotNetObjectReference.Create(this);
-
-        await JS.InvokeVoidAsync("setupDraggables", ".pickPoolDraggable", "." + PickPoolDropzoneClassName, blazorComponent);
-        await JS.InvokeVoidAsync("setupDropzones", "." + PickPoolDropzoneClassName, blazorComponent);
+        BlazorComponent = DotNetObjectReference.Create(this as DraggableContainerComponent);
+        InitJS();
     }
 
-    private int? FutureDropIndex { get; set; }
-    private Card? CurrentCard { get; set; }
-    private CardItemList? CurrentSource { get; set; }
-    private CardItemList? CurrentHoverTarget { get; set; }
-
-    [JSInvokable(nameof(OnDragStartAsync))]
-    public async Task OnDragStartAsync(DragStartEventArgs args)
+    [JSInvokable(nameof(OnDraggableDragStart))]
+    public override async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
-        CurrentSource = GetTargetPickSource(args.PickSource);
-        CurrentCard = CurrentSource.Cards[args.PickIndex];
-        FutureDropIndex = args.PickIndex;
+        this.CurrentSource = GetTargetPickSource(args.DraggableSource);
+        await base.OnDraggableDragStart(args);
     }
 
-    [JSInvokable(nameof(OnDragEndAsync))]
-    public async Task OnDragEndAsync(DragEndEventArgs args)
+    [JSInvokable(nameof(OnDraggableDropzoneEnter))]
+    public override async Task OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
     {
-        CurrentCard.Reset();
-        CurrentCard = null;
-        CurrentSource.Reset();
-        CurrentSource = null;
-        CurrentHoverTarget.Reset();
-        CurrentHoverTarget = null;
-        StateHasChanged();
-    }
-
-    [JSInvokable(nameof(OnDrop))]
-    public async ValueTask OnDrop(DropEventArgs args)
-    {
-        // A revoir
-        if (args.DropEventSource == DropEventSource.Outside)
-        {
-
-        }
-        if (args.DropEventSource == DropEventSource.Self)
-        {
-            CurrentSource.Cards.PutBackAtIndex(CurrentCard, FutureDropIndex);
-        }
-        else if (args.DropEventSource == DropEventSource.Target)
-        {
-            CardItemList dropDestination = GetTargetPickSource(args.Destination);
-            CurrentSource.Cards.Remove(CurrentCard);
-            dropDestination.Cards.InsertOrAppend(CurrentCard, FutureDropIndex);
-            dropDestination.Reset();
-        }
-        FutureDropIndex = null;
-        StateHasChanged();
+        this.CurrentHoverTarget = GetTargetPickSource(args.DropzoneHoverSource);
+        await base.OnDraggableDropzoneEnter(args);
     }
 
     #region A extraire dans un PickPoolManager
+    // TODO : En réalité c'est ceci qu'il faudrait transformer en
+    // Dico/Hashset pour determiner chaque cible selon l'id et construire le dico
+    // dans le constructeur du composant avec le @ref
     private CardItemList GetTargetPickSource(string pickSourceId)
     {
         if (pickSourceId == nameof(PickPool)) return PickPool;
@@ -121,67 +87,5 @@
         if (pickSourceId == nameof(PickHand)) return PickPool;
         else throw new ArgumentException();
     }
-
-    public void UpdateHoveredCardList(DragEnterEventArgs args)
-    {
-        CardItemList? target = null;
-        CardItemList? previous = null;
-        if (args.DragHoverTarget == DragHoverTarget.None)
-        {
-            CurrentSource.ResetExceptCard(CurrentCard);
-            previous = GetOppositePickSource(CurrentSource.Id);
-        }
-        else
-        {
-            if (args.DragHoverTarget == DragHoverTarget.Target)
-            {
-                target = GetTargetPickSource(args.HoverSource);
-                previous = GetOppositePickSource(args.HoverSource);
-            }
-            else if (args.DragHoverTarget == DragHoverTarget.Self)
-            {
-                target = CurrentSource;
-            }
-        }
-        previous?.ResetExceptCard(CurrentCard);
-        target!.IsHovered = true;
-    }
-
-    [JSInvokable(nameof(OnDragLeave))]
-    public async ValueTask OnDragLeave()
-    {
-        CurrentHoverTarget.ResetExceptCard(CurrentCard);
-        CurrentHoverTarget = null;
-        StateHasChanged();
-    }
-
-    [JSInvokable(nameof(OnDragEnter))]
-    public async ValueTask OnDragEnter(DragEnterEventArgs args)
-    {
-        CurrentHoverTarget = GetTargetPickSource(args.HoverSource);
-        UpdateHoveredCardList(args);
-        StateHasChanged();
-    }
-
     #endregion
-    [JSInvokable(nameof(OnDragMove))]
-    public async ValueTask OnDragMove(DragMoveEventArgs args)
-    {
-        CurrentCard.UpdatePosition(args.DragMoveDirection);
-        FutureDropIndex = DragManager.GetFutureIndex(args);
-        if (CurrentHoverTarget is not null)
-        {
-            if (FutureDropIndex.HasValue)
-            {
-                CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
-            }
-            CurrentHoverTarget.HandleOverlap();
-        }
-        else
-        {
-            PickHand.HandleOverlap();
-            PickPool.HandleOverlap();
-        }
-        StateHasChanged();
-    }
 }
