@@ -6,7 +6,7 @@
 @using System.Globalization
 @inject IJSRuntime JS;
 
-<RadzenStack style="width: 100%; height: 100vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
+<RadzenStack style="width: 100%; height: 70vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
     <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){PickPoolDropzoneClassName}" CardClasses=cardClasses />
     <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
 
@@ -27,7 +27,8 @@
 </RadzenStack>
 
 @code {
-    private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}"; private DotNetObjectReference<PickPoolComponent>? blazorComponent;
+    private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}"; 
+    private DotNetObjectReference<PickPoolComponent>? blazorComponent;
     private List<string> cardClasses = new() { "pickPoolDraggable" };
     [Parameter]
     public int PickHandLowerThreshold { get; set; }
@@ -71,7 +72,6 @@
         CurrentCard = CurrentSource.Cards[args.PickIndex];
         FutureDropIndex = args.PickIndex;
     }
-
 
     [JSInvokable(nameof(OnDragEndAsync))]
     public async Task OnDragEndAsync(DragEndEventArgs args)

@@ -3,14 +3,19 @@
 @using CitadellesDotIO.Engine.Factories
 
 <CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
-                                           PickHandUpperThreshold=default
-                                           PickPoolValue=BuildItems() />
+                                                           PickHandUpperThreshold=pickHandUpperThreshold
+                                                           PickPoolValue=PickPoolValue />
+<CitadellesDotIO.DeckAssembly.Components.IdleHandComponent IdleHandValue=IdleHandValue />
 
 @code {
     private int pickHandLowerThreshold = 0;
     private int pickHandUpperThreshold = default;
     private int pickPoolSize = 5;
 
-    private List<Card> BuildItems()
+    private List<Card> PickPoolValue = BuildItems();
+    private List<Card> IdleHandValue = BuildItems();
+
+
+    private static List<Card> BuildItems()
     => CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();
 }
