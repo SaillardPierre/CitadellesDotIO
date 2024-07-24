@@ -1,19 +1,9 @@
-﻿function getUpperTopCoordinatesForList(parentElement, className) {
-    var elements = parentElement.querySelectorAll(className);
-    var coordinatesList = [];
-
-    for (var i = 0; i < elements.length; i++) {
-        coordinatesList.push(getUpperTopCoordinates(elements[i]));
-    }
-
-    return coordinatesList;
-}
-
-function getUpperTopCoordinates(element) {
-    var rect = element.getBoundingClientRect();
-    var x = rect.left + window.pageXOffset;
-    var y = rect.top + window.pageYOffset;
-    return { x: x, y: y };
+﻿function getUpperTopCoordinatesById(id) {
+    const rect = document.getElementById(id).getBoundingClientRect();
+    return {
+        x: rect.left + window.pageXOffset,
+        y: rect.top + window.pageYOffset
+    };
 }
 
 async function setupDraggables(className, dropzoneClassName, blazorComponent) {
@@ -27,24 +17,19 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
                     console.log('no source dropzone, OnCardMove move will return early');
                     return;
                 }
-                var targetNeighboursPositions = null;
                 var dragHoverTarget = 0; // DragHoverTarget.None
                 const dropzone = document.querySelector('.drop-available');
                 if (dropzone) {
                     if (sourceDropzone != dropzone) {
                         dragHoverTarget = 2; // DragHoverTarget.Target
-                        targetNeighboursPositions = getUpperTopCoordinatesForList(dropzone, className);
                     }
                     else {
                         dragHoverTarget = 1; // DragHoverTarget.Self        
-                        targetNeighboursPositions = getUpperTopCoordinatesForList(sourceDropzone, className);
                     }
                 }
                 const args = {
-                    dragHoverTarget: dragHoverTarget,
-                    draggablePosition: getUpperTopCoordinates(draggable),
                     dragMoveDirection: { x: event.dx, y: event.dy },
-                    targetNeighboursPositions: targetNeighboursPositions
+                    dragHoverTarget: dragHoverTarget
                 }
                 blazorComponent.invokeMethod('OnDraggableMove', args);
             },
@@ -82,7 +67,7 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
                 return;
             }
 
-            const draggableSource = element.closest(dropzoneClassName);            
+            const draggableSource = element.closest(dropzoneClassName);
             const args = {
                 draggableIndex: parseInt(element.dataset.index),
                 draggableSource: draggableSource.id

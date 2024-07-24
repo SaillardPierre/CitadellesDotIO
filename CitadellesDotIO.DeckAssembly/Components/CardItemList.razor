@@ -1,4 +1,5 @@
 ﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+@using CitadellesDotIO.DeckAssembly.Exceptions
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
@@ -65,7 +66,7 @@
         if (firstRender)
         {
             await Task.Delay(1);
-            SetOverlapFromIndex(0);
+            SetOverlapFromIndex(Cards.Count-1);
         }
     }
 
@@ -81,7 +82,6 @@
         {
             card.Reset();
         }
-        SetOverlapFromIndex(0);
     }
     public void ResetExceptCard(Card exceptCard)
     {
@@ -95,197 +95,62 @@
                 card.Reset();
             }
         }
-        SetOverlapFromIndex(0);
     }
-    private void ResetPreviousNeighbours()
+
+    public void ResetExceptDraggedCard()
     {
+        IsHovered = false;
+        LeftIndex = default;
+        RightIndex = default;
         foreach (Card card in Cards)
         {
-            bool shouldReset = true;
-            // Il s'agit du voisin de gauche
-            if (LeftIndex.HasValue && card.Index == LeftIndex.Value)
-            {
-                shouldReset = false;
-            }
-            // Il s'agit du voisin de droite
-            if (RightIndex.HasValue && card.Index == RightIndex.Value)
-            {
-                shouldReset = false;
-            }
-            // Il s'agit de la carte en cours de déplacement
-            if (card.IsDragged)
-            {
-                shouldReset = false;
-            }
-
-            if (shouldReset)
+            if (!card.IsDragged)
             {
                 card.Reset();
             }
         }
     }
 
-    public void HandleOverlap()
+    public void SetOverlapFromIndex(int splitIndex, DragHoverTarget dragHoverTarget = DragHoverTarget.Self, int? draggedItemIndex = default)
     {
-        // Tentative de comportement par défaut => Premiere carte "dragged"
-        int? rightIndex = RightIndex;
-        //int? leftIndex = LeftIndex ?? Cards.Count;
-        if (!LeftIndex.HasValue)
+        (int? leftIndex, int? rightIndex) = DragManager.ComputeLeftRightIndexes(splitIndex, Cards.Count, dragHoverTarget, draggedItemIndex);
+
+        if (leftIndex.HasValue)
         {
-            if (!RightIndex.HasValue)
-            {
-                rightIndex = 0;
-            }
-        }
-        else
-        {
+            int zIndex = CardParameters.DraggedCardZIndex - (leftIndex.Value + 1);
             // a gauche
-            int decrIndex = CardParameters.DraggedCardZIndex;
-            for (int i = LeftIndex.Value; i != -1; i--)
+            for (int i = 0; i != leftIndex + 1; i++)
             {
-                decrIndex--;
                 Card target = Cards[i];
                 if (!target.IsDragged)
                 {
-                    target.ZIndex = decrIndex;
-                    target.MarginRight = null;
-                    target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
+                    target.Reset();
+                    target.ZIndex = zIndex;                    
+                    //target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
                 }
+                zIndex++;
             }
+            Cards[leftIndex.Value].IsDirectNeighbour = true;
         }
         if (rightIndex.HasValue)
         {
+            int zIndex = CardParameters.DraggedCardZIndex;
             // a droite
-            int decrIndex = CardParameters.DraggedCardZIndex;
             for (int i = rightIndex.Value; i < Cards.Count; i++)
             {
-                decrIndex--;
+                zIndex--;
                 Card target = Cards[i];
                 if (!target.IsDragged)
                 {
-                    target.ZIndex = decrIndex;
-                    target.MarginLeft = null;
-                    target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
+                    target.Reset();
+                    target.ZIndex = zIndex;
+                    //target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
                 }
             }
+            Cards[rightIndex.Value].IsDirectNeighbour = true;
         }
         StateHasChanged();
     }
-    // TODO : Utiliser cette version (renomée) pour """l'animation pendant le drag"""
-    // A revoir
-    public void SetOverlapFromIndex(int splittingIndex)
-    {
-        // a gauche
-        int decrIndex = CardParameters.DraggedCardZIndex;
-        for (int i = splittingIndex - 1; i != -1; i--)
-        {
-            decrIndex--;
-            Card target = Cards[i];
-            if (!target.IsDragged)
-            {
-                target.ZIndex = decrIndex;
-                target.MarginRight = null;
-                target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
-            }
-        }
-
-        // a droite
-        decrIndex = CardParameters.DraggedCardZIndex;
-        for (int i = splittingIndex+1; i < Cards.Count; i++)
-        {
-            decrIndex--;
-            Card target = Cards[i];
-            if (!target.IsDragged)
-            {
-                target.ZIndex = decrIndex;
-                target.MarginLeft = null;
-                target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
-            }
-        }
-        StateHasChanged();
-    }
-
-
-
-
-    public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
-    {
-        if (!Cards.Any()) return;
-        ResetPreviousNeighbours();
-
-        bool isFirst = futureDropIndex == 0;
-        bool isLast = false;
-
-        int? leftIndex = default;
-        int? rightIndex = default;
-
-        if (dragHoverTarget == DragHoverTarget.Target)
-        {
-            isLast = futureDropIndex == Cards.Count;
-            if (!isFirst)
-            {
-                leftIndex = futureDropIndex - 1;
-            }
-            if (!isLast)
-            {
-                rightIndex = futureDropIndex;
-            }
-        }
-        else if (dragHoverTarget == DragHoverTarget.Self)
-        {
-            isLast = futureDropIndex == Cards.Count - 1;
-            int draggedItemIndex = Cards.Single(x => x.IsDragged).Index;
-
-            if (!isFirst)
-            {
-                leftIndex = futureDropIndex - 1;
-                // l'item est a droite de son origine
-                if (draggedItemIndex < futureDropIndex)
-                {
-                    leftIndex++;
-                }
-            }
-            if (!isLast)
-            {
-                rightIndex = futureDropIndex + 1;
-                // l'item est a gauche de son origine
-                if (draggedItemIndex > futureDropIndex)
-                {
-                    rightIndex--;
-                }
-            }
-        }
-
-        LeftIndex = leftIndex;
-        RightIndex = rightIndex;
-
-        StartNeighboursAnimation();
-    }
-
-    private void StartNeighboursAnimation()
-    {
-        if (!LeftIndex.HasValue && !RightIndex.HasValue)
-        {
-            string mess = "Aucun index voisin pour l'animation";
-            //throw new ArgumentException(mess);
-            Console.WriteLine(mess);
-            return;
-        }
-
-        if (RightIndex.HasValue)
-        {
-            Card target = Cards[RightIndex.Value];
-            target.IsDirectNeighbour = true;
-        }
-
-        if (LeftIndex.HasValue)
-        {
-            Card target = Cards[LeftIndex.Value];
-            target.IsDirectNeighbour = true;
-        }
-
-    }
-
 
     [Parameter]
     public List<string> CssClasses { get; set; } = new() { };

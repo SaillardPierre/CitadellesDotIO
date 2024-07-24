@@ -28,14 +28,13 @@ namespace CitadellesDotIO.DeckAssembly.Components
         }
         protected DotNetObjectReference<DraggableContainerComponent>? BlazorComponent { get; set; }
         protected Card? DraggedCard { get; set; }
+        protected CardItemList? DraggedCardSouce { get; set; }
         protected Card? HoveredCard { get; set; }
         protected CardItemList? HoveredCardSource { get; set; }
-        protected CardItemList? CurrentSource { get; set; }
-        protected CardItemList? CurrentHoverTarget { get; set; }
+        protected CardItemList? DropzoneHoverSource { get; set; }
         protected int? FutureDropIndex { get; set; }
 
         #region Evenements sur le draggable
-        // TODO : Trouver un moyen d'avoir l'event hover sur le draggable
         [JSInvokable(nameof(OnDraggableHoverStart))]
         public virtual async Task OnDraggableHoverStart(DraggableHoverStartEventArgs args)
         {
@@ -61,16 +60,15 @@ namespace CitadellesDotIO.DeckAssembly.Components
 
             HoveredCard.IsHovered = false;
             HoveredCard = null;
-            HoveredCardSource.SetOverlapFromIndex(0);
             HoveredCardSource = null;
             StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDragStart))]
         public virtual async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
         {
-            ArgumentNullException.ThrowIfNull(CurrentSource);
+            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
 
-            DraggedCard = CurrentSource.Cards[args.DraggableIndex];
+            DraggedCard = DraggedCardSouce.Cards[args.DraggableIndex];
             DraggedCard.IsDragged = true;
             FutureDropIndex = args.DraggableIndex;
         }
@@ -78,16 +76,16 @@ namespace CitadellesDotIO.DeckAssembly.Components
         public async Task OnDraggableDragEnd(DraggableDragEndEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(DraggedCard);
-            ArgumentNullException.ThrowIfNull(CurrentSource);
+            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
 
             DraggedCard.Reset();
             DraggedCard = null;
-            CurrentSource.Reset();
-            CurrentSource = null;
-            if (CurrentHoverTarget is not null)
+            DraggedCardSouce.Reset();
+            DraggedCardSouce = null;
+            if (DropzoneHoverSource is not null)
             {
-                CurrentHoverTarget.Reset();
-                CurrentHoverTarget = null;
+                DropzoneHoverSource.Reset();
+                DropzoneHoverSource = null;
             }
             StateHasChanged();
         }
@@ -97,14 +95,10 @@ namespace CitadellesDotIO.DeckAssembly.Components
             ArgumentNullException.ThrowIfNull(DraggedCard);
 
             DraggedCard.UpdatePosition(args.DragMoveDirection);
-            FutureDropIndex = DragManager.GetFutureIndex(args);
-            if (CurrentHoverTarget is not null)
+            FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, DropzoneHoverSource?.Cards.Select(x => x.Position));
+            if (DropzoneHoverSource is not null && FutureDropIndex.HasValue)
             {
-                if (FutureDropIndex.HasValue)
-                {
-                    CurrentHoverTarget.HandleHovering(FutureDropIndex.Value, args.DragHoverTarget);
-                }
-                CurrentHoverTarget.HandleOverlap();
+                DropzoneHoverSource.SetOverlapFromIndex(FutureDropIndex.Value, args.DragHoverTarget, DraggedCard.Index);
             }
             StateHasChanged();
         }
@@ -113,18 +107,18 @@ namespace CitadellesDotIO.DeckAssembly.Components
         {
             InvalidEnumException.ThrowIfEqual(args.DropEventSource, DropEventSource.Outside);
             ArgumentNullException.ThrowIfNull(DraggedCard);
-            ArgumentNullException.ThrowIfNull(CurrentSource);
-            ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
+            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
+            ArgumentNullException.ThrowIfNull(DropzoneHoverSource);
 
             if (args.DropEventSource == DropEventSource.Self)
             {
-                CurrentSource.Cards.PutBackAtIndex(DraggedCard, FutureDropIndex);
+                DraggedCardSouce.Cards.PutBackAtIndex(DraggedCard, FutureDropIndex);
             }
             else if (args.DropEventSource == DropEventSource.Target)
             {
-                CurrentSource.Cards.Remove(DraggedCard);
-                CurrentHoverTarget.Cards.InsertOrAppend(DraggedCard, FutureDropIndex);
-                CurrentHoverTarget.Reset();
+                DraggedCardSouce.Cards.Remove(DraggedCard);
+                DropzoneHoverSource.Cards.InsertOrAppend(DraggedCard, FutureDropIndex);
+                DropzoneHoverSource.Reset();
             }
             FutureDropIndex = null;
             StateHasChanged();
@@ -132,20 +126,20 @@ namespace CitadellesDotIO.DeckAssembly.Components
         [JSInvokable(nameof(OnDraggableDropzoneEnter))]
         public virtual async Task OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
         {
-            ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
+            ArgumentNullException.ThrowIfNull(DropzoneHoverSource);
             InvalidEnumException.ThrowIfEqual(args.DragHoverTarget, DragHoverTarget.None);
 
-            CurrentHoverTarget.IsHovered = true;
+            DropzoneHoverSource.IsHovered = true;
             StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDropzoneLeave))]
         public async Task OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
         {
-            ArgumentNullException.ThrowIfNull(CurrentHoverTarget);
+            ArgumentNullException.ThrowIfNull(DropzoneHoverSource);
             ArgumentNullException.ThrowIfNull(DraggedCard);
 
-            CurrentHoverTarget.ResetExceptCard(DraggedCard);
-            CurrentHoverTarget = null;
+            DropzoneHoverSource.ResetExceptCard(DraggedCard);
+            DropzoneHoverSource = null;
             StateHasChanged();
         }
         #endregion

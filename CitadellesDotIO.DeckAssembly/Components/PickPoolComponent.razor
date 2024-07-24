@@ -17,11 +17,11 @@
         </p>
         <p>
             CurrentSource :
-            <RadzenText Text=@CurrentSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
+            <RadzenText Text=@DraggedCardSouce?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
         </p>
         <p>
             CurrentHoverTarget :
-            <RadzenText Text=@CurrentHoverTarget?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
+            <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
         </p>
     </RadzenRow>
     <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
@@ -67,14 +67,14 @@
     [JSInvokable(nameof(OnDraggableDragStart))]
     public override async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
-        this.CurrentSource = GetTargetPickSource(args.DraggableSource);
+        this.DraggedCardSouce = GetTargetPickSource(args.DraggableSource);
         await base.OnDraggableDragStart(args);
     }
 
     [JSInvokable(nameof(OnDraggableDropzoneEnter))]
     public override async Task OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
     {
-        this.CurrentHoverTarget = GetTargetPickSource(args.DropzoneHoverSource);
+        this.DropzoneHoverSource = GetTargetPickSource(args.DropzoneHoverSource);
         await base.OnDraggableDropzoneEnter(args);
     }
 

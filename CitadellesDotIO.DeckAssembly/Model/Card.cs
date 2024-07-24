@@ -8,6 +8,7 @@ public class Card
     public string? MarginLeft { get; set; }
     public string? MarginRight{ get; set; }
     public Position Transform { get; set; }
+    public Position? Position { get; set; }
     public bool IsDragged { get; set; }
     public bool IsDirectNeighbour { get; set; }
     public bool IsHovered { get; set; }

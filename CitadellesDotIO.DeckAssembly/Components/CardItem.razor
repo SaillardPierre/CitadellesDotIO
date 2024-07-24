@@ -1,5 +1,6 @@
 ﻿@using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
+@inject IJSRuntime JS;
 <RadzenCard Style="@StyleAttribute"
             Class="@ClassAttribute" id="@CardId"
             data-identifier="@Card.Id"
@@ -20,15 +21,12 @@
                     <RadzenText>UNKNOWN CARD TYPE</RadzenText>
                     break;
             }
-        }        
-        @* <p>X : @(Card.Transform.X)</p>
-        <p>Y : @(Card.Transform.Y)</p>   *@
+        }
+        <p>InitialPosition : X : @(Card.Position?.X.ToString()) , Y : @(Card.Position?.Y.ToString())</p>
         <p>MarginLeft : @(Card.MarginLeft)</p>
         <p>MarginRight : @(Card.MarginRight)</p>
         <p>ZIndex : @(Card.ZIndex)</p>
-
-@*         <p>@(nameof(Card.IsDirectNeighbour)) : @(Card.IsDirectNeighbour.ToString()) </p>
- *@    </RadzenStack>
+    </RadzenStack>
 </RadzenCard>
 @code {
     [Parameter]
@@ -39,7 +37,14 @@
         Card.Index = Index;
     }
 
-            var test = await JS.InvokeAsync<IEnumerable<Position>>(CardId);
+    private Position? InitialPosition { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
+        Card.Position = InitialPosition;        
+    }
+
     [Parameter]
     public int Index { get; set; }
 
@@ -85,7 +90,7 @@
                 stringBuilder.Append(cssClass).Append(' ');
             }
             stringBuilder.Append("rz-p-1 ");
-            if (Card.IsHovered)
+            if (Card.IsHovered || Card.IsDirectNeighbour)
             {
                 stringBuilder.Append("rz-border-primary ");
             }
