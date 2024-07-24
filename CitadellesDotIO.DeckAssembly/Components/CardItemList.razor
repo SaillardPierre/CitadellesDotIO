@@ -65,7 +65,7 @@
         if (firstRender)
         {
             await Task.Delay(1);
-            HandleOverlap();
+            SetOverlapFromIndex(0);
         }
     }
 
@@ -81,7 +81,7 @@
         {
             card.Reset();
         }
-        HandleOverlap();
+        SetOverlapFromIndex(0);
     }
     public void ResetExceptCard(Card exceptCard)
     {
@@ -95,7 +95,7 @@
                 card.Reset();
             }
         }
-        HandleOverlap();
+        SetOverlapFromIndex(0);
     }
     private void ResetPreviousNeighbours()
     {
@@ -171,6 +171,42 @@
         }
         StateHasChanged();
     }
+    // TODO : Utiliser cette version (renomée) pour """l'animation pendant le drag"""
+    // A revoir
+    public void SetOverlapFromIndex(int splittingIndex)
+    {
+        // a gauche
+        int decrIndex = CardParameters.DraggedCardZIndex;
+        for (int i = splittingIndex - 1; i != -1; i--)
+        {
+            decrIndex--;
+            Card target = Cards[i];
+            if (!target.IsDragged)
+            {
+                target.ZIndex = decrIndex;
+                target.MarginRight = null;
+                target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
+            }
+        }
+
+        // a droite
+        decrIndex = CardParameters.DraggedCardZIndex;
+        for (int i = splittingIndex+1; i < Cards.Count; i++)
+        {
+            decrIndex--;
+            Card target = Cards[i];
+            if (!target.IsDragged)
+            {
+                target.ZIndex = decrIndex;
+                target.MarginLeft = null;
+                target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
+            }
+        }
+        StateHasChanged();
+    }
+
+
+
 
     public void HandleHovering(int futureDropIndex, DragHoverTarget dragHoverTarget)
     {

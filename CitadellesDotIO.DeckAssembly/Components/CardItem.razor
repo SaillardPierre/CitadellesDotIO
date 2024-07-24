@@ -3,6 +3,8 @@
 <RadzenCard Style="@StyleAttribute"
             Class="@ClassAttribute" id="@CardId"
             data-identifier="@Card.Id"
+            data-dragged="@Card.IsDragged.ToString().ToLower()"
+            data-hovered="@Card.IsHovered.ToString().ToLower()"
             data-index="@Index">
     <RadzenStack Gap="0">
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Card.Id</RadzenText>
@@ -59,14 +61,10 @@
                 .Append(Card.Transform.X).Append("px,")
                 .Append(Card.Transform.Y).Append("px);");
 
-            
+
             if(Card.ZIndex.HasValue)
             {
                 stringBuilder.Append($"z-index:{Card.ZIndex};");
-            }
-            if (Card.IsDragged)
-            {
-                stringBuilder.Append($"z-index:{CardParameters.DraggedCardZIndex};");
             }
 
             stringBuilder.Append(Card.MarginLeft);
@@ -86,10 +84,15 @@
                 stringBuilder.Append(cssClass).Append(' ');
             }
             stringBuilder.Append("rz-p-1 ");
-            if(Card.IsDragged || Card.IsDirectNeighbour)
+            if (Card.IsHovered)
             {
-                stringBuilder.Append("rz-border-base-300 ");
+                stringBuilder.Append("rz-border-primary ");
             }
+            else if (Card.IsDragged)
+            {
+                stringBuilder.Append("rz-border-secondary ");
+            }
+            else stringBuilder.Append("rz-border-white ");
             return stringBuilder.ToString();
         }
     }

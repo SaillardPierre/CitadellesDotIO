@@ -1,6 +1,6 @@
-﻿namespace CitadellesDotIO.DeckAssembly
+﻿namespace CitadellesDotIO.DeckAssembly.Exceptions
 {
-    public class ArgumentInvalidException : ArgumentException
+    public class InvalidEnumException : ArgumentException
     {
         public static void ThrowIfEqual<TEnum>(TEnum value, TEnum invalidValue, string? paramName = null)
        where TEnum : struct, Enum

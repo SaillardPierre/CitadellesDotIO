@@ -57,6 +57,13 @@
         InitJS();
     }
 
+    [JSInvokable(nameof(OnDraggableHoverStart))]
+    public override async Task OnDraggableHoverStart(DraggableHoverStartEventArgs args)
+    {
+        this.HoveredCardSource = GetTargetPickSource(args.DraggableSource);
+        await base.OnDraggableHoverStart(args);
+    }
+
     [JSInvokable(nameof(OnDraggableDragStart))]
     public override async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
     {

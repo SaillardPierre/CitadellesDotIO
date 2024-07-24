@@ -1,6 +1,7 @@
 ﻿namespace CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
 {
-    public class DraggableDragEndEventArgs
+    public class DraggableHoverStartEventArgs : DraggableBaseEventArgs
     {
+
     }
 }

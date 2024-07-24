@@ -9,11 +9,8 @@ public class Card
     public string? MarginRight{ get; set; }
     public Position Transform { get; set; }
     public bool IsDragged { get; set; }
-
-    /// <summary>
-    /// Est pour 'linstant 'neighbour'
-    /// </summary>
     public bool IsDirectNeighbour { get; set; }
+    public bool IsHovered { get; set; }
     public Card(int id)
     {
         Id = id;
@@ -24,6 +21,7 @@ public class Card
     {
         Transform = new Position();
         IsDragged = false;
+        IsHovered = false;
         IsDirectNeighbour = false;
         MarginLeft = null;
         MarginRight = null;
@@ -32,7 +30,6 @@ public class Card
 
     public void UpdatePosition(Position movementPosition)
     {
-        IsDragged = true;
         Transform.X += movementPosition.X;
         Transform.Y += movementPosition.Y;
     }

@@ -20,7 +20,7 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
     interact(className).draggable({
         intertia: true,
         listeners: {
-            move(event) {                
+            move(event) {
                 const draggable = event.target;
                 const sourceDropzone = draggable.closest(dropzoneClassName);
                 if (!sourceDropzone) {
@@ -49,7 +49,6 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
                 blazorComponent.invokeMethod('OnDraggableMove', args);
             },
             start(event) {
-                //console.log("dragstart");
                 const draggable = event.target;
                 const draggableIndex = parseInt(draggable.dataset.index);
                 const draggableSource = event.target.closest(dropzoneClassName);
@@ -64,22 +63,46 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
                 blazorComponent.invokeMethod('OnDraggableDragStart', args);
             },
             end(event) {
-                //console.log("dragend");
-                const draggable = event.target;
-                const draggableIndex = parseInt(draggable.dataset.index);
-                const draggableSource = event.target.closest(dropzoneClassName);
-                if (!draggableSource) {
-                    console.log('no source dropzone, OnDragEnd will return early');
-                    return;
-                }
-                const args = {
-                    draggableIndex: draggableIndex,
-                    draggableSource: draggableSource.id
-                }
+                const args = {}
                 blazorComponent.invokeMethod('OnDraggableDragEnd', args);
             }
         }
     })
+
+    const elements = document.querySelectorAll(className);
+    elements.forEach(function (element) {
+
+        element.addEventListener('mouseover', function (event) {
+            // Si un item est en cours de drag
+            if (document.querySelector(`${className}[data-dragged="true"]`) !== null) {
+                return;
+            }
+            // Si l'évènement est levé par un enfant de la div cible
+            if (element.contains(event.relatedTarget)) {
+                return;
+            }
+
+            const draggableSource = element.closest(dropzoneClassName);            
+            const args = {
+                draggableIndex: parseInt(element.dataset.index),
+                draggableSource: draggableSource.id
+            };
+            blazorComponent.invokeMethod('OnDraggableHoverStart', args);
+        });
+
+        element.addEventListener('mouseout', function (event) {
+            // Si un item est en cours de drag
+            if (document.querySelector(`${className}[data-dragged="true"]`) !== null) {
+                return;
+            }
+            // Si l'évènement est levé par un enfant de la div cible
+            if (element.contains(event.relatedTarget)) {
+                return;
+            }
+            const args = {};
+            blazorComponent.invokeMethod('OnDraggableHoverEnd', args);
+        });
+    });
 };
 function setupDropzones(className, blazorComponent) {
     interact(className)
