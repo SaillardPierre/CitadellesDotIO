@@ -39,6 +39,7 @@
         Card.Index = Index;
     }
 
+            var test = await JS.InvokeAsync<IEnumerable<Position>>(CardId);
     [Parameter]
     public int Index { get; set; }
 
