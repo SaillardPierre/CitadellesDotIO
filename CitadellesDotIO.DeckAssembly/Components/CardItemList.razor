@@ -3,9 +3,25 @@
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
+    <RadzenRow>
+        <RadzenStack>
+            <RadzenRow>
+                <RadzenCheckBox @bind-Value=@AnchorLeft />
+                Anchor Left
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenCheckBox @bind-Value=@AnchorRight />
+                Anchor Right
+            </RadzenRow>
+        </RadzenStack>
+        <RadzenStack>
+            <RadzenRow>
+                Base Transform Ratio
+                <RadzenNumeric @bind-Value=@BaseTransformRatio />
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenRow>
     @Id
-    <p>left : @LeftIndex</p>
-    <p>right : @RightIndex</p>
     <div class="w-100"
          style="
         display: flex;
@@ -31,10 +47,6 @@
 @code {
     [Parameter]
     public List<Card> Cards { get; set; } = new();
-
-    public int? LeftIndex;
-    public int? RightIndex;
-
     [Parameter]
     public string Id { get; set; }
 
@@ -66,18 +78,20 @@
         if (firstRender)
         {
             await Task.Delay(1);
-            SetOverlapFromIndex(Cards.Count-1);
+            SetOverlapFromIndex(Cards.Count - 1);
         }
     }
 
+
+    private bool AnchorLeft { get; set; }
+    private bool AnchorRight { get; set; }
+    private int BaseTransformRatio { get; set; }
 
     public bool IsHovered = false;
 
     public void Reset()
     {
         IsHovered = false;
-        LeftIndex = default;
-        RightIndex = default;
         foreach (Card card in Cards)
         {
             card.Reset();
@@ -86,8 +100,6 @@
     public void ResetExceptCard(Card exceptCard)
     {
         IsHovered = false;
-        LeftIndex = default;
-        RightIndex = default;
         foreach (Card card in Cards)
         {
             if (card != exceptCard)
@@ -100,8 +112,6 @@
     public void ResetExceptDraggedCard()
     {
         IsHovered = false;
-        LeftIndex = default;
-        RightIndex = default;
         foreach (Card card in Cards)
         {
             if (!card.IsDragged)
@@ -115,27 +125,35 @@
     {
         (int? leftIndex, int? rightIndex) = DragManager.ComputeLeftRightIndexes(splitIndex, Cards.Count, dragHoverTarget, draggedItemIndex);
 
+        int transformRatio = BaseTransformRatio;
+
+        // a gauche
         if (leftIndex.HasValue)
         {
             int zIndex = CardParameters.DraggedCardZIndex - (leftIndex.Value + 1);
-            // a gauche
+            transformRatio = transformRatio + leftIndex.Value;
             for (int i = 0; i != leftIndex + 1; i++)
             {
                 Card target = Cards[i];
                 if (!target.IsDragged)
                 {
                     target.Reset();
-                    target.ZIndex = zIndex;                    
-                    //target.MarginLeft = $"margin-left:{CardParameters.MarginLeftPercentage}%";
+                    target.ZIndex = zIndex;
+                    if (!AnchorLeft)
+                    {
+                        target.Transform = new(transformRatio * 20, 0);
+                    }
+                    transformRatio--;
                 }
                 zIndex++;
             }
             Cards[leftIndex.Value].IsDirectNeighbour = true;
         }
+        // a droite
         if (rightIndex.HasValue)
         {
+            transformRatio = BaseTransformRatio;
             int zIndex = CardParameters.DraggedCardZIndex;
-            // a droite
             for (int i = rightIndex.Value; i < Cards.Count; i++)
             {
                 zIndex--;
@@ -144,7 +162,11 @@
                 {
                     target.Reset();
                     target.ZIndex = zIndex;
-                    //target.MarginRight = $"margin-right:-{CardParameters.MarginRightPercentage}%";
+                    if (!AnchorRight)
+                    {
+                        target.Transform = new(transformRatio * (-20), 0);
+                    }
+                    transformRatio++;
                 }
             }
             Cards[rightIndex.Value].IsDirectNeighbour = true;

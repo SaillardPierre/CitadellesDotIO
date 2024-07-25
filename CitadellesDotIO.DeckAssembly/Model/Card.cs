@@ -5,8 +5,6 @@ public class Card
     public int Id { get; set; }
     public int Index { get; set; }
     public int? ZIndex { get; set; }
-    public string? MarginLeft { get; set; }
-    public string? MarginRight{ get; set; }
     public Position Transform { get; set; }
     public Position? Position { get; set; }
     public bool IsDragged { get; set; }
@@ -24,8 +22,6 @@ public class Card
         IsDragged = false;
         IsHovered = false;
         IsDirectNeighbour = false;
-        MarginLeft = null;
-        MarginRight = null;
         ZIndex = null;
     }
 

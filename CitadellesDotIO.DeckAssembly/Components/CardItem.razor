@@ -22,10 +22,28 @@
                     break;
             }
         }
-        <p>InitialPosition : X : @(Card.Position?.X.ToString()) , Y : @(Card.Position?.Y.ToString())</p>
-        <p>MarginLeft : @(Card.MarginLeft)</p>
-        <p>MarginRight : @(Card.MarginRight)</p>
-        <p>ZIndex : @(Card.ZIndex)</p>
+        <RadzenStack>
+            <RadzenText>InitialPosition</RadzenText>
+            <RadzenRow Gap="10">
+                <RadzenText>
+                    X : @(Card.Position?.X.ToString())
+                </RadzenText>
+                <RadzenText>
+                    Y : @(Card.Position?.Y.ToString())
+                </RadzenText>
+            </RadzenRow>
+            <RadzenText>Transform</RadzenText>
+            <RadzenRow Gap="10">
+                <RadzenText>
+                    X : @(Card.Transform?.X.ToString())
+                </RadzenText>
+                <RadzenText>
+                    Y : @(Card.Transform?.Y.ToString())
+                </RadzenText>
+            </RadzenRow>
+            <RadzenText>ZIndex :  @(Card.ZIndex)</RadzenText>
+        </RadzenStack>
+
     </RadzenStack>
 </RadzenCard>
 @code {
@@ -42,7 +60,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
-        Card.Position = InitialPosition;        
+        Card.Position = InitialPosition;
     }
 
     [Parameter]
@@ -68,13 +86,10 @@
                 .Append(Card.Transform.Y).Append("px);");
 
 
-            if(Card.ZIndex.HasValue)
+            if (Card.ZIndex.HasValue)
             {
                 stringBuilder.Append($"z-index:{Card.ZIndex};");
             }
-
-            stringBuilder.Append(Card.MarginLeft);
-            stringBuilder.Append(Card.MarginRight);
 
             return stringBuilder.ToString();
         }
@@ -85,12 +100,12 @@
         get
         {
             StringBuilder stringBuilder = new();
-            foreach(string cssClass in CssClasses)
+            foreach (string cssClass in CssClasses)
             {
                 stringBuilder.Append(cssClass).Append(' ');
             }
             stringBuilder.Append("rz-p-1 ");
-            if (Card.IsHovered || Card.IsDirectNeighbour)
+            if (Card.IsHovered)
             {
                 stringBuilder.Append("rz-border-primary ");
             }
@@ -106,5 +121,5 @@
     private string CardId => "DraggableCard" + Card.Id;
 
     [Parameter]
-    public List<string> CssClasses { get; set; } = new() {  };
+    public List<string> CssClasses { get; set; } = new() { };
 }
