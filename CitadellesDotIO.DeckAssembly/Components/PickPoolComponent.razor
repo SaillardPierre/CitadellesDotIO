@@ -86,13 +86,13 @@
     {
         if (pickSourceId == nameof(PickPool)) return PickPool;
         if (pickSourceId == nameof(PickHand)) return PickHand;
-        else throw new ArgumentException();
+        else throw new ArgumentException(nameof(pickSourceId));
     }
     private CardItemList GetOppositePickSource(string pickSourceId)
     {
         if (pickSourceId == nameof(PickPool)) return PickHand;
         if (pickSourceId == nameof(PickHand)) return PickPool;
-        else throw new ArgumentException();
+        else throw new ArgumentException(nameof(pickSourceId));
     }
     #endregion
 }

@@ -12,7 +12,7 @@ namespace CitadellesDotIO.DeckAssembly.Components
     {
         protected string DraggablesClassName { get; set; }
         protected string DropzonesClassName { get; set; }
-        public DraggableContainerComponent(string draggablesClassName, string dropzonesClassName)
+        protected DraggableContainerComponent(string draggablesClassName, string dropzonesClassName)
         {
             DraggablesClassName = draggablesClassName;
             DropzonesClassName = dropzonesClassName;
@@ -21,11 +21,16 @@ namespace CitadellesDotIO.DeckAssembly.Components
         [Inject]
         private IJSRuntime JS { get; set; }
 
-        protected async void InitJS()
+        protected async Task InitJS()
         {
-            await JS.InvokeVoidAsync("setupDraggables", "." + DraggablesClassName, "." + DropzonesClassName, BlazorComponent);
+            await InitDraggables();
             await JS.InvokeVoidAsync("setupDropzones", "." + DropzonesClassName, BlazorComponent);
         }
+        protected async Task InitDraggables()
+        {
+            await JS.InvokeVoidAsync("setupDraggables", "." + DraggablesClassName, "." + DropzonesClassName, BlazorComponent);
+        }
+
         protected DotNetObjectReference<DraggableContainerComponent>? BlazorComponent { get; set; }
         protected Card? DraggedCard { get; set; }
         protected CardItemList? DraggedCardSouce { get; set; }
@@ -53,7 +58,7 @@ namespace CitadellesDotIO.DeckAssembly.Components
         [JSInvokable(nameof(OnDraggableHoverEnd))]
         public async Task OnDraggableHoverEnd(DraggableHoverEndEventArgs args)
         {
-            StateException.ThrowIfNotNull(DraggedCard);
+            //StateException.ThrowIfNotNull(DraggedCard);
 
             ArgumentNullException.ThrowIfNull(HoveredCard);
             ArgumentNullException.ThrowIfNull(HoveredCardSource);
@@ -118,10 +123,11 @@ namespace CitadellesDotIO.DeckAssembly.Components
             {
                 DraggedCardSouce.Cards.Remove(DraggedCard);
                 DropzoneHoverSource.Cards.InsertOrAppend(DraggedCard, FutureDropIndex);
-                DropzoneHoverSource.Reset();
+
             }
             FutureDropIndex = null;
             StateHasChanged();
+            //InitDraggables();
         }
         [JSInvokable(nameof(OnDraggableDropzoneEnter))]
         public virtual async Task OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
@@ -129,7 +135,7 @@ namespace CitadellesDotIO.DeckAssembly.Components
             ArgumentNullException.ThrowIfNull(DropzoneHoverSource);
             InvalidEnumException.ThrowIfEqual(args.DragHoverTarget, DragHoverTarget.None);
 
-            DropzoneHoverSource.IsHovered = true;
+            DropzoneHoverSource.SetHoveredState();
             StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDropzoneLeave))]

@@ -6,7 +6,7 @@
             data-identifier="@Card.Id"
             data-dragged="@Card.IsDragged.ToString().ToLower()"
             data-hovered="@Card.IsHovered.ToString().ToLower()"
-            data-index="@Index">
+            data-index="@Card.Index">
     <RadzenStack Gap="0">
         <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Card.Id</RadzenText>
         @{
@@ -23,6 +23,7 @@
             }
         }
         <RadzenStack>
+            <RadzenText>Index : @Card.Index</RadzenText>
             <RadzenText>InitialPosition</RadzenText>
             <RadzenRow Gap="10">
                 <RadzenText>
@@ -50,11 +51,7 @@
     [Parameter]
     public Card Card { get; set; }
 
-    protected override void OnParametersSet()
-    {
-        Card.Index = Index;
-    }
-
+   
     private Position? InitialPosition { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -62,9 +59,6 @@
         InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
         Card.Position = InitialPosition;
     }
-
-    [Parameter]
-    public int Index { get; set; }
 
     private string StyleAttribute
     {

@@ -36,7 +36,8 @@
             int index = 0;
             foreach (Card i in Cards)
             {
-                <CardItem Card=i Index=index CssClasses=CardClasses />
+                i.Index = index;
+                <CardItem Card=i  CssClasses=CardClasses />
                 index++;
             }
         }
@@ -87,15 +88,24 @@
     private bool AnchorRight { get; set; }
     private int BaseTransformRatio { get; set; }
 
-    public bool IsHovered = false;
+    public void SetHoveredState()
+    {
+        IsHovered = true;
+    }
+
+    private bool IsHovered = false;
 
     public void Reset()
     {
         IsHovered = false;
+        int index = 0;
         foreach (Card card in Cards)
         {
             card.Reset();
+            card.Index = index;
+            index++;
         }
+        //StateHasChanged();
     }
     public void ResetExceptCard(Card exceptCard)
     {

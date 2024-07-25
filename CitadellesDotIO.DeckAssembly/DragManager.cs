@@ -3,7 +3,7 @@ using CitadellesDotIO.DeckAssembly.Model;
 
 namespace CitadellesDotIO.DeckAssembly;
 
-public class DragManager
+public static class DragManager
 {    
     public static int? GetFutureIndex(DragHoverTarget dragHoverTarget, Position? testedPosition, IEnumerable<Position?>? relativePositions)
     {
@@ -23,7 +23,7 @@ public class DragManager
             }
             return index;
         }
-        throw new ArgumentOutOfRangeException(nameof(DragHoverTarget) + "invalid");
+        throw new ArgumentOutOfRangeException(nameof(DragHoverTarget));
     }
     public static Tuple<int?, int?> ComputeLeftRightIndexes(int splitIndex, int itemCount, DragHoverTarget dragHoverTarget, int? draggedItemIndex = default)
     {
