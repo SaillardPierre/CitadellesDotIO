@@ -1,0 +1,105 @@
+﻿@using CitadellesDotIO.DeckAssembly.Model
+@using System.Text
+
+<CascadingValue Value="this">
+    <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
+        <RadzenRow>
+            <RadzenStack>
+                <RadzenRow>
+                    <RadzenCheckBox @bind-Value=@AnchorLeft />
+                    Anchor Left
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenCheckBox @bind-Value=@AnchorRight />
+                    Anchor Right
+                </RadzenRow>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenRow>
+                    Base Transform Ratio
+                    <RadzenNumeric @bind-Value=@BaseTransformRatio />
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenRow>
+        @Id
+        <div class="w-100"
+             style="
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #000;
+        overflow-x: visible;
+        overflow-y: visible;">
+            @{
+                int index = 0;
+                foreach (Card i in Cards)
+                {
+                    i.Index = index;
+                    <CardComponent Card=i />
+                    index++;
+                }
+            }
+        </div>
+    </div>
+</CascadingValue>
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+
+    [CascadingParameter] CardsContainer Container { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Cards.Clear();
+        Cards.AddRange(Container.Cards);
+    }
+    List<Card> Cards = new();
+    private void HandleDragEnter()
+    {
+
+    }
+
+
+    private void HandleDragLeave()
+    {
+    }
+
+    private async Task HandleDrop()
+    {
+    }
+    private string OuterStyleAttribute => "display: flex;flex-direction: column;justify-content: center;align-items: center;align-self: center;";
+    private bool AnchorLeft { get; set; }
+    private bool AnchorRight { get; set; }
+    private int BaseTransformRatio { get; set; }
+    private bool IsHovered = false;
+
+    private string OuterClassAttributes
+    {
+        get
+        {
+            StringBuilder stringBuilder = new();
+            stringBuilder.Append("w-100 h-100 m-0 ");
+            foreach (string cssClass in CssClasses)
+            {
+                stringBuilder.Append(cssClass).Append(' ');
+            }
+            if (IsHovered)
+            {
+                stringBuilder.Append("drop-available ");
+                stringBuilder.Append("rz-border-base-300");
+            }
+
+            return stringBuilder.ToString();
+        }
+    }
+
+
+    [Parameter]
+    public List<string> CssClasses { get; set; } = new() { };
+
+    [Parameter]
+    public List<string> CardClasses { get; set; } = new();
+
+}

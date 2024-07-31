@@ -1,0 +1,151 @@
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.Model
+@using System.Text
+@inject IJSRuntime JS;
+
+<div 
+     style="transform:translate(@(xTransform)px,@(yTransform)px)"
+     id="@CardId">
+    <RadzenCard Class="@ClassAttribute" Style="@StyleAttribute">
+        <RadzenStack Gap="0">
+            <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Card.Id</RadzenText>
+            <RadzenStack>
+                <RadzenText>Index : @Card.Index</RadzenText>                
+                <RadzenText>Transform</RadzenText>
+                <RadzenRow Gap="10">
+                    <RadzenText>
+                        X : @(xTransform.ToString())
+                    </RadzenText>
+                    <RadzenText>
+                        Y : @(yTransform.ToString())
+                    </RadzenText>
+                </RadzenRow>
+                <RadzenText>Hovered : @Card.IsHovered.ToString().ToLower()</RadzenText>
+                <RadzenText>ZIndex :  @(Card.ZIndex)</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</div>
+
+@code {
+    [CascadingParameter] CardsContainer Container { get; set; }
+    [CascadingParameter] CardListComponent CardList { get; set; }
+    [Parameter]
+    public Card Card { get; set; }
+
+    private double xTransform = 0, yTransform = 0;
+    private Position? InitialPosition { get; set; }
+
+    private DotNetObjectReference<CardComponent>? self;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("setupDraggableById", CardId, ".futureDropzoneClassName", self);
+            InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);            
+        }
+    }
+
+    [JSInvokable(nameof(OnDraggableHoverStart))]
+    public void OnDraggableHoverStart()
+    {
+        // TODO : Proc sur les cartes au Z-index supérieur.
+        // Voir quand gérer les Zindex
+        if (Card.IsDragged)
+        {
+            return;
+        }
+        Card.IsHovered = true;
+        // TODO : Invoke ?
+        StateHasChanged();
+    }
+
+    [JSInvokable(nameof(OnDraggableHoverEnd))]
+    public void OnDraggableHoverEnd()
+    {
+        if (Card.IsDragged) return;
+        Card.IsHovered = false;
+        // TODO : Invoke ?
+        StateHasChanged();
+    }
+
+    [JSInvokable(nameof(OnDraggableMove))]
+    public void OnDraggableMove(DraggableMoveEventArgs args)
+    {
+        xTransform += args.DragMoveDirection.X;
+        yTransform += args.DragMoveDirection.Y;
+
+        Container.OnDraggableMove(args);
+        // TODO : Invoke le composant cascadé pour le calcul depuis un DraggableMoveEventArgs
+        StateHasChanged();
+    }
+
+    [JSInvokable(nameof(OnDraggableDragStart))]
+    public async void OnDraggableDragStart()
+    {
+        Card.IsDragged = true;
+        Container.OnDraggableDragStart(Card, CardList);
+    }
+    [JSInvokable(nameof(OnDraggableDragEnd))]
+    public async void OnDraggableDragEnd()
+    {
+        Card.IsDragged = false;        
+        // TODO : Invoke le composant cascadé pour le cacul depuis un DragEndEventArgs
+        Container.OnDraggableDragEnd();
+    }
+
+    
+
+    private string StyleAttribute
+    {
+        get
+        {
+            StringBuilder stringBuilder = new();
+            const double minWidth = 45;
+            const double width = 125;
+            const double ratio = 1.8;
+            const double minHeight = minWidth * ratio;
+            const double height = width * ratio;
+            stringBuilder.Append("min-height:").Append(minHeight).Append("px;");
+            stringBuilder.Append("min-width:").Append(minWidth).Append("px;");
+            stringBuilder.Append("height:").Append(height).Append("px;");
+            stringBuilder.Append("width:").Append(width).Append("px;");
+
+            if (Card.ZIndex.HasValue)
+            {
+                stringBuilder.Append($"z-index:{Card.ZIndex};");
+            }
+
+            return stringBuilder.ToString();
+        }
+    }
+
+    [Parameter]
+    public List<string> CssClasses { get; set; } = new() { };
+    private string CardId => "DraggableCard" + Card.Id;
+
+    private string ClassAttribute
+    {
+        get
+        {
+            StringBuilder stringBuilder = new();
+            foreach (string cssClass in CssClasses)
+            {
+                stringBuilder.Append(cssClass).Append(' ');
+            }
+            stringBuilder.Append("rz-p-1 ");
+            if (Card.IsHovered)
+            {
+                stringBuilder.Append("rz-border-primary ");
+            }
+            else if (Card.IsDragged)
+            {
+                stringBuilder.Append("rz-border-secondary ");
+            }
+            else stringBuilder.Append("rz-border-white ");
+            return stringBuilder.ToString();
+        }
+    }
+}

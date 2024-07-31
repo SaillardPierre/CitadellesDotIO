@@ -1,12 +1,18 @@
 ﻿@page "/"
+@using CitadellesDotIO.DeckAssembly.Components
 @using CitadellesDotIO.DeckAssembly.Model
 @using CitadellesDotIO.Engine.Factories
 
-<CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
+@* <CitadellesDotIO.DeckAssembly.Components.PickPoolComponent PickHandLowerThreshold=0
                                                            PickHandUpperThreshold=pickHandUpperThreshold
-                                                           PickPoolValue=PickPoolValue />
-@* <CitadellesDotIO.DeckAssembly.Components.IdleHandComponent IdleHandValue=IdleHandValue />
- *@
+                                                           PickPoolValue=PickPoolValue /> *@
+@* <CitadellesDotIO.DeckAssembly.Components.IdleHandComponent IdleHandValue=IdleHandValue />*@
+
+<CardsContainer Cards="IdleHandValue">
+    <CardListComponent />
+</CardsContainer>
+
+
 @code {
     private int pickHandLowerThreshold = 0;
     private int pickHandUpperThreshold = default;
@@ -15,7 +21,9 @@
     private List<Card> PickPoolValue = BuildItems();
     private List<Card> IdleHandValue = BuildItems();
 
-
     private static List<Card> BuildItems()
     => CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();
+
+   
+
 }

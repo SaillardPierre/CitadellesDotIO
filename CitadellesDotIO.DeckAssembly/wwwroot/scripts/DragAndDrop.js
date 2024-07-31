@@ -6,6 +6,51 @@
     };
 }
 
+async function setupDraggableById(elementId, dropzoneClassName, blazorComponent) {
+    interact(`#${elementId}`).draggable({
+        intertia: true,
+        listeners: {
+            move(event) {
+                const draggable = event.target;
+                const sourceDropzone = draggable.closest(dropzoneClassName);
+                if (!sourceDropzone) {
+                    console.log('no source dropzone, OnCardMove move will return early');
+                    return;
+                }
+                var dragHoverTarget = 0; // DragHoverTarget.None
+                const dropzone = document.querySelector('.drop-available');
+                if (dropzone) {
+                    if (sourceDropzone != dropzone) {
+                        dragHoverTarget = 2; // DragHoverTarget.Target
+                    }
+                    else {
+                        dragHoverTarget = 1; // DragHoverTarget.Self        
+                    }
+                }
+                const args = {
+                    dragMoveDirection: { x: event.dx, y: event.dy },
+                    dragHoverTarget: dragHoverTarget
+                }
+                blazorComponent.invokeMethodAsync('OnDraggableMove', args);
+            },
+            start(event) {
+                blazorComponent.invokeMethod('OnDraggableDragStart');
+            },
+            end(event) {
+                blazorComponent.invokeMethod('OnDraggableDragEnd');
+            }
+        }
+    });
+
+    var element = document.getElementById(elementId);
+    element.onmouseenter = function (event) {        
+        blazorComponent.invokeMethod('OnDraggableHoverStart');
+    };
+    element.onmouseleave = function (event) {
+        blazorComponent.invokeMethod('OnDraggableHoverEnd');
+    };
+};
+
 async function setupDraggables(className, dropzoneClassName, blazorComponent) {
     interact(className).draggable({
         intertia: true,
@@ -53,41 +98,6 @@ async function setupDraggables(className, dropzoneClassName, blazorComponent) {
             }
         }
     })
-
-    const elements = document.querySelectorAll(className);
-    elements.forEach(function (element) {
-
-        element.addEventListener('mouseover', function (event) {
-            // Si un item est en cours de drag
-            if (document.querySelector(`${className}[data-dragged="true"]`) !== null) {
-                return;
-            }
-            // Si l'évènement est levé par un enfant de la div cible
-            if (element.contains(event.relatedTarget)) {
-                return;
-            }
-
-            const draggableSource = element.closest(dropzoneClassName);
-            const args = {
-                draggableIndex: parseInt(element.dataset.index),
-                draggableSource: draggableSource.id
-            };
-            blazorComponent.invokeMethod('OnDraggableHoverStart', args);
-        });
-
-        element.addEventListener('mouseout', function (event) {
-            // Si un item est en cours de drag
-            if (document.querySelector(`${className}[data-dragged="true"]`) !== null) {
-                return;
-            }
-            // Si l'évènement est levé par un enfant de la div cible
-            if (element.contains(event.relatedTarget)) {
-                return;
-            }
-            const args = {};
-            blazorComponent.invokeMethod('OnDraggableHoverEnd', args);
-        });
-    });
 };
 function setupDropzones(className, blazorComponent) {
     interact(className)

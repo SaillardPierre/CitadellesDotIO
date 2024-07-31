@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace CitadellesDotIO.DeckAssembly.Exceptions
 {
-    public class StateException : ArgumentException
+    public class StateException : ArgumentNullException
     {
         public static void ThrowIfNotNull(object? argument, string? paramName = null)      
         {

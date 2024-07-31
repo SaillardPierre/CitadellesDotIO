@@ -33,32 +33,39 @@ namespace CitadellesDotIO.DeckAssembly.Components
 
         protected DotNetObjectReference<DraggableContainerComponent>? BlazorComponent { get; set; }
         protected Card? DraggedCard { get; set; }
-        protected CardItemList? DraggedCardSouce { get; set; }
+        protected CardItemList? DraggedCardSource { get; set; }
         protected Card? HoveredCard { get; set; }
         protected CardItemList? HoveredCardSource { get; set; }
         protected CardItemList? DropzoneHoverSource { get; set; }
         protected int? FutureDropIndex { get; set; }
 
         #region Evenements sur le draggable
-        [JSInvokable(nameof(OnDraggableHoverStart))]
         public virtual async Task OnDraggableHoverStart(DraggableHoverStartEventArgs args)
         {
-            StateException.ThrowIfNotNull(DraggedCard);
-
             ArgumentNullException.ThrowIfNull(HoveredCardSource);
 
             HoveredCard = HoveredCardSource.Cards[args.DraggableIndex];
+
+            // La carte en cours de drag a levé l'evenement
+            if (DraggedCard is not null && HoveredCard == DraggedCard)
+            {
+                return;
+            }
+
             HoveredCard.Reset();
             HoveredCard.IsHovered = true;
             HoveredCard.ZIndex = CardParameters.DraggedCardZIndex;
-
             HoveredCardSource.SetOverlapFromIndex(args.DraggableIndex);
-            StateHasChanged();
+
+            //StateHasChanged();
         }
-        [JSInvokable(nameof(OnDraggableHoverEnd))]
         public async Task OnDraggableHoverEnd(DraggableHoverEndEventArgs args)
         {
-            //StateException.ThrowIfNotNull(DraggedCard);
+            // L'event de drop vient de proc
+            if (HoveredCard is null && HoveredCardSource is null)
+            {
+                return;
+            }
 
             ArgumentNullException.ThrowIfNull(HoveredCard);
             ArgumentNullException.ThrowIfNull(HoveredCardSource);
@@ -66,33 +73,41 @@ namespace CitadellesDotIO.DeckAssembly.Components
             HoveredCard.IsHovered = false;
             HoveredCard = null;
             HoveredCardSource = null;
-            StateHasChanged();
+            //StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDragStart))]
         public virtual async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
         {
-            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
+            ArgumentNullException.ThrowIfNull(DraggedCardSource);
 
-            DraggedCard = DraggedCardSouce.Cards[args.DraggableIndex];
+            var test = DraggedCardSource.Cards.SingleOrDefault(x => x.IsHovered);
+
+
+
+            DraggedCard = DraggedCardSource.Cards[args.DraggableIndex];
             DraggedCard.IsDragged = true;
             FutureDropIndex = args.DraggableIndex;
+            StateHasChanged();
         }
+
+        
+
         [JSInvokable(nameof(OnDraggableDragEnd))]
         public async Task OnDraggableDragEnd(DraggableDragEndEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(DraggedCard);
-            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
+            ArgumentNullException.ThrowIfNull(DraggedCardSource);
 
             DraggedCard.Reset();
             DraggedCard = null;
-            DraggedCardSouce.Reset();
-            DraggedCardSouce = null;
+            DraggedCardSource.Reset();
+            DraggedCardSource = null;
             if (DropzoneHoverSource is not null)
             {
                 DropzoneHoverSource.Reset();
                 DropzoneHoverSource = null;
             }
-            StateHasChanged();
+            //StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableMove))]
         public async Task OnDraggableMove(DraggableMoveEventArgs args)
@@ -100,33 +115,39 @@ namespace CitadellesDotIO.DeckAssembly.Components
             ArgumentNullException.ThrowIfNull(DraggedCard);
 
             DraggedCard.UpdatePosition(args.DragMoveDirection);
-            FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, DropzoneHoverSource?.Cards.Select(x => x.Position));
+
+            var relativePositions = DropzoneHoverSource?.Cards.Select(x => x.Position);
+
+            FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, relativePositions);
             if (DropzoneHoverSource is not null && FutureDropIndex.HasValue)
             {
                 DropzoneHoverSource.SetOverlapFromIndex(FutureDropIndex.Value, args.DragHoverTarget, DraggedCard.Index);
             }
-            StateHasChanged();
+            //StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDrop))]
         public virtual async Task OnDraggableDrop(DraggableDropEventArgs args)
         {
             InvalidEnumException.ThrowIfEqual(args.DropEventSource, DropEventSource.Outside);
             ArgumentNullException.ThrowIfNull(DraggedCard);
-            ArgumentNullException.ThrowIfNull(DraggedCardSouce);
+            ArgumentNullException.ThrowIfNull(DraggedCardSource);
             ArgumentNullException.ThrowIfNull(DropzoneHoverSource);
 
             if (args.DropEventSource == DropEventSource.Self)
             {
-                DraggedCardSouce.Cards.PutBackAtIndex(DraggedCard, FutureDropIndex);
+                DraggedCardSource.Cards.PutBackAtIndex(DraggedCard, FutureDropIndex);
             }
             else if (args.DropEventSource == DropEventSource.Target)
             {
-                DraggedCardSouce.Cards.Remove(DraggedCard);
+                DraggedCardSource.Cards.Remove(DraggedCard);
                 DropzoneHoverSource.Cards.InsertOrAppend(DraggedCard, FutureDropIndex);
-
             }
+
+            DraggedCard.Reset();
+            DraggedCardSource = null;
+            DropzoneHoverSource = null;
             FutureDropIndex = null;
-            StateHasChanged();
+            //StateHasChanged();
             //InitDraggables();
         }
         [JSInvokable(nameof(OnDraggableDropzoneEnter))]
@@ -136,7 +157,7 @@ namespace CitadellesDotIO.DeckAssembly.Components
             InvalidEnumException.ThrowIfEqual(args.DragHoverTarget, DragHoverTarget.None);
 
             DropzoneHoverSource.SetHoveredState();
-            StateHasChanged();
+            //StateHasChanged();
         }
         [JSInvokable(nameof(OnDraggableDropzoneLeave))]
         public async Task OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
@@ -146,7 +167,7 @@ namespace CitadellesDotIO.DeckAssembly.Components
 
             DropzoneHoverSource.ResetExceptCard(DraggedCard);
             DropzoneHoverSource = null;
-            StateHasChanged();
+            //StateHasChanged();
         }
         #endregion
     }

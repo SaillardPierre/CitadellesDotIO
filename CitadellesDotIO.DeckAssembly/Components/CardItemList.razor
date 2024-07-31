@@ -1,7 +1,9 @@
-﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
 @using CitadellesDotIO.DeckAssembly.Exceptions
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
+
 <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
     <RadzenRow>
         <RadzenStack>
@@ -37,7 +39,7 @@
             foreach (Card i in Cards)
             {
                 i.Index = index;
-                <CardItem Card=i  CssClasses=CardClasses />
+                <CardItem Card=i SourceId=Id CssClasses=CardClasses />
                 index++;
             }
         }
@@ -50,7 +52,8 @@
     public List<Card> Cards { get; set; } = new();
     [Parameter]
     public string Id { get; set; }
-
+    [CascadingParameter]
+    public Func<DraggableHoverStartEventArgs, Task> OnDraggableHoverStart { get; set; }
     private int Gap { get; set; } = -10;
 
     private string OuterStyleAttribute => "display: flex;flex-direction: column;justify-content: center;align-items: center;align-self: center;";
@@ -137,6 +140,8 @@
 
         int transformRatio = BaseTransformRatio;
 
+
+
         // a gauche
         if (leftIndex.HasValue)
         {
@@ -159,6 +164,10 @@
             }
             Cards[leftIndex.Value].IsDirectNeighbour = true;
         }
+
+
+
+
         // a droite
         if (rightIndex.HasValue)
         {

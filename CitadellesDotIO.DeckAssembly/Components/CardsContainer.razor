@@ -1,0 +1,45 @@
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.Exceptions
+@using CitadellesDotIO.DeckAssembly.Model;
+﻿<div class="futureDropzoneClassName">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+
+@code {
+    [Parameter] public List<Card> Cards { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    private Card? draggedCard { get; set; }
+    private CardListComponent? draggedCardSource { get; set; }
+    public virtual void OnDraggableDragStart(Card card, CardListComponent cardSource)
+    {
+        StateException.ThrowIfNotNull(draggedCard);
+        StateException.ThrowIfNotNull(draggedCardSource);
+
+        draggedCard = card;
+        draggedCardSource = cardSource;
+    }
+
+    public virtual void OnDraggableDragEnd()
+    {
+        // TODO : A voir si au moment du drop le reset est pas fait
+        StateException.ThrowIfNull(draggedCard);
+        StateException.ThrowIfNull(draggedCardSource);
+
+        draggedCard = null;
+        draggedCardSource = null; 
+    }
+
+
+    public virtual void OnDraggableMove(DraggableMoveEventArgs args)
+    {
+        StateException.ThrowIfNull(draggedCard);
+        StateException.ThrowIfNull(draggedCardSource);
+    }
+
+
+}

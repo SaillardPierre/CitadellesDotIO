@@ -1,7 +1,11 @@
-﻿@using CitadellesDotIO.DeckAssembly.Model
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 @inject IJSRuntime JS;
-<RadzenCard Style="@StyleAttribute"
+<RadzenCard @onmouseover=RaiseHoverStartEvent
+            @onmouseleave=RaiseHoverEndEvent
+            @ondrag=DragStart
+            Style="@StyleAttribute"
             Class="@ClassAttribute" id="@CardId"
             data-identifier="@Card.Id"
             data-dragged="@Card.IsDragged.ToString().ToLower()"
@@ -50,14 +54,45 @@
 @code {
     [Parameter]
     public Card Card { get; set; }
+    [Parameter]
+    public string SourceId { get; set; }
 
-   
     private Position? InitialPosition { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
         Card.Position = InitialPosition;
+    }
+
+    [CascadingParameter]
+    public Func<DraggableHoverStartEventArgs, Task> OnDraggableHoverStart { get; set; }
+
+    private void DragStart()
+    {
+
+    }
+
+    private async Task RaiseHoverStartEvent()
+    {
+        if (Card.IsDragged) return;
+        DraggableHoverStartEventArgs args = new()
+            {
+                DraggableIndex = Card.Index,
+                DraggableSource = SourceId
+            };
+
+        await OnDraggableHoverStart(args);
+    }
+
+    [CascadingParameter]
+    public Func<DraggableHoverEndEventArgs, Task> OnDraggableHoverEnd { get; set; }
+
+    private async Task RaiseHoverEndEvent()
+    {
+        if (Card.IsDragged) return;
+        DraggableHoverEndEventArgs args = new();
+        await OnDraggableHoverEnd(args);
     }
 
     private string StyleAttribute

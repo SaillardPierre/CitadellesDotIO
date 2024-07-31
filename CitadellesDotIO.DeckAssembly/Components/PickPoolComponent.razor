@@ -7,25 +7,29 @@
 @using System.Globalization
 @inherits DraggableContainerComponent;
 
-<RadzenStack style="width: 100%; height: 70vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
-    <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
-    <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
+<CascadingValue Value="(Func<DraggableHoverStartEventArgs, Task>) OnDraggableHoverStart">
+    <CascadingValue Value="(Func<DraggableHoverEndEventArgs, Task>) OnDraggableHoverEnd">
+        <RadzenStack style="width: 100%; height: 70vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
+            <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+            <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
 
-        <p>
-            FutureDropIndex :
-            <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />
-        </p>
-        <p>
-            CurrentSource :
-            <RadzenText Text=@DraggedCardSouce?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
-        </p>
-        <p>
-            CurrentHoverTarget :
-            <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
-        </p>
-    </RadzenRow>
-    <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
-</RadzenStack>
+                <p>
+                    FutureDropIndex :
+                    <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH1" />
+                </p>
+                <p>
+                    CurrentSource :
+                    <RadzenText Text=@DraggedCardSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
+                </p>
+                <p>
+                    CurrentHoverTarget :
+                    <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
+                </p>
+            </RadzenRow>
+            <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+        </RadzenStack>
+    </CascadingValue>
+</CascadingValue>
 
 @code {
 
@@ -67,7 +71,7 @@
     [JSInvokable(nameof(OnDraggableDragStart))]
     public override async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
-        this.DraggedCardSouce = GetTargetPickSource(args.DraggableSource);
+        this.DraggedCardSource = GetTargetPickSource(args.DraggableSource);
         await base.OnDraggableDragStart(args);
     }
 

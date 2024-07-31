@@ -1,26 +1,27 @@
 ﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
 @using CitadellesDotIO.DeckAssembly.Model
 @inherits DraggableContainerComponent
-
-<RadzenStack style="width: 100%; height: 30vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
-    <CardItemList @ref=IdleHand Id=@nameof(IdleHand) Cards=IdleHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
-    <RadzenRow>
-        <p>
-            FutureDropIndex :
-            <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH4" />
-        </p>
-        <p>
-            CurrentSource :
-            <RadzenText Text=@DraggedCardSouce?.Id.ToString() TextStyle="TextStyle.DisplayH4" />
-        </p>
-        <p>
-            CurrentHoverTarget :
-            <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH4" />
-        </p>
-    </RadzenRow>
-
-</RadzenStack>
-
+<CascadingValue Value="(Func<DraggableHoverStartEventArgs, Task>) OnDraggableHoverStart">
+    <CascadingValue Value="(Func<DraggableHoverEndEventArgs, Task>) OnDraggableHoverEnd">
+        <RadzenStack style="width: 100%; height: 30vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
+            <CardItemList @ref=IdleHand Id=@nameof(IdleHand) Cards=IdleHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+            <RadzenRow>
+                <p>
+                    FutureDropIndex :
+                    <RadzenText Text=@FutureDropIndex.ToString() TextStyle="TextStyle.DisplayH4" />
+                </p>
+                <p>
+                    CurrentSource :
+                    <RadzenText Text=@DraggedCardSource?.Id.ToString() TextStyle="TextStyle.DisplayH4" />
+                </p>
+                <p>
+                    CurrentHoverTarget :
+                    <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH4" />
+                </p>
+            </RadzenRow>
+        </RadzenStack>
+    </CascadingValue>
+</CascadingValue>
 
 @code {
 
@@ -42,7 +43,6 @@
         InitJS();
     }
 
-    [JSInvokable(nameof(OnDraggableHoverStart))]
     public override async Task OnDraggableHoverStart(DraggableHoverStartEventArgs args)
     {
         this.HoveredCardSource = IdleHand;
@@ -52,7 +52,7 @@
     [JSInvokable(nameof(OnDraggableDragStart))]
     public override async Task OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
-        this.DraggedCardSouce = IdleHand;
+        this.DraggedCardSource = IdleHand;
         await base.OnDraggableDragStart(args);
     }
 

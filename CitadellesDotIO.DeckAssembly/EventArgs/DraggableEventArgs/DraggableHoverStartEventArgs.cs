@@ -4,4 +4,6 @@
     {
 
     }
+
+    public delegate Task DraggableHoverStartEventHandler(DraggableHoverStartEventArgs args);
 }
