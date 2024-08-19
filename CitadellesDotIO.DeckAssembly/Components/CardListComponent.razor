@@ -1,4 +1,5 @@
-﻿@using CitadellesDotIO.DeckAssembly.Model
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+@using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 
 <CascadingValue Value="this">
@@ -18,6 +19,14 @@
                 <RadzenRow>
                     Base Transform Ratio
                     <RadzenNumeric @bind-Value=@BaseTransformRatio />
+                </RadzenRow>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenRow>
+                    Left : @leftIndex
+                </RadzenRow>
+                <RadzenRow>
+                    Right : @rightIndex
                 </RadzenRow>
             </RadzenStack>
         </RadzenRow>
@@ -47,8 +56,10 @@
     [Parameter]
     public string Id { get; set; }
 
-
     [CascadingParameter] CardsContainer Container { get; set; }
+
+    private int? leftIndex { get; set; }
+    private int? rightIndex { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -56,11 +67,24 @@
         Cards.AddRange(Container.Cards);
     }
     List<Card> Cards = new();
-    private void HandleDragEnter()
-    {
 
+    public void OnDraggableHoverStart(int cardIndex)
+    {
+        // Pas sur pour le self, à voir
+        (leftIndex, rightIndex) = DragManager.ComputeLeftRightIndexes(cardIndex, Cards.Count, DragHoverTarget.Self);
+        StateHasChanged();
     }
 
+    public void OnDraggableHoverEnd()
+    {
+        leftIndex = default;
+        rightIndex = default;
+        StateHasChanged();
+    }
+
+    private void HandleDragEnter()
+    {
+    }
 
     private void HandleDragLeave()
     {

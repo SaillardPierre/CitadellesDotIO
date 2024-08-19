@@ -53,12 +53,11 @@
     {
         // TODO : Proc sur les cartes au Z-index supérieur.
         // Voir quand gérer les Zindex
-        if (Card.IsDragged)
-        {
-            return;
-        }
+        if (Card.IsDragged) return;        
         Card.IsHovered = true;
-        // TODO : Invoke ?
+
+        CardList.OnDraggableHoverStart(Card.Index);
+        // TODO : Invoke un truc sur le container ?
         StateHasChanged();
     }
 
@@ -67,7 +66,9 @@
     {
         if (Card.IsDragged) return;
         Card.IsHovered = false;
-        // TODO : Invoke ?
+
+        CardList.OnDraggableHoverEnd();
+        // TODO : Invoke un truc sur le container ?
         StateHasChanged();
     }
 
