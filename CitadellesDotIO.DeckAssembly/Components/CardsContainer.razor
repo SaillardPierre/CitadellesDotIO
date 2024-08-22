@@ -14,7 +14,10 @@
     [Parameter] public RenderFragment ChildContent { get; set; }
 
     private Card? draggedCard { get; set; }
+    public bool HasDraggedCard => draggedCard is not null;
+
     private CardListComponent? draggedCardSource { get; set; }
+
     public virtual void OnDraggableDragStart(Card card, CardListComponent cardSource)
     {
         StateException.ThrowIfNotNull(draggedCard);

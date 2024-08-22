@@ -25,6 +25,12 @@ public class Card
         ZIndex = null;
     }
 
+    public void SetDraggedState(bool isDragged)
+    {
+        IsDragged = isDragged;
+        if (IsDragged) ZIndex = CardParameters.DraggedCardZIndex;
+    }
+
     public void UpdatePosition(Position movementPosition)
     {
         Transform.X += movementPosition.X;

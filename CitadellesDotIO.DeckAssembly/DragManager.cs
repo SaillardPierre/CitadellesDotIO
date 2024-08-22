@@ -72,4 +72,62 @@ public static class DragManager
 
         return new(leftIndex, rightIndex);
     }
+
+
+    public static void SetOverlapFromIndexes(List<Card> cards, int? leftIndex, int? rightIndex)
+    {
+        bool anchorLeft = false;
+        bool anchorRight = false;
+        int BaseTransformRatio = 0;
+        int transformRatio = BaseTransformRatio;
+
+        // a gauche
+        if (leftIndex.HasValue)
+        {
+            int zIndex = CardParameters.DraggedCardZIndex - (leftIndex.Value + 1);
+            transformRatio = transformRatio + leftIndex.Value;
+            for (int i = 0; i != leftIndex + 1; i++)
+            {
+                Card target = cards[i];
+                if (!target.IsDragged)
+                {
+                    target.Reset();
+                    target.ZIndex = zIndex;
+                    if (!anchorLeft)
+                    {
+                        target.Transform = new(transformRatio * 20, 0);
+                    }
+                    transformRatio--;
+                }
+                zIndex++;
+            }
+            cards[leftIndex.Value].IsDirectNeighbour = true;
+        }
+
+
+
+
+        // a droite
+        if (rightIndex.HasValue)
+        {
+            transformRatio = BaseTransformRatio;
+            int zIndex = CardParameters.DraggedCardZIndex;
+            for (int i = rightIndex.Value; i < cards.Count; i++)
+            {
+                zIndex--;
+                Card target = cards[i];
+                if (!target.IsDragged)
+                {
+                    target.Reset();
+                    target.ZIndex = zIndex;
+                    if (!anchorRight)
+                    {
+                        target.Transform = new(transformRatio * (-20), 0);
+                    }
+                    transformRatio++;
+                }
+            }
+            cards[rightIndex.Value].IsDirectNeighbour = true;
+        }
+    }
 }

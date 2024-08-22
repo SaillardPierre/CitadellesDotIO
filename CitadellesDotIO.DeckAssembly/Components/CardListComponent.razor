@@ -1,6 +1,9 @@
-﻿@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
+@using CitadellesDotIO.DeckAssembly.Exceptions
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
+@inject IJSRuntime JS;
 
 <CascadingValue Value="this">
     <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
@@ -23,10 +26,13 @@
             </RadzenStack>
             <RadzenStack>
                 <RadzenRow>
-                    Left : @leftIndex
+                    Left : @LeftIndex
                 </RadzenRow>
                 <RadzenRow>
-                    Right : @rightIndex
+                    Right : @RightIndex
+                </RadzenRow>
+                <RadzenRow>
+                    FutureDropIndex : @FutureDropIndex
                 </RadzenRow>
             </RadzenStack>
         </RadzenRow>
@@ -48,6 +54,11 @@
                     <CardComponent Card=i />
                     index++;
                 }
+                // // Ne fonctionne pas, pas très grave pour l'instnat
+                // foreach (CardComponent cardComponent in CardComponents)
+                // {
+                //     @cardComponent
+                // }
             }
         </div>
     </div>
@@ -57,31 +68,98 @@
     public string Id { get; set; }
 
     [CascadingParameter] CardsContainer Container { get; set; }
+    List<Card> Cards = new();
 
-    private int? leftIndex { get; set; }
-    private int? rightIndex { get; set; }
+    private List<CardComponent> CardComponents { get; set; } = new();
+
+    private DotNetObjectReference<CardListComponent>? self;
+
+    private int? FutureDropIndex { get; set; }
+    private int? LeftIndex { get; set; }
+    private int? RightIndex { get; set; }
+
+    private Card? HoveredCard { get; set; }
+    private Card? DraggedCard { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            self = DotNetObjectReference.Create(this);
+            // TODO : Faire un setupDropzonesById() dans le JS pour invoker les evenments depuis interact coté dropzone
+            //await JS.InvokeVoidAsync("setupDraggableById", CardId, ".futureDropzoneClassName", self);
+        }
+    }
 
     protected override void OnParametersSet()
     {
-        Cards.Clear();
+        Cards.Clear();       
         Cards.AddRange(Container.Cards);
+        // CardComponents.AddRange(Cards.Select(x => new CardComponent()
+        //     {
+        //         Card = x
+        //     }));
     }
-    List<Card> Cards = new();
 
     public void OnDraggableHoverStart(int cardIndex)
     {
-        // Pas sur pour le self, à voir
-        (leftIndex, rightIndex) = DragManager.ComputeLeftRightIndexes(cardIndex, Cards.Count, DragHoverTarget.Self);
+        if (DraggedCard is not null) return;
+        StateException.ThrowIfNotNull(HoveredCard);
+        HoveredCard = Cards[cardIndex];
+        StateException.ThrowIfNull(HoveredCard);
+        (LeftIndex, RightIndex) = DragManager.ComputeLeftRightIndexes(cardIndex, Cards.Count, DragHoverTarget.Self);
         StateHasChanged();
     }
 
     public void OnDraggableHoverEnd()
     {
-        leftIndex = default;
-        rightIndex = default;
+        if (DraggedCard is not null) return;
+        StateException.ThrowIfNull(HoveredCard);
+        LeftIndex = default;
+        RightIndex = default;
+        HoveredCard = null;
         StateHasChanged();
     }
 
+    public void OnDraggableMove(DraggableMoveEventArgs args)
+    {
+        DraggedCard = Cards[args.DraggableIndex];
+        (LeftIndex, RightIndex) = DragManager.ComputeLeftRightIndexes(args.DraggableIndex, Cards.Count, DragHoverTarget.Self);
+        // TODO : Bug a régler ici, a voir plus tard
+        FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, Cards.Select(x => x.Position));
+        // if(args.DragHoverTarget == DragHoverTarget.Self)
+        // {
+        DragManager.SetOverlapFromIndexes(Cards, LeftIndex, RightIndex);
+        // }
+        Container.OnDraggableMove(args);
+        StateHasChanged();
+    }
+
+    public async void OnDraggableDragStart(int cardIndex)
+    {
+        StateException.ThrowIfNotNull(DraggedCard);
+        DraggedCard = Cards[cardIndex];
+        FutureDropIndex = cardIndex;
+        IsHovered = true;
+        StateException.ThrowIfNull(DraggedCard);
+        Container.OnDraggableDragStart(DraggedCard, this);
+    }
+
+    public void OnDraggableDragEnd()
+    {
+        bool putBack = true;
+
+        StateException.ThrowIfNull(DraggedCard, nameof(DraggedCard));
+        if (putBack)
+        {
+            DraggedCard.Reset();
+        }
+        DraggedCard = null;
+        FutureDropIndex = null;
+        Container.OnDraggableDragEnd();
+    }
+
+    // TODO : Besoin de gérer ca pour le args.DragHoverTarget
     private void HandleDragEnter()
     {
     }

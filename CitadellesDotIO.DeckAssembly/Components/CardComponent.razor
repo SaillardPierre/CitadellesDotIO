@@ -3,14 +3,14 @@
 @using System.Text
 @inject IJSRuntime JS;
 
-<div 
-     style="transform:translate(@(xTransform)px,@(yTransform)px)"
+<div
+    style="@OuterStyleAttribute"
      id="@CardId">
-    <RadzenCard Class="@ClassAttribute" Style="@StyleAttribute">
+    <RadzenCard Class="@ClassAttribute" Style="@InnerStyleAttribute">
         <RadzenStack Gap="0">
             <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">@Card.Id</RadzenText>
             <RadzenStack>
-                <RadzenText>Index : @Card.Index</RadzenText>                
+                <RadzenText>Index : @Card.Index</RadzenText>
                 <RadzenText>Transform</RadzenText>
                 <RadzenRow Gap="10">
                     <RadzenText>
@@ -20,6 +20,7 @@
                         Y : @(yTransform.ToString())
                     </RadzenText>
                 </RadzenRow>
+                <RadzenText>Dragged : @Card.IsDragged.ToString().ToLower()</RadzenText>
                 <RadzenText>Hovered : @Card.IsHovered.ToString().ToLower()</RadzenText>
                 <RadzenText>ZIndex :  @(Card.ZIndex)</RadzenText>
             </RadzenStack>
@@ -44,7 +45,8 @@
         {
             self = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("setupDraggableById", CardId, ".futureDropzoneClassName", self);
-            InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);            
+            InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
+            Card.Position = InitialPosition;
         }
     }
 
@@ -53,7 +55,7 @@
     {
         // TODO : Proc sur les cartes au Z-index supérieur.
         // Voir quand gérer les Zindex
-        if (Card.IsDragged) return;        
+        if (Card.IsDragged) return;
         Card.IsHovered = true;
 
         CardList.OnDraggableHoverStart(Card.Index);
@@ -68,7 +70,6 @@
         Card.IsHovered = false;
 
         CardList.OnDraggableHoverEnd();
-        // TODO : Invoke un truc sur le container ?
         StateHasChanged();
     }
 
@@ -78,28 +79,44 @@
         xTransform += args.DragMoveDirection.X;
         yTransform += args.DragMoveDirection.Y;
 
-        Container.OnDraggableMove(args);
-        // TODO : Invoke le composant cascadé pour le calcul depuis un DraggableMoveEventArgs
+        args.DraggableIndex = Card.Index;
+
+        CardList.OnDraggableMove(args);
         StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDraggableDragStart))]
     public async void OnDraggableDragStart()
     {
-        Card.IsDragged = true;
-        Container.OnDraggableDragStart(Card, CardList);
+        Card.SetDraggedState(true);
+
+        StateHasChanged();
+        CardList.OnDraggableDragStart(Card.Index);
     }
     [JSInvokable(nameof(OnDraggableDragEnd))]
     public async void OnDraggableDragEnd()
     {
-        Card.IsDragged = false;        
-        // TODO : Invoke le composant cascadé pour le cacul depuis un DragEndEventArgs
-        Container.OnDraggableDragEnd();
+        Card.SetDraggedState(false);
+
+        StateHasChanged();
+        CardList.OnDraggableDragEnd();
     }
 
-    
+    private string OuterStyleAttribute
+    {
+        get
+        {
+            StringBuilder stringBuilder = new();
+            if (xTransform != 0 || yTransform != 0)
+            {
+                stringBuilder.Append($"transform: translate({xTransform}px,{yTransform}px);");
+            }
+            if (Card.ZIndex.HasValue) stringBuilder.Append($"z-index:{Card.ZIndex};");
+            return stringBuilder.ToString();
+        }
+    }
 
-    private string StyleAttribute
+    private string InnerStyleAttribute
     {
         get
         {
@@ -113,12 +130,6 @@
             stringBuilder.Append("min-width:").Append(minWidth).Append("px;");
             stringBuilder.Append("height:").Append(height).Append("px;");
             stringBuilder.Append("width:").Append(width).Append("px;");
-
-            if (Card.ZIndex.HasValue)
-            {
-                stringBuilder.Append($"z-index:{Card.ZIndex};");
-            }
-
             return stringBuilder.ToString();
         }
     }
