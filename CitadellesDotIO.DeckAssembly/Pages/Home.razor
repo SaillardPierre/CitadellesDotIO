@@ -8,8 +8,7 @@
                                                            PickPoolValue=PickPoolValue /> *@
 @* <CitadellesDotIO.DeckAssembly.Components.OSIdleHandComponent IdleHandValue=IdleHandValue />*@
 
-<CardsContainer Cards="IdleHandValue">
-    <CardListComponent />
+<CardsContainer InitialCardsDeals="BuildInitalDeal()">
 </CardsContainer>
 
 
@@ -20,6 +19,17 @@
 
     private List<Card> PickPoolValue = BuildItems();
     private List<Card> IdleHandValue = BuildItems();
+
+    private static Dictionary<string, List<Card>> BuildInitalDeal()
+    {
+        Dictionary<string, List<Card>> result = new();
+
+        result.Add("pickPool", BuildItems());
+        result.Add("pickhand", new(){ new Card(1)});
+        result.Add("thirdPool", new());
+
+        return result;
+    }
 
     private static List<Card> BuildItems()
     => CharactersDtoFactory.VanillaCharactersList().Select((c, i) => new CharacterCard(i, c) as Card).ToList();

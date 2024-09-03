@@ -3,28 +3,45 @@
 @using CitadellesDotIO.DeckAssembly.Model;
 ﻿<div class="futureDropzoneClassName">
     <CascadingValue Value="this">
-        @ChildContent
+        @{
+            foreach (KeyValuePair<string, List<Card>> cardsDeal in InitialCardsDeals)
+            {
+                <CardListComponent Id="@cardsDeal.Key" Cards="@cardsDeal.Value" @ref=CardListComponentsRefs[cardsDeal.Key] />
+            }
+        }
     </CascadingValue>
 </div>
 
 
 @code {
-    [Parameter] public List<Card> Cards { get; set; }
-
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public Dictionary<string, List<Card>> InitialCardsDeals { get; set; }
+    private Dictionary<string, CardListComponent> CardListComponentsRefs { get; set; } = new();
 
     private Card? draggedCard { get; set; }
     public bool HasDraggedCard => draggedCard is not null;
 
     private CardListComponent? draggedCardSource { get; set; }
 
-    public virtual void OnDraggableDragStart(Card card, CardListComponent cardSource)
+    protected override void OnParametersSet()
+    {
+        StateException.ThrowIfNull(InitialCardsDeals);
+        // Crée les clés pour recevoir la référence lors du rendu du composant
+        foreach (var key in InitialCardsDeals.Keys)
+        {
+            CardListComponentsRefs[key] = null;
+        }
+    }
+
+    public virtual void OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
         StateException.ThrowIfNotNull(draggedCard);
         StateException.ThrowIfNotNull(draggedCardSource);
 
-        draggedCard = card;
-        draggedCardSource = cardSource;
+        draggedCardSource = CardListComponentsRefs[args.DraggableSource];
+        StateException.ThrowIfNull(draggedCardSource);
+
+        draggedCard = draggedCardSource.Cards[args.DraggableIndex];
+        StateException.ThrowIfNull(draggedCard);
     }
 
     public virtual void OnDraggableDragEnd()
@@ -34,7 +51,7 @@
         StateException.ThrowIfNull(draggedCardSource);
 
         draggedCard = null;
-        draggedCardSource = null; 
+        draggedCardSource = null;
     }
 
 

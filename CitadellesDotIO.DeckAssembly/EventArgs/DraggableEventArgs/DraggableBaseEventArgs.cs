@@ -1,7 +1,7 @@
 ﻿namespace CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
 {
     public abstract class DraggableBaseEventArgs
-    {
+    {        
         /// <summary>
         /// L'index du draggable dans sa source
         /// </summary>

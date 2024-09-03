@@ -3,8 +3,7 @@
 @using System.Text
 @inject IJSRuntime JS;
 
-<div
-    style="@OuterStyleAttribute"
+<div style="@OuterStyleAttribute"
      id="@CardId">
     <RadzenCard Class="@ClassAttribute" Style="@InnerStyleAttribute">
         <RadzenStack Gap="0">
@@ -36,7 +35,6 @@
 
     private double xTransform = 0, yTransform = 0;
     private Position? InitialPosition { get; set; }
-
     private DotNetObjectReference<CardComponent>? self;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -136,7 +134,7 @@
 
     [Parameter]
     public List<string> CssClasses { get; set; } = new() { };
-    private string CardId => "DraggableCard" + Card.Id;
+    private string CardId => CardList.Id + "Card" + Card.Index;
 
     private string ClassAttribute
     {

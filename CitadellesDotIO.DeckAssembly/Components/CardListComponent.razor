@@ -68,7 +68,9 @@
     public string Id { get; set; }
 
     [CascadingParameter] CardsContainer Container { get; set; }
-    List<Card> Cards = new();
+
+    [Parameter, EditorRequired]
+    public List<Card> Cards { get; set; }
 
     private List<CardComponent> CardComponents { get; set; } = new();
 
@@ -93,12 +95,8 @@
 
     protected override void OnParametersSet()
     {
-        Cards.Clear();       
-        Cards.AddRange(Container.Cards);
-        // CardComponents.AddRange(Cards.Select(x => new CardComponent()
-        //     {
-        //         Card = x
-        //     }));
+        StateException.ThrowIfNull(Cards, nameof(Cards));
+        StateException.ThrowIfNull(Container, nameof(Container));
     }
 
     public void OnDraggableHoverStart(int cardIndex)
@@ -142,7 +140,8 @@
         FutureDropIndex = cardIndex;
         IsHovered = true;
         StateException.ThrowIfNull(DraggedCard);
-        Container.OnDraggableDragStart(DraggedCard, this);
+        DraggableDragStartEventArgs args = new(cardIndex, Id);
+        Container.OnDraggableDragStart(args);
     }
 
     public void OnDraggableDragEnd()
