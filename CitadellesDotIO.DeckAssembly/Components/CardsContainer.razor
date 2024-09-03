@@ -1,8 +1,19 @@
 ﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
+@using CitadellesDotIO.DeckAssembly.EventArgs.Enums
 @using CitadellesDotIO.DeckAssembly.Exceptions
 @using CitadellesDotIO.DeckAssembly.Model;
-﻿<div class="futureDropzoneClassName">
+﻿<div>
     <CascadingValue Value="this">
+        <RadzenRow>
+            <RadzenColumn>
+                Has Dragged Card : @(DraggedCard is not null ? "True" : "False")
+                <RadzenText />
+            </RadzenColumn>
+            <RadzenColumn>
+                Has Drag Hover Source : @(DragHoverSource is not null ? "True (" + DragHoverSource.Id + ")" : "False")
+                <RadzenText />
+            </RadzenColumn>
+        </RadzenRow>
         @{
             foreach (KeyValuePair<string, List<Card>> cardsDeal in InitialCardsDeals)
             {
@@ -17,47 +28,85 @@
     [Parameter] public Dictionary<string, List<Card>> InitialCardsDeals { get; set; }
     private Dictionary<string, CardListComponent> CardListComponentsRefs { get; set; } = new();
 
-    private Card? draggedCard { get; set; }
-    public bool HasDraggedCard => draggedCard is not null;
+    private Card? DraggedCard { get; set; }
+    private CardListComponent? DraggedCardSource { get; set; }
 
-    private CardListComponent? draggedCardSource { get; set; }
+    private CardListComponent? DragHoverSource { get; set; }
 
     protected override void OnParametersSet()
     {
         StateException.ThrowIfNull(InitialCardsDeals);
-        // Crée les clés pour recevoir la référence lors du rendu du composant
+        // Création des clés pour recevoir la référence lors du rendu du composant
         foreach (var key in InitialCardsDeals.Keys)
         {
             CardListComponentsRefs[key] = null;
         }
     }
 
-    public virtual void OnDraggableDragStart(DraggableDragStartEventArgs args)
+    private void SelfStateHasChanged()
     {
-        StateException.ThrowIfNotNull(draggedCard);
-        StateException.ThrowIfNotNull(draggedCardSource);
-
-        draggedCardSource = CardListComponentsRefs[args.DraggableSource];
-        StateException.ThrowIfNull(draggedCardSource);
-
-        draggedCard = draggedCardSource.Cards[args.DraggableIndex];
-        StateException.ThrowIfNull(draggedCard);
+        foreach (var cardListComponent in CardListComponentsRefs.Values)
+        {
+            cardListComponent.PreventRender();
+        }
+        StateHasChanged();
+        foreach (var cardListComponent in CardListComponentsRefs.Values)
+        {
+            cardListComponent.AllowRender();
+        }
     }
 
-    public virtual void OnDraggableDragEnd()
+    public void OnDraggableDragStart(DraggableDragStartEventArgs args)
     {
-        // TODO : A voir si au moment du drop le reset est pas fait
-        StateException.ThrowIfNull(draggedCard);
-        StateException.ThrowIfNull(draggedCardSource);
+        StateException.ThrowIfNotNull(DraggedCard);
+        StateException.ThrowIfNotNull(DraggedCardSource);
 
-        draggedCard = null;
-        draggedCardSource = null;
+        DraggedCardSource = CardListComponentsRefs[args.DraggableSource];
+        StateException.ThrowIfNull(DraggedCardSource);
+
+        DraggedCard = DraggedCardSource.Cards[args.DraggableIndex];
+        StateException.ThrowIfNull(DraggedCard);
+
+        StateHasChanged();
     }
 
-
-    public virtual void OnDraggableMove(DraggableMoveEventArgs args)
+    public void OnDraggableDragEnd()
     {
-        StateException.ThrowIfNull(draggedCard);
-        StateException.ThrowIfNull(draggedCardSource);
+        StateException.ThrowIfNull(DraggedCard);
+        StateException.ThrowIfNull(DraggedCardSource);
+
+        DraggedCard = null;
+        DraggedCardSource = null;
+
+        StateHasChanged();
+    }
+
+    public void OnDraggableMove(DraggableMoveEventArgs args)
+    {
+        StateException.ThrowIfNull(DraggedCard);
+        StateException.ThrowIfNull(DraggedCardSource);
+    }
+
+    public void OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
+    {
+        StateException.ThrowIfNull(DraggedCard, nameof(DraggedCard));
+        // Ici le DragHoverSource peut déja avoir une valeur si on passe de l'une à l'autre, on remplace juste la ref
+        // Donc pas de : StateException.ThrowIfNotNull(DragHoverSource, nameof(DragHoverSource));
+
+        DragHoverSource = CardListComponentsRefs[args.DropzoneHoverSource];
+        StateException.ThrowIfNull(DragHoverSource, nameof(DragHoverSource));
+
+        if (args.DragHoverTarget == DragHoverTarget.Target)
+        {
+            DragHoverSource.ToggleDragHover(true);
+        }
+        SelfStateHasChanged();
+    }
+
+    public void OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
+    {
+        StateException.ThrowIfNull(DragHoverSource, nameof(DragHoverSource));
+        DragHoverSource = null;
+        SelfStateHasChanged();
     }
 }

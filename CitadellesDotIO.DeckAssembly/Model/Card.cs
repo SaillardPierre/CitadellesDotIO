@@ -18,7 +18,7 @@ public class Card
 
     public void Reset()
     {
-        Transform = new Position();
+        Transform = new Position(0,0);
         IsDragged = false;
         IsHovered = false;
         IsDirectNeighbour = false;

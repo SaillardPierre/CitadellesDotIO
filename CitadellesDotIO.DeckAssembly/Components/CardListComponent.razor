@@ -9,19 +9,31 @@
     <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
         <RadzenRow>
             <RadzenStack>
-                <RadzenRow>
-                    <RadzenCheckBox @bind-Value=@AnchorLeft />
-                    Anchor Left
+                @* <RadzenRow>
+                <RadzenCheckBox @bind-Value=@AnchorLeft />
+                Anchor Left
                 </RadzenRow>
                 <RadzenRow>
-                    <RadzenCheckBox @bind-Value=@AnchorRight />
-                    Anchor Right
+                <RadzenCheckBox @bind-Value=@AnchorRight />
+                Anchor Right
                 </RadzenRow>
-            </RadzenStack>
-            <RadzenStack>
+                </RadzenStack>
+                <RadzenStack>
                 <RadzenRow>
-                    Base Transform Ratio
-                    <RadzenNumeric @bind-Value=@BaseTransformRatio />
+                Base Transform Ratio
+                <RadzenNumeric @bind-Value=@BaseTransformRatio />
+                </RadzenRow> *@
+                <RadzenRow>
+                    Has draghover : @(IsDragHoverTarget ? "True" : "False")
+                    <RadzenText />
+                </RadzenRow>
+                <RadzenRow>
+                    Has Dragged Card : @(DraggedCard is not null ? "True" : "False")
+                    <RadzenText />
+                </RadzenRow>
+                <RadzenRow>
+                    Has Hovered Card : @(HoveredCard is not null ? "True" : "False")
+                    <RadzenText />
                 </RadzenRow>
             </RadzenStack>
             <RadzenStack>
@@ -54,16 +66,24 @@
                     <CardComponent Card=i />
                     index++;
                 }
-                // // Ne fonctionne pas, pas très grave pour l'instnat
-                // foreach (CardComponent cardComponent in CardComponents)
-                // {
-                //     @cardComponent
-                // }
             }
         </div>
     </div>
 </CascadingValue>
 @code {
+    private bool _shouldRender = true;
+    protected override bool ShouldRender()
+    {
+        return _shouldRender;
+    }
+    public void PreventRender()
+    {
+        _shouldRender = false;
+    }
+    public void AllowRender()
+    {
+        _shouldRender = true;
+    }
     [Parameter]
     public string Id { get; set; }
 
@@ -88,8 +108,7 @@
         if (firstRender)
         {
             self = DotNetObjectReference.Create(this);
-            // TODO : Faire un setupDropzonesById() dans le JS pour invoker les evenments depuis interact coté dropzone
-            //await JS.InvokeVoidAsync("setupDraggableById", CardId, ".futureDropzoneClassName", self);
+            await JS.InvokeVoidAsync("setupDropzoneById", Id, '.' + DropzoneParameters.ClassName, self);
         }
     }
 
@@ -98,7 +117,7 @@
         StateException.ThrowIfNull(Cards, nameof(Cards));
         StateException.ThrowIfNull(Container, nameof(Container));
     }
-
+    #region Draggables Events
     public void OnDraggableHoverStart(int cardIndex)
     {
         if (DraggedCard is not null) return;
@@ -142,6 +161,7 @@
         StateException.ThrowIfNull(DraggedCard);
         DraggableDragStartEventArgs args = new(cardIndex, Id);
         Container.OnDraggableDragStart(args);
+        StateHasChanged();
     }
 
     public void OnDraggableDragEnd()
@@ -149,24 +169,54 @@
         bool putBack = true;
 
         StateException.ThrowIfNull(DraggedCard, nameof(DraggedCard));
+        // TODO : Ici peut être appliquer les refs en dico comme dans le CardsContainer pour StateHasChanged() l'element enfant
         if (putBack)
         {
             DraggedCard.Reset();
         }
+        if (IsDragHoverTarget)
+        {
+            IsDragHoverTarget = false;
+        }
         DraggedCard = null;
         FutureDropIndex = null;
+        StateHasChanged();
         Container.OnDraggableDragEnd();
     }
+    #endregion
 
-    // TODO : Besoin de gérer ca pour le args.DragHoverTarget
-    private void HandleDragEnter()
+    [JSInvokable(nameof(OnDraggableDropzoneEnter))]
+    public void OnDraggableDropzoneEnter(DraggableDropzoneEnterEventArgs args)
     {
+        InvalidEnumException.ThrowIfEqual<DragHoverTarget>(args.DragHoverTarget, DragHoverTarget.None);
+        if (args.DragHoverTarget == DragHoverTarget.Self)
+        {
+            if (args.DropzoneHoverSource == this.Id)
+            {
+                // Faire le traitement sur la cardItemList
+                this.ToggleDragHover(true);
+            }
+            else
+            {
+                // Pas normal ca
+            }
+        }
+        Container.OnDraggableDropzoneEnter(args);
     }
 
-    private void HandleDragLeave()
+    [JSInvokable(nameof(OnDraggableDropzoneLeave))]
+    public void OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
     {
+        this.ToggleDragHover(false);
+        Container.OnDraggableDropzoneLeave(args);
     }
 
+    private bool IsDragHoverTarget;
+    public void ToggleDragHover(bool isDragHoverTarget)
+    {
+        this.IsDragHoverTarget = isDragHoverTarget;
+        StateHasChanged();
+    }
     private async Task HandleDrop()
     {
     }
@@ -181,7 +231,8 @@
         get
         {
             StringBuilder stringBuilder = new();
-            stringBuilder.Append("w-100 h-100 m-0 ");
+            stringBuilder.Append(DropzoneParameters.ClassName);
+            stringBuilder.Append(" w-100 h-100 m-0 ");
             foreach (string cssClass in CssClasses)
             {
                 stringBuilder.Append(cssClass).Append(' ');

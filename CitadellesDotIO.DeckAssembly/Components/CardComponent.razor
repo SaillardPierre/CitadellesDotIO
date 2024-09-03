@@ -22,6 +22,7 @@
                 <RadzenText>Dragged : @Card.IsDragged.ToString().ToLower()</RadzenText>
                 <RadzenText>Hovered : @Card.IsHovered.ToString().ToLower()</RadzenText>
                 <RadzenText>ZIndex :  @(Card.ZIndex)</RadzenText>
+                <RadzenText>SourceDropzone :  @(CardList.Id.ToString())</RadzenText>
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
@@ -42,7 +43,7 @@
         if (firstRender)
         {
             self = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("setupDraggableById", CardId, ".futureDropzoneClassName", self);
+            await JS.InvokeVoidAsync("setupDraggableById", CardId, '.' + DropzoneParameters.ClassName, self);
             InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
             Card.Position = InitialPosition;
         }
