@@ -8,11 +8,11 @@ using Microsoft.JSInterop;
 
 namespace CitadellesDotIO.DeckAssembly.Components
 {
-    public abstract class DraggableContainerComponent : ComponentBase
+    public abstract class OSDraggableContainerComponent : ComponentBase
     {
         protected string DraggablesClassName { get; set; }
         protected string DropzonesClassName { get; set; }
-        protected DraggableContainerComponent(string draggablesClassName, string dropzonesClassName)
+        protected OSDraggableContainerComponent(string draggablesClassName, string dropzonesClassName)
         {
             DraggablesClassName = draggablesClassName;
             DropzonesClassName = dropzonesClassName;
@@ -31,12 +31,12 @@ namespace CitadellesDotIO.DeckAssembly.Components
             await JS.InvokeVoidAsync("setupDraggables", "." + DraggablesClassName, "." + DropzonesClassName, BlazorComponent);
         }
 
-        protected DotNetObjectReference<DraggableContainerComponent>? BlazorComponent { get; set; }
+        protected DotNetObjectReference<OSDraggableContainerComponent>? BlazorComponent { get; set; }
         protected Card? DraggedCard { get; set; }
-        protected CardItemList? DraggedCardSource { get; set; }
+        protected OSCardItemList? DraggedCardSource { get; set; }
         protected Card? HoveredCard { get; set; }
-        protected CardItemList? HoveredCardSource { get; set; }
-        protected CardItemList? DropzoneHoverSource { get; set; }
+        protected OSCardItemList? HoveredCardSource { get; set; }
+        protected OSCardItemList? DropzoneHoverSource { get; set; }
         protected int? FutureDropIndex { get; set; }
 
         #region Evenements sur le draggable

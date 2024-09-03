@@ -5,12 +5,12 @@
 @using Microsoft.JSInterop;
 @using System.Text.RegularExpressions
 @using System.Globalization
-@inherits DraggableContainerComponent;
+@inherits OSDraggableContainerComponent;
 
 <CascadingValue Value="(Func<DraggableHoverStartEventArgs, Task>) OnDraggableHoverStart">
     <CascadingValue Value="(Func<DraggableHoverEndEventArgs, Task>) OnDraggableHoverEnd">
         <RadzenStack style="width: 100%; height: 70vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
-            <CardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+            <OSCardItemList @ref=PickPool Id=@nameof(PickPool) Cards=PickPoolValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
             <RadzenRow style="width: 100%; height: 10vh;min-height:10vh" JustifyContent="JustifyContent.Stretch">
 
                 <p>
@@ -26,14 +26,14 @@
                     <RadzenText Text=@DropzoneHoverSource?.Id.ToString() TextStyle="TextStyle.DisplayH1" />
                 </p>
             </RadzenRow>
-            <CardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+            <OSCardItemList @ref=PickHand Id=@nameof(PickHand) Cards=PickHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
         </RadzenStack>
     </CascadingValue>
 </CascadingValue>
 
 @code {
 
-    public PickPoolComponent() : base("pickPoolDraggable", "pickPoolDropzone")
+    public OSPickPoolComponent() : base("pickPoolDraggable", "pickPoolDropzone")
     {
     }
     private string PickPoolSizeLabel => $"PickPoolSize : {PickPoolValue.Count + PickHandValue.Count}";
@@ -44,10 +44,10 @@
 
     [Parameter]
     public List<Card> PickPoolValue { get; set; }
-    private CardItemList PickPool { get; set; }
+    private OSCardItemList PickPool { get; set; }
 
     public List<Card> PickHandValue { get; set; } = new() { new CharacterCard(9, new Engine.DTOs.CharacterDto(1, "Test", null)), new CharacterCard(10, new Engine.DTOs.CharacterDto(1, "Test", null)) };
-    private CardItemList PickHand { get; set; }
+    private OSCardItemList PickHand { get; set; }
 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -57,7 +57,7 @@
             return;
         }
 
-        BlazorComponent = DotNetObjectReference.Create(this as DraggableContainerComponent);
+        BlazorComponent = DotNetObjectReference.Create(this as OSDraggableContainerComponent);
         InitJS();
     }
 
@@ -86,13 +86,13 @@
     // TODO : En réalité c'est ceci qu'il faudrait transformer en
     // Dico/Hashset pour determiner chaque cible selon l'id et construire le dico
     // dans le constructeur du composant avec le @ref
-    private CardItemList GetTargetPickSource(string pickSourceId)
+    private OSCardItemList GetTargetPickSource(string pickSourceId)
     {
         if (pickSourceId == nameof(PickPool)) return PickPool;
         if (pickSourceId == nameof(PickHand)) return PickHand;
         else throw new ArgumentException(nameof(pickSourceId));
     }
-    private CardItemList GetOppositePickSource(string pickSourceId)
+    private OSCardItemList GetOppositePickSource(string pickSourceId)
     {
         if (pickSourceId == nameof(PickPool)) return PickHand;
         if (pickSourceId == nameof(PickHand)) return PickPool;

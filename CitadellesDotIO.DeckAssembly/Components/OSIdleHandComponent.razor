@@ -1,10 +1,10 @@
 ﻿@using CitadellesDotIO.DeckAssembly.EventArgs.DraggableEventArgs
 @using CitadellesDotIO.DeckAssembly.Model
-@inherits DraggableContainerComponent
+@inherits OSDraggableContainerComponent
 <CascadingValue Value="(Func<DraggableHoverStartEventArgs, Task>) OnDraggableHoverStart">
     <CascadingValue Value="(Func<DraggableHoverEndEventArgs, Task>) OnDraggableHoverEnd">
         <RadzenStack style="width: 100%; height: 30vh;" JustifyContent="JustifyContent.Stretch" Gap="0px">
-            <CardItemList @ref=IdleHand Id=@nameof(IdleHand) Cards=IdleHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
+            <OSCardItemList @ref=IdleHand Id=@nameof(IdleHand) Cards=IdleHandValue CssClasses="new(){DropzonesClassName}" CardClasses="new(){DraggablesClassName}" />
             <RadzenRow>
                 <p>
                     FutureDropIndex :
@@ -25,13 +25,13 @@
 
 @code {
 
-    public IdleHandComponent() : base("idleHandDraggable", "idleHandDropzone")
+    public OSIdleHandComponent() : base("idleHandDraggable", "idleHandDropzone")
     {
     }
 
     [Parameter]
     public List<Card> IdleHandValue { get; set; }
-    private CardItemList IdleHand { get; set; }
+    private OSCardItemList IdleHand { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -39,7 +39,7 @@
         {
             return;
         }
-        BlazorComponent = DotNetObjectReference.Create(this as DraggableContainerComponent);
+        BlazorComponent = DotNetObjectReference.Create(this as OSDraggableContainerComponent);
         InitJS();
     }
 
