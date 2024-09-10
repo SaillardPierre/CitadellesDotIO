@@ -4,25 +4,12 @@
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 @inject IJSRuntime JS;
+@inherits CustomComponent;
 
 <CascadingValue Value="this">
     <div class="@OuterClassAttributes" style="@OuterStyleAttribute" id="@Id">
         <RadzenRow>
             <RadzenStack>
-                @* <RadzenRow>
-                <RadzenCheckBox @bind-Value=@AnchorLeft />
-                Anchor Left
-                </RadzenRow>
-                <RadzenRow>
-                <RadzenCheckBox @bind-Value=@AnchorRight />
-                Anchor Right
-                </RadzenRow>
-                </RadzenStack>
-                <RadzenStack>
-                <RadzenRow>
-                Base Transform Ratio
-                <RadzenNumeric @bind-Value=@BaseTransformRatio />
-                </RadzenRow> *@
                 <RadzenRow>
                     Has draghover : @(IsDragHoverTarget ? "True" : "False")
                     <RadzenText />
@@ -49,50 +36,28 @@
             </RadzenStack>
         </RadzenRow>
         @Id
-        <div class="w-100"
-             style="
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid #000;
-        overflow-x: visible;
-        overflow-y: visible;">
-            @{
-                int index = 0;
-                foreach (Card i in Cards)
-                {
-                    i.Index = index;
-                    <CardComponent Card=i />
-                    index++;
-                }
+        <div class="w-100" style="@(wrapperStyle)">
+            @foreach (Card card in Cards)
+            {
+                string key = Id.ToString() + "Card" + card.Id;
+                <CardComponent Card=card @key="key" @ref="CardComponentsRefs[card.Id]" />
             }
         </div>
     </div>
 </CascadingValue>
 @code {
-    private bool _shouldRender = true;
-    protected override bool ShouldRender()
-    {
-        return _shouldRender;
-    }
-    public void PreventRender()
-    {
-        _shouldRender = false;
-    }
-    public void AllowRender()
-    {
-        _shouldRender = true;
-    }
+    private static string wrapperStyle => " display: flex;flex-wrap: nowrap;justify-content: center;align-items: center;border: 1px solid #000;overflow-x: visible;overflow-y: visible;";
     [Parameter]
     public string Id { get; set; }
 
     [CascadingParameter] CardsContainer Container { get; set; }
 
     [Parameter, EditorRequired]
+    public List<Card> InitialCards { get; set; }
+
     public List<Card> Cards { get; set; }
 
-    private List<CardComponent> CardComponents { get; set; } = new();
+    private Dictionary<int, CardComponent> CardComponentsRefs { get; set; } = new();
 
     private DotNetObjectReference<CardListComponent>? self;
 
@@ -112,11 +77,40 @@
         }
     }
 
+    public override void SelfRefresh()
+    {
+        foreach (CardComponent? cardComponent in CardComponentsRefs.Values)
+        {
+            cardComponent?.PreventRender();
+        }
+        StateHasChanged();
+        foreach (CardComponent? cardComponent in CardComponentsRefs.Values)
+        {
+            cardComponent?.AllowRender();
+        }
+    }
+
     protected override void OnParametersSet()
     {
-        StateException.ThrowIfNull(Cards, nameof(Cards));
+        Console.WriteLine($"OnParametersSet called in {Id}");
+
+        StateException.ThrowIfNull(InitialCards, nameof(InitialCards));
         StateException.ThrowIfNull(Container, nameof(Container));
+
+        Cards = new List<Card>(InitialCards.Count);
+        int i = 0;
+        foreach (Card card in InitialCards)
+        {
+            card.Index = i;
+            CardComponentsRefs[i] = null;
+            Cards.Add((Card)card.Clone());
+            i++;
+        }
+
+        StateException.ThrowIfNull(CardComponentsRefs, nameof(CardComponentsRefs));
     }
+
+
     #region Draggables Events
     public void OnDraggableHoverStart(int cardIndex)
     {
@@ -125,17 +119,18 @@
         HoveredCard = Cards[cardIndex];
         StateException.ThrowIfNull(HoveredCard);
         (LeftIndex, RightIndex) = DragManager.ComputeLeftRightIndexes(cardIndex, Cards.Count, DragHoverTarget.Self);
-        StateHasChanged();
+        SelfRefresh();
     }
 
     public void OnDraggableHoverEnd()
     {
         if (DraggedCard is not null) return;
+        // TODO : Exception levée ici parfois
         StateException.ThrowIfNull(HoveredCard);
         LeftIndex = default;
         RightIndex = default;
         HoveredCard = null;
-        StateHasChanged();
+        SelfRefresh();
     }
 
     public void OnDraggableMove(DraggableMoveEventArgs args)
@@ -143,13 +138,23 @@
         DraggedCard = Cards[args.DraggableIndex];
         (LeftIndex, RightIndex) = DragManager.ComputeLeftRightIndexes(args.DraggableIndex, Cards.Count, DragHoverTarget.Self);
         // TODO : Bug a régler ici, a voir plus tard
-        FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, Cards.Select(x => x.Position));
+        try
+        {
+            FutureDropIndex = DragManager.GetFutureIndex(args.DragHoverTarget, DraggedCard.Position, Cards.Select(x => x.Position));
+        }
+        catch (Exception ex)
+        {
+
+        }
         // if(args.DragHoverTarget == DragHoverTarget.Self)
         // {
-        DragManager.SetOverlapFromIndexes(Cards, LeftIndex, RightIndex);
+        //DragManager.SetOverlapFromIndexes(Cards, LeftIndex, RightIndex);
         // }
+
+        Console.WriteLine($"MOVE called in {Id} before StateHasChange");
+        SelfRefresh();
+
         Container.OnDraggableMove(args);
-        StateHasChanged();
     }
 
     public async void OnDraggableDragStart(int cardIndex)
@@ -160,8 +165,11 @@
         IsHovered = true;
         StateException.ThrowIfNull(DraggedCard);
         DraggableDragStartEventArgs args = new(cardIndex, Id);
+        Console.WriteLine($"DRAGSTART called in {Id} before StateHasChange");
+
+        SelfRefresh();
+
         Container.OnDraggableDragStart(args);
-        StateHasChanged();
     }
 
     public void OnDraggableDragEnd()
@@ -169,18 +177,20 @@
         bool putBack = true;
 
         StateException.ThrowIfNull(DraggedCard, nameof(DraggedCard));
-        // TODO : Ici peut être appliquer les refs en dico comme dans le CardsContainer pour StateHasChanged() l'element enfant
-        if (putBack)
-        {
-            DraggedCard.Reset();
-        }
+        // TODO : Faire la logique de si on veut remettre ou aps la carte avec la ref du composant
+        //    // if (putBack)
+        // {
+        //     DraggedCard.Reset();
+        // }
         if (IsDragHoverTarget)
         {
             IsDragHoverTarget = false;
         }
         DraggedCard = null;
         FutureDropIndex = null;
-        StateHasChanged();
+        Console.WriteLine($"DRAGEND called in {Id} before StateHasChange");
+
+        SelfRefresh();
         Container.OnDraggableDragEnd();
     }
     #endregion
@@ -201,6 +211,7 @@
                 // Pas normal ca
             }
         }
+
         Container.OnDraggableDropzoneEnter(args);
     }
 
@@ -215,10 +226,12 @@
     public void ToggleDragHover(bool isDragHoverTarget)
     {
         this.IsDragHoverTarget = isDragHoverTarget;
-        StateHasChanged();
+        Console.WriteLine($"ToggleDragHover called in {Id} with {isDragHoverTarget} parameter before StateHasChange");
+        SelfRefresh();
     }
     private async Task HandleDrop()
     {
+        // TODO : Gérer le drop ici et dans le container
     }
     private string OuterStyleAttribute => "display: flex;flex-direction: column;justify-content: center;align-items: center;align-self: center;";
     private bool AnchorLeft { get; set; }
@@ -253,5 +266,4 @@
 
     [Parameter]
     public List<string> CardClasses { get; set; } = new();
-
 }

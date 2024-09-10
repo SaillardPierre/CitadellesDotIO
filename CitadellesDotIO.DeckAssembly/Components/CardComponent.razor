@@ -2,6 +2,7 @@
 @using CitadellesDotIO.DeckAssembly.Model
 @using System.Text
 @inject IJSRuntime JS;
+@inherits CustomComponent;
 
 <div style="@OuterStyleAttribute"
      id="@CardId">
@@ -38,6 +39,11 @@
     private Position? InitialPosition { get; set; }
     private DotNetObjectReference<CardComponent>? self;
 
+    public override void SelfRefresh()
+    {
+        StateHasChanged();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -47,6 +53,7 @@
             InitialPosition = await JS.InvokeAsync<Position>("getUpperTopCoordinatesById", CardId);
             Card.Position = InitialPosition;
         }
+        Console.WriteLine($"OnAfterRender hit for {Card.Id} : Card.IsHovered : {Card.IsHovered}");
     }
 
     [JSInvokable(nameof(OnDraggableHoverStart))]
@@ -57,9 +64,9 @@
         if (Card.IsDragged) return;
         Card.IsHovered = true;
 
+        SelfRefresh();
+
         CardList.OnDraggableHoverStart(Card.Index);
-        // TODO : Invoke un truc sur le container ?
-        StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDraggableHoverEnd))]
@@ -68,8 +75,9 @@
         if (Card.IsDragged) return;
         Card.IsHovered = false;
 
+        SelfRefresh();
+
         CardList.OnDraggableHoverEnd();
-        StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDraggableMove))]
@@ -79,9 +87,8 @@
         yTransform += args.DragMoveDirection.Y;
 
         args.DraggableIndex = Card.Index;
-
+        SelfRefresh();
         CardList.OnDraggableMove(args);
-        StateHasChanged();
     }
 
     [JSInvokable(nameof(OnDraggableDragStart))]
@@ -89,7 +96,7 @@
     {
         Card.SetDraggedState(true);
 
-        StateHasChanged();
+        SelfRefresh();
         CardList.OnDraggableDragStart(Card.Index);
     }
     [JSInvokable(nameof(OnDraggableDragEnd))]
@@ -97,7 +104,7 @@
     {
         Card.SetDraggedState(false);
 
-        StateHasChanged();
+        SelfRefresh();
         CardList.OnDraggableDragEnd();
     }
 
@@ -135,7 +142,7 @@
 
     [Parameter]
     public List<string> CssClasses { get; set; } = new() { };
-    private string CardId => CardList.Id + "Card" + Card.Index;
+    public string CardId => CardList.Id + "Card" + Card.Index;
 
     private string ClassAttribute
     {

@@ -2,6 +2,7 @@
 @using CitadellesDotIO.DeckAssembly.EventArgs.Enums
 @using CitadellesDotIO.DeckAssembly.Exceptions
 @using CitadellesDotIO.DeckAssembly.Model;
+@inherits CustomComponent
 ﻿<div>
     <CascadingValue Value="this">
         <RadzenRow>
@@ -17,7 +18,8 @@
         @{
             foreach (KeyValuePair<string, List<Card>> cardsDeal in InitialCardsDeals)
             {
-                <CardListComponent Id="@cardsDeal.Key" Cards="@cardsDeal.Value" @ref=CardListComponentsRefs[cardsDeal.Key] />
+                <CardListComponent Id="@cardsDeal.Key" InitialCards="@cardsDeal.Value"
+                                   @ref=CardListComponentsRefs[cardsDeal.Key] @key=cardsDeal.Key />
             }
         }
     </CascadingValue>
@@ -43,16 +45,17 @@
         }
     }
 
-    private void SelfStateHasChanged()
+    // TODO : Appliquer ceci comme pour les listes
+    public override void SelfRefresh()
     {
-        foreach (var cardListComponent in CardListComponentsRefs.Values)
+        foreach (CardListComponent? cardListComponent in CardListComponentsRefs.Values)
         {
-            cardListComponent.PreventRender();
+            cardListComponent?.PreventRender();
         }
         StateHasChanged();
-        foreach (var cardListComponent in CardListComponentsRefs.Values)
+        foreach (CardListComponent? cardListComponent in CardListComponentsRefs.Values)
         {
-            cardListComponent.AllowRender();
+            cardListComponent?.AllowRender();
         }
     }
 
@@ -67,7 +70,7 @@
         DraggedCard = DraggedCardSource.Cards[args.DraggableIndex];
         StateException.ThrowIfNull(DraggedCard);
 
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     public void OnDraggableDragEnd()
@@ -78,7 +81,7 @@
         DraggedCard = null;
         DraggedCardSource = null;
 
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     public void OnDraggableMove(DraggableMoveEventArgs args)
@@ -100,13 +103,13 @@
         {
             DragHoverSource.ToggleDragHover(true);
         }
-        SelfStateHasChanged();
+        //SelfStateHasChanged();
     }
 
     public void OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
     {
         StateException.ThrowIfNull(DragHoverSource, nameof(DragHoverSource));
         DragHoverSource = null;
-        SelfStateHasChanged();
+        //SelfStateHasChanged();
     }
 }

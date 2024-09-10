@@ -1,6 +1,6 @@
 ﻿namespace CitadellesDotIO.DeckAssembly.Model;
 
-public class Card
+public class Card : ICloneable
 {
     public int Id { get; set; }
     public int Index { get; set; }
@@ -35,5 +35,12 @@ public class Card
     {
         Transform.X += movementPosition.X;
         Transform.Y += movementPosition.Y;
+    }
+
+    public object Clone()
+    {
+        Card card = new(Id);
+        card.Index = Index;
+        return card;
     }
 }
