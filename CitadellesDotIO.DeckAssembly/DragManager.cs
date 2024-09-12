@@ -21,6 +21,7 @@ public static class DragManager
                 ArgumentNullException.ThrowIfNull(pos);
                 if (pos.X < testedPosition.X) index++;
             }
+            var test = relativePositions.ToList();
             return index;
         }
         throw new ArgumentOutOfRangeException(nameof(DragHoverTarget));

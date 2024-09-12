@@ -61,7 +61,7 @@
 
     private DotNetObjectReference<CardListComponent>? self;
 
-    private int? FutureDropIndex { get; set; }
+    public int? FutureDropIndex { get; set; }
     private int? LeftIndex { get; set; }
     private int? RightIndex { get; set; }
 
@@ -79,11 +79,20 @@
 
     public override void SelfRefresh()
     {
+        PreventChildrenRender();
+        StateHasChanged();
+        AllowChildrenRender();
+    }
+
+    public void PreventChildrenRender()
+    {
         foreach (CardComponent? cardComponent in CardComponentsRefs.Values)
         {
             cardComponent?.PreventRender();
         }
-        StateHasChanged();
+    }
+    public void AllowChildrenRender()
+    {
         foreach (CardComponent? cardComponent in CardComponentsRefs.Values)
         {
             cardComponent?.AllowRender();
@@ -165,7 +174,6 @@
         IsHovered = true;
         StateException.ThrowIfNull(DraggedCard);
         DraggableDragStartEventArgs args = new(cardIndex, Id);
-        Console.WriteLine($"DRAGSTART called in {Id} before StateHasChange");
 
         SelfRefresh();
 
@@ -226,7 +234,6 @@
     public void ToggleDragHover(bool isDragHoverTarget)
     {
         this.IsDragHoverTarget = isDragHoverTarget;
-        Console.WriteLine($"ToggleDragHover called in {Id} with {isDragHoverTarget} parameter before StateHasChange");
         SelfRefresh();
     }
     private async Task HandleDrop()

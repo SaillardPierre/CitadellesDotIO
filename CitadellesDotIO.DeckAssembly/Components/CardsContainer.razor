@@ -50,11 +50,13 @@
     {
         foreach (CardListComponent? cardListComponent in CardListComponentsRefs.Values)
         {
+            //cardListComponent?.PreventChildrenRender();
             cardListComponent?.PreventRender();
         }
         StateHasChanged();
         foreach (CardListComponent? cardListComponent in CardListComponentsRefs.Values)
         {
+            //cardListComponent?.AllowChildrenRender();
             cardListComponent?.AllowRender();
         }
     }
@@ -70,7 +72,7 @@
         DraggedCard = DraggedCardSource.Cards[args.DraggableIndex];
         StateException.ThrowIfNull(DraggedCard);
 
-        //StateHasChanged();
+        SelfRefresh();
     }
 
     public void OnDraggableDragEnd()
@@ -81,7 +83,7 @@
         DraggedCard = null;
         DraggedCardSource = null;
 
-        //StateHasChanged();
+        SelfRefresh();
     }
 
     public void OnDraggableMove(DraggableMoveEventArgs args)
@@ -103,13 +105,27 @@
         {
             DragHoverSource.ToggleDragHover(true);
         }
-        //SelfStateHasChanged();
+        SelfRefresh();
     }
 
     public void OnDraggableDropzoneLeave(DraggableDropzoneLeaveEventArgs args)
     {
+        StateException.ThrowIfNull(DraggedCardSource, nameof(DraggedCardSource));
         StateException.ThrowIfNull(DragHoverSource, nameof(DragHoverSource));
+
+        if(DragHoverSource.Id == DraggedCardSource.Id)
+        {
+            DragHoverSource.FutureDropIndex = null;
+            DragHoverSource.SelfRefresh();
+        }
+        else
+        {
+            // La carte quitte une autre cible
+            DragHoverSource.FutureDropIndex = null;
+            DragHoverSource.SelfRefresh();
+        }
+
         DragHoverSource = null;
-        //SelfStateHasChanged();
+        SelfRefresh();
     }
 }
